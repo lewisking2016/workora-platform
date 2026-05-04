@@ -1,0 +1,10 @@
+{
+  "name": "juakazi-platform",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "juakazi-web",
+    "juakazi-backend",
+    "packages/*"
+  ]
+}

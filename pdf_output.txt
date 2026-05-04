@@ -1,0 +1,291 @@
+ 
+JUA KAZI 
+Your Work. Your Reputation. Your Key. 
+Investment Memorandum — Confidential 
+Contact: Lewis Ndungu  
+Email: info@imeantech.com 
+Phone: +254114971070  
+Website: https://imeantech.com/juakazi 
+ Date: May 2026 
+ 
+1. EXECUTIVE SUMMARY 
+JuaKazi is a digital Trust Passport for Africa's invisible workforce—the 80% of 
+workers who operate in the informal economy, unbanked, unverifiable, and unknown 
+to the formal hiring, credit, and insurance markets. 
+We are building a unified mobile ecosystem (video, chat, professional profile, and 
+shareable trust card) that gives every informal worker a permanent, portable, verifiable 
+reputation. They find work instantly. They access loans and insurance. They build a 
+career. We generate revenue through transaction fees, subscriptions, and licensing trust 
+data to financial institutions. And 20% of all platform revenue is automatically routed 
+into a Bridge Fund that funds apprenticeships and digital skills training for Kenya's 
+most vulnerable. 
+At 1 million users, JuaKazi projects gross monthly revenue of KES 135 million 
+(~USD 1 million), with a net operating revenue of KES 108 million after mission 
+allocation. 
+We are seeking seed investment and strategic partners to launch the pilot and scale 
+nation-wide. 
+ 
+2. THE PROBLEM 
+Pain Point Data 
+Invisible 
+Workforce 
+80% of Kenyans lack a formal address or verifiable work identity. They are 
+invisible to e-commerce, logistics, and formal employment. 
+
+---PAGE---
+
+ 
+Trust 
+Breakdown 
+Finding a reliable fundi (plumber, cleaner, electrician) depends on word-of-
+mouth and phone calls. Misdelivery rates in last-mile logistics exceed 25%. 
+No Credit 
+History 
+Informal workers have no verifiable work history, so they cannot access 
+affordable loans, insurance, or asset financing—despite steady, 
+documentable income. 
+Skills Waste Excellent craftspeople, drivers, and caregivers have no way to prove their 
+reliability beyond a handshake. 
+Donation 
+Inefficiency 
+Philanthropy and skills training programs reach fewer than 5% of targeted 
+beneficiaries and often lack accountability. 
+The informal economy in Kenya is worth an estimated KES 5 trillion, yet its 
+participants are systematically locked out of the digital economy. 
+ 
+3. THE SOLUTION: JUA KAZI 
+JuaKazi is a single, unified mobile application with four key surfaces that share one 
+identity, one trust graph, and one reputation. 
+Surface Description 
+JuaKazi 
+Feed 
+A short-form vertical video feed (like Instagram/TikTok) where workers post 
+proof-of-work content. Every video is tied to a verified completed gig, turning 
+content into unfakeable social proof. 
+JuaKazi 
+Chat 
+Integrated directly with WhatsApp Business API. Workers receive messages on 
+their existing WhatsApp. In-app fallback available. All communication 
+metadata feeds the trust score. 
+JuaKazi 
+Profile 
+A rich, LinkedIn-like professional profile—but built on verified work history, 
+not school certificates. Trust score, badges, voice testimonials, gig timeline, and 
+portable digital credentials. 
+JuaKazi 
+Trust Card 
+A lightweight, shareable web link (jua.kazi/@username) that displays essential 
+trust data. Works on any phone via SMS or WhatsApp—no app download 
+needed. The bridge to the offline world. 
+One app. One trust graph. Multiple surfaces. 
+ 
+
+---PAGE---
+
+ 
+4. THE ECOSYSTEM & USER JOURNEY 
+1. A worker (e.g., a plumber) downloads the app and creates a profile in 30 
+seconds: photo, voice intro, skill selection. 
+2. They post a 30-second video of themselves fixing a pipe. The video gets the "膆  
+Verified Gig" badge once it's tied to a paid, rated job. 
+3. A hirer nearby searches "plumber" and sees the worker's Feed video, profile, and 
+4.8-star rating. They message via WhatsApp directly from the app. 
+4. The gig is agreed upon, payment held in M-Pesa escrow. Upon completion, both 
+parties rate each other. The worker's trust score updates. 
+5. The worker shares their Trust Card link via SMS to another potential client. The 
+client opens it on a feature phone, sees the rating and voice testimonials, and 
+hires. 
+6. After 20 completed gigs, the worker qualifies for a KES 5,000 fuel loan, offered 
+through a partner MFI, based solely on their JuaKazi trust data. 
+7. A corporate sponsor funds apprenticeships through the Uwezo Fund. A youth 
+without skills learns under a 4.9-rated master craftsperson. Progress is tracked 
+and visible to the donor. 
+ 
+5. REVENUE MODEL 
+JuaKazi monetizes through 8 diversified, recurring streams, all built on top of a 
+proprietary asset: the Trust Graph. 
+# Stream Mechanism Unit Economics 
+1 Gig Transaction 
+Fee 
+5% fee on each escrow payment 
+released after completed gig 
+Avg. gig KES 2,000 → KES 
+100 fee 
+2 JuaKazi Pro Worker subscription for priority 
+listing, verified badge, unlimited 
+applications 
+KES 200/month 
+3 JuaKazi for 
+Business 
+B2B dashboard for bulk hiring, 
+analytics, and API access 
+KES 5,000–50,000/month 
+
+---PAGE---
+
+ 
+4 Trust API (TaaS) Banks/insurers pay per query or 
+monthly for access to verified worker 
+trust data 
+KES 20–200/query or KES 
+200,000/month 
+5 Micro-Loan 
+Interest Share 
+10% share of interest from loans 
+facilitated for workers via partner 
+MFIs 
+Average KES 25/loan 
+6 Sponsored Feed 
+Content 
+Brands and training schools pay for 
+targeted native advertising in the Feed 
+KES 50,000–
+500,000/campaign 
+7 Skill 
+Certification 
+Fees 
+In-app certified skills assessments 
+(e.g., electrical safety, food handling) 
+KES 200–
+1,000/certification 
+8 Uwezo Fund 
+Admin Fee 
+10% fee on all external donations 
+processed through the apprenticeship 
+fund 
+Variable 
+Projected Monthly Gross Revenue at 1,000,000 Users 
+Stream Monthly (KES) 
+Transaction Fees 100,000,000 
+Pro Subscriptions (50k users) 10,000,000 
+Business Subscriptions (200 businesses) 3,000,000 
+Trust API 7,000,000 
+Micro-Loan Share 5,000,000 
+Sponsored Feed 4,000,000 
+Certifications 4,000,000 
+Uwezo Admin Fee 2,000,000 
+Gross Revenue 135,000,000 
+Bridge Fund (20%) (27,000,000) 
+Net Operating Revenue 108,000,000 
+
+---PAGE---
+
+ 
+Annual net revenue: ~KES 1.3 billion (~USD 10 million). 
+The Trust Graph is a defensible, high-margin data moat that grows more valuable with 
+every transaction. 
+ 
+6. MISSION & SOCIAL IMPACT: THE IMEANTECH BRIDGE FUND 
+20% of all platform revenue is automatically routed into the ImeanTech Bridge Fund—
+a transparent, auditable social impact engine. 
+Fund Allocation: 
+ Community Agents: Stipends for ImeanTech-trained youth who onboard 
+workers, verify IDs, and facilitate apprenticeships in underserved areas. 
+ Apprenticeship Sponsorships: Pays master craftspersons to train unskilled 
+youth, tracked transparently. 
+ Digital Literacy Bursaries: Scholarships for underprivileged Kenyans to gain 
+tech skills. 
+ Worker Emergency Relief: Support for high-rated workers facing sudden crises. 
+This is not a CSR afterthought. It's a core differentiator that builds community loyalty, 
+attracts impact investors, and positions JuaKazi as a national digital public good 
+aligned with Kenya's Vision 2030 and digital inclusion goals. 
+ 
+7. MARKET OPPORTUNITY 
+ Kenyan informal workforce: ~16 million workers. 
+ Addressable market (smartphone + feature phone): 55 million mobile 
+connections. 
+ East African informal sector: Over 80 million workers. 
+ Total African informal economy: Estimated at USD 1.5 trillion. 
+JuaKazi targets an initial market of 2 million active informal workers in Kenyan urban 
+and peri-urban areas, expanding to East Africa within 3 years. 
+
+---PAGE---
+
+ 
+Comparable global validation: India's Apna (blue-collar professional network) raised 
+$190M and attained unicorn status by solving a similar trust and job-matching problem 
+for informal workers. 
+ 
+8. COMPETITIVE LANDSCAPE 
+Competitor Approach Weakness 
+Existing gig apps 
+(Fundi, Lynk) 
+Vertical: plumbers or 
+cleaners only 
+No portable identity; closed 
+platforms; no trust graph 
+Classifieds (OLX, Jiji) Listings, no trust layer No verification; high fraud 
+Word-of-mouth + phone 
+calls 
+Current default Not scalable, no data 
+Micro-insurers/Banks Proprietary credit 
+scoring 
+Expensive, not interoperable 
+JuaKazi's moat: A horizontal, open-API trust graph built on verified gig data, voice 
+testimonials, and portable credentials. Once workers build their reputation on JuaKazi, 
+leaving means starting over from zero. This creates a powerful network effect. 
+ 
+9. TECHNOLOGY STACK (MVP Built by Founder) 
+Layer Technology 
+Mobile App Flutter (Dart) — single codebase for iOS & Android 
+Web (Dashboard & Trust Card) Next.js (React, TypeScript) 
+Backend API Node.js + Fastify (TypeScript) 
+Database PostgreSQL (via Supabase) 
+Cache Redis 
+Storage & CDN AWS S3 + CloudFront (Cape Town region) 
+Real-Time Messaging WhatsApp Business API + Socket.io fallback 
+Push Notifications Firebase Cloud Messaging 
+
+---PAGE---
+
+ 
+Search Meilisearch 
+AI/ML (Phase 2) Python (FastAPI) microservice 
+Hosting AWS and Google Cloud (Johannesburg failover) 
+The MVP core loop (worker profile, job posting, rating, Trust Card) is functional and 
+will be demonstrated live. 
+ 
+10. TRACTION & ROADMAP 
+Current Status (MVP): 
+ Functional prototype: worker signup, profile, job posting, rating, Trust Card web 
+share. 
+ Landing page waitlist live. 
+ Founder is a full-stack developer, ready to build and iterate. 
+Next 6 Months: 
+ Pilot in Eastleigh/Kibera with 200 workers, onboarded by 20 trained community 
+agents. 
+ Integrate M-Pesa escrow and WhatsApp Business API. 
+ Launch Feed (video proof-of-work) v1. 
+ Secure 1-2 business pilot partners (logistics, agri-supply). 
+12-Month Goal: 50,000 registered workers; 10,000 monthly completed gigs; first Trust 
+API contract with an insurer. 
+24-Month Goal: 500,000 workers; 5 revenue streams active; on path to 1M users. 
+ 
+11. THE ASK 
+We are seeking: 
+ Seed investment of [amount to be discussed] KES for technology scaling, agent 
+network training, and pilot city expansion. 
+
+---PAGE---
+
+ 
+ Strategic partners: logistics companies, microfinance institutions, insurers, and 
+county governments willing to pilot the platform. 
+ Advisors with deep experience in African marketplaces, fintech, and social 
+impact. 
+Use of Funds: 
+ 40% Product Development (engineer salaries, infrastructure) 
+ 30% Agent Network & Pilot Operations 
+ 20% Marketing & User Acquisition 
+ 10% Legal, Compliance, Admin 
+ 
+12. CONTACT & DEMO 
+Founder:Lewis Ndungu 
+Company: ImeanTech 
+Email: info@imeantech.com 
+Phone: +254114971070 
+Live Trust Card Demo: https://imeantech.com/juakazi 
+ 
+"The future of work in Africa will be built on trust. We are building the infrastructure to make 
+that trust visible, portable, and bankable." 
+ 
