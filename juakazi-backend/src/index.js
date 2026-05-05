@@ -1,6 +1,8 @@
 require('dotenv').config();
 const fastify = require('fastify')({ logger: true });
 const { Pool } = require('pg');
+const fs = require('fs');
+const path = require('path');
 
 // Plugins
 fastify.register(require('@fastify/cors'), { origin: '*' });
@@ -16,6 +18,21 @@ const pool = new Pool({
 // Decorate fastify with pool
 fastify.decorate('pool', pool);
 
+// Auto-Migration: Create tables on startup if they don't exist
+async function autoMigrate() {
+  const client = await pool.connect();
+  try {
+    const schemaPath = path.join(__dirname, '..', 'schema.sql');
+    const schemaSql = fs.readFileSync(schemaPath, 'utf8');
+    await client.query(schemaSql);
+    fastify.log.info('Auto-migration complete — all tables verified.');
+  } catch (err) {
+    fastify.log.error({ err }, 'Auto-migration failed — check schema.sql');
+  } finally {
+    client.release();
+  }
+}
+
 // Routes
 fastify.register(require('./routes/auth'), { prefix: '/auth' });
 fastify.register(require('./routes/profile'), { prefix: '/profile' });
@@ -25,6 +42,9 @@ fastify.get('/health', async () => ({ status: 'ok', service: 'juakazi-backend' }
 
 const start = async () => {
   try {
+    // Run auto-migration before listening
+    await autoMigrate();
+
     const port = process.env.PORT || 3001;
     await fastify.listen({ port, host: '0.0.0.0' });
   } catch (err) {
