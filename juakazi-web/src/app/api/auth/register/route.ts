@@ -8,7 +8,11 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { trade, fullName, phone, username, password, role, birthday } = body;
 
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:3001';
+    let backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    // If backendUrl is just a name like 'base', fallback to localhost or the known IP
+    if (backendUrl === 'base') backendUrl = 'http://4.221.170.153:3001';
+    
+    console.log('[API/Register] Connecting to:', `${backendUrl}/auth/register`);
 
     const response = await fetch(`${backendUrl}/auth/register`, {
       method: 'POST',
@@ -26,6 +30,7 @@ export async function POST(request: Request) {
     });
 
     clearTimeout(timeoutId);
+    console.log('[API/Register] Received response status:', response.status);
     const data = await response.json();
 
     if (!response.ok) {

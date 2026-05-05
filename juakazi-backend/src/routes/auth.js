@@ -56,6 +56,7 @@ async function authRoutes(fastify) {
       return { token, user: { id: userId, username, full_name, role } };
 
     } catch (err) {
+      console.error('[Register] CRITICAL ERROR:', err);
       await client.query('ROLLBACK');
       if (err.code === '23505') {
         // Determine which field caused the duplicate
