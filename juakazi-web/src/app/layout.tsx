@@ -3,6 +3,7 @@ import { Inter, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/Providers';
 import { BottomNav } from '@/components/BottomNav';
+import { TopNav } from '@/components/TopNav';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -42,9 +43,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${spaceGrotesk.variable}`}>
-      <body className="min-h-screen bg-background font-sans text-foreground pb-20 lg:pb-0">
+      <body className="min-h-screen bg-white font-display text-foreground pb-20 lg:pb-0">
+        {/* Radiant Top Progress Bar (Pulse Effect) */}
+        <div className="fixed top-0 left-0 right-0 h-[3px] z-[9999] overflow-hidden">
+          <div className="w-full h-full bg-gradient-to-r from-[#0066FF] via-[#7000FF] to-[#0066FF] shadow-[0_0_15px_rgba(0,102,255,0.8)] animate-pulse" />
+        </div>
         <Providers>
-          <main className="mx-auto max-w-screen-xl px-4 pt-4">
+          <TopNav />
+          <main className="mx-auto max-w-screen-2xl px-[5%] pt-20">
             {children}
           </main>
           <BottomNav />

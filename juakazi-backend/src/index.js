@@ -18,6 +18,7 @@ fastify.decorate('pool', pool);
 
 // Routes
 fastify.register(require('./routes/auth'), { prefix: '/auth' });
+fastify.register(require('./routes/profile'), { prefix: '/profile' });
 
 // Health Check
 fastify.get('/health', async () => ({ status: 'ok', service: 'juakazi-backend' }));
