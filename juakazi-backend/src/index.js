@@ -8,15 +8,25 @@ const path = require('path');
 fastify.register(require('@fastify/cors'), { origin: '*' });
 fastify.register(require('@fastify/jwt'), { secret: process.env.JWT_SECRET || 'juakazi-super-secret-2026' });
 
+// Helper to clean env variables (strips accidental quotes from Docker/Shell)
+const cleanEnv = (val) => val ? val.replace(/^["'](.+)["']$/, '$1') : val;
+
 // Initialize Neon Database Pool
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: cleanEnv(process.env.DATABASE_URL),
   max: 5,
   ssl: { rejectUnauthorized: false }
 });
 
 // Decorate fastify with pool
 fastify.decorate('pool', pool);
+
+const dbUrl = cleanEnv(process.env.DATABASE_URL);
+if (dbUrl) {
+  console.log(`[DB] Using Connection: ${dbUrl.substring(0, 15)}...${dbUrl.substring(dbUrl.length - 10)}`);
+} else {
+  console.error('[DB] DATABASE_URL is NOT defined!');
+}
 
 // Auto-Migration: Create tables on startup if they don't exist
 async function autoMigrate() {
