@@ -4,19 +4,21 @@ const { z } = require('zod');
 const registerSchema = z.object({
   phone_number: z.string().min(10),
   email: z.string().email().optional(),
+  username: z.string().min(3).optional(),
   password: z.string().min(6),
   full_name: z.string().min(2),
   trade: z.string().min(2),
+  birthday: z.string().optional(),
   role: z.enum(['worker', 'hirer']).default('worker'),
 });
 
-async function authRoutes(fastify, options) {
+async function authRoutes(fastify) {
   const { pool } = fastify;
 
   // 1. REGISTER
   fastify.post('/register', async (request, reply) => {
     const validated = registerSchema.parse(request.body);
-    const { phone_number, email, password, full_name, trade, role } = validated;
+    const { phone_number, email, username, password, full_name, trade, birthday, role } = validated;
 
     // Hash password
     const salt = await bcrypt.genSalt(10);
@@ -28,27 +30,34 @@ async function authRoutes(fastify, options) {
 
       // Create User
       const userRes = await client.query(
-        'INSERT INTO users (phone_number, email, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING id',
-        [phone_number, email, password_hash, role]
+        'INSERT INTO users (phone_number, email, username, password_hash, role, birthday) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
+        [phone_number, email || null, username || null, password_hash, role, birthday || null]
       );
       const userId = userRes.rows[0].id;
 
       // Create Profile
       await client.query(
-        'INSERT INTO worker_profiles (user_id, full_name, trade) VALUES ($1, $2, $3)',
-        [userId, full_name, trade]
+        'INSERT INTO worker_profiles (user_id, full_name, display_name, trade) VALUES ($1, $2, $3, $4)',
+        [userId, full_name, full_name, trade]
       );
 
       await client.query('COMMIT');
 
       // Generate JWT
       const token = fastify.jwt.sign({ id: userId, role });
-      return { token, user: { id: userId, full_name, role } };
+      return { token, user: { id: userId, username, full_name, role } };
 
     } catch (err) {
       await client.query('ROLLBACK');
       if (err.code === '23505') {
-        return reply.status(400).send({ message: 'Phone number or email already exists' });
+        // Determine which field caused the duplicate
+        if (err.detail && err.detail.includes('phone_number')) {
+          return reply.status(400).send({ message: 'Phone number already registered' });
+        }
+        if (err.detail && err.detail.includes('username')) {
+          return reply.status(400).send({ message: 'Username already taken' });
+        }
+        return reply.status(400).send({ message: 'Account already exists' });
       }
       throw err;
     } finally {
@@ -68,7 +77,21 @@ async function authRoutes(fastify, options) {
     }
 
     const token = fastify.jwt.sign({ id: user.id, role: user.role });
-    return { token, user: { id: user.id, role: user.role } };
+    return { token, user: { id: user.id, username: user.username, role: user.role } };
+  });
+
+  // 3. UPDATE TEAM TYPE
+  fastify.patch('/team', async (request, reply) => {
+    const { userId, team_type } = request.body;
+    await pool.query('UPDATE users SET team_type = $1 WHERE id = $2', [team_type, userId]);
+    return { success: true };
+  });
+
+  // 4. UPDATE SUBSCRIPTION
+  fastify.patch('/subscription', async (request, reply) => {
+    const { userId, subscription } = request.body;
+    await pool.query('UPDATE users SET subscription = $1 WHERE id = $2', [subscription, userId]);
+    return { success: true };
   });
 }
 

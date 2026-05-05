@@ -1,63 +1,136 @@
-async function profileRoutes(fastify, options) {
+async function profileRoutes(fastify) {
   const { pool } = fastify;
 
-  // 1. GET ME (Current User Profile)
-  fastify.get('/me', {
-    preHandler: [fastify.authenticate]
-  }, async (request, reply) => {
-    const userId = request.user.id;
+  // 1. GET PROFILE
+  fastify.get('/me/:userId', async (request, reply) => {
+    const { userId } = request.params;
+    const userRes = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
+    if (!userRes.rows[0]) return reply.status(404).send({ message: 'User not found' });
 
-    const res = await pool.query(`
-      SELECT 
-        u.id, 
-        u.phone_number, 
-        u.email, 
-        u.role,
-        wp.full_name,
-        wp.trade,
-        wp.location,
-        wp.bio,
-        wp.profile_image_url,
-        wp.is_verified,
-        wp.rating,
-        wp.jobs_completed
-      FROM users u
-      LEFT JOIN worker_profiles wp ON u.id = wp.user_id
-      WHERE u.id = $1
-    `, [userId]);
+    const profileRes = await pool.query('SELECT * FROM worker_profiles WHERE user_id = $1', [userId]);
+    const skillsRes = await pool.query(
+      'SELECT * FROM worker_skills WHERE profile_id = $1', [profileRes.rows[0]?.id]
+    );
+    const langsRes = await pool.query(
+      'SELECT * FROM worker_languages WHERE profile_id = $1', [profileRes.rows[0]?.id]
+    );
+    const expRes = await pool.query(
+      'SELECT * FROM worker_experience WHERE profile_id = $1 ORDER BY start_date DESC', [profileRes.rows[0]?.id]
+    );
+    const eduRes = await pool.query(
+      'SELECT * FROM worker_education WHERE profile_id = $1 ORDER BY end_year DESC', [profileRes.rows[0]?.id]
+    );
+    const certRes = await pool.query(
+      'SELECT * FROM worker_certifications WHERE profile_id = $1', [profileRes.rows[0]?.id]
+    );
 
-    const user = res.rows[0];
-    if (!user) {
-      return reply.status(404).send({ message: 'Profile not found' });
-    }
-
-    return user;
+    return {
+      user: userRes.rows[0],
+      profile: profileRes.rows[0] || null,
+      skills: skillsRes.rows,
+      languages: langsRes.rows,
+      experience: expRes.rows,
+      education: eduRes.rows,
+      certifications: certRes.rows,
+    };
   });
 
-  // 2. GET WORKER BY ID (Public Profile)
-  fastify.get('/:id', async (request, reply) => {
-    const { id } = request.params;
+  // 2. UPDATE PROFILE (bio, title, display_name, location)
+  fastify.patch('/update/:userId', async (request, reply) => {
+    const { userId } = request.params;
+    const { bio, title, display_name, location } = request.body;
 
-    const res = await pool.query(`
-      SELECT 
-        wp.full_name,
-        wp.trade,
-        wp.location,
-        wp.bio,
-        wp.profile_image_url,
-        wp.is_verified,
-        wp.rating,
-        wp.jobs_completed
-      FROM worker_profiles wp
-      WHERE wp.user_id = $1
-    `, [id]);
+    await pool.query(
+      `UPDATE worker_profiles SET 
+        bio = COALESCE($1, bio), 
+        title = COALESCE($2, title), 
+        display_name = COALESCE($3, display_name), 
+        location = COALESCE($4, location),
+        updated_at = CURRENT_TIMESTAMP
+       WHERE user_id = $5`,
+      [bio, title, display_name, location, userId]
+    );
+    return { success: true };
+  });
 
-    const profile = res.rows[0];
-    if (!profile) {
-      return reply.status(404).send({ message: 'Profile not found' });
-    }
+  // 3. ADD SKILL
+  fastify.post('/skills', async (request, reply) => {
+    const { profile_id, skill_name, skill_level } = request.body;
+    const res = await pool.query(
+      'INSERT INTO worker_skills (profile_id, skill_name, skill_level) VALUES ($1, $2, $3) RETURNING *',
+      [profile_id, skill_name, skill_level || 'intermediate']
+    );
+    return res.rows[0];
+  });
 
-    return profile;
+  // 4. DELETE SKILL
+  fastify.delete('/skills/:id', async (request, reply) => {
+    await pool.query('DELETE FROM worker_skills WHERE id = $1', [request.params.id]);
+    return { success: true };
+  });
+
+  // 5. ADD LANGUAGE
+  fastify.post('/languages', async (request, reply) => {
+    const { profile_id, language, proficiency } = request.body;
+    const res = await pool.query(
+      'INSERT INTO worker_languages (profile_id, language, proficiency) VALUES ($1, $2, $3) RETURNING *',
+      [profile_id, language, proficiency || 'conversational']
+    );
+    return res.rows[0];
+  });
+
+  // 6. DELETE LANGUAGE
+  fastify.delete('/languages/:id', async (request, reply) => {
+    await pool.query('DELETE FROM worker_languages WHERE id = $1', [request.params.id]);
+    return { success: true };
+  });
+
+  // 7. ADD EXPERIENCE
+  fastify.post('/experience', async (request, reply) => {
+    const { profile_id, company, role_title, description, start_date, end_date, is_current } = request.body;
+    const res = await pool.query(
+      'INSERT INTO worker_experience (profile_id, company, role_title, description, start_date, end_date, is_current) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [profile_id, company, role_title, description, start_date, end_date, is_current || false]
+    );
+    return res.rows[0];
+  });
+
+  // 8. DELETE EXPERIENCE
+  fastify.delete('/experience/:id', async (request, reply) => {
+    await pool.query('DELETE FROM worker_experience WHERE id = $1', [request.params.id]);
+    return { success: true };
+  });
+
+  // 9. ADD EDUCATION
+  fastify.post('/education', async (request, reply) => {
+    const { profile_id, institution, degree, field_of_study, start_year, end_year } = request.body;
+    const res = await pool.query(
+      'INSERT INTO worker_education (profile_id, institution, degree, field_of_study, start_year, end_year) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [profile_id, institution, degree, field_of_study, start_year, end_year]
+    );
+    return res.rows[0];
+  });
+
+  // 10. DELETE EDUCATION
+  fastify.delete('/education/:id', async (request, reply) => {
+    await pool.query('DELETE FROM worker_education WHERE id = $1', [request.params.id]);
+    return { success: true };
+  });
+
+  // 11. ADD CERTIFICATION
+  fastify.post('/certifications', async (request, reply) => {
+    const { profile_id, cert_name, issuing_org, issue_date, expiry_date, credential_url } = request.body;
+    const res = await pool.query(
+      'INSERT INTO worker_certifications (profile_id, cert_name, issuing_org, issue_date, expiry_date, credential_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [profile_id, cert_name, issuing_org, issue_date, expiry_date, credential_url]
+    );
+    return res.rows[0];
+  });
+
+  // 12. DELETE CERTIFICATION
+  fastify.delete('/certifications/:id', async (request, reply) => {
+    await pool.query('DELETE FROM worker_certifications WHERE id = $1', [request.params.id]);
+    return { success: true };
   });
 }
 
