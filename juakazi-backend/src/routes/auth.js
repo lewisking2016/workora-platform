@@ -20,13 +20,18 @@ async function authRoutes(fastify) {
     const validated = registerSchema.parse(request.body);
     const { phone_number, email, username, password, full_name, trade, birthday, role } = validated;
 
+    console.log('[Register] Starting for:', phone_number);
+    
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash(password, salt);
+    console.log('[Register] Password hashed');
 
     const client = await pool.connect();
     try {
+      console.log('[Register] Database connection acquired');
       await client.query('BEGIN');
+      console.log('[Register] Transaction started');
 
       // Create User
       const userRes = await client.query(
@@ -34,14 +39,17 @@ async function authRoutes(fastify) {
         [phone_number, email || null, username || null, password_hash, role, birthday || null]
       );
       const userId = userRes.rows[0].id;
+      console.log('[Register] User created:', userId);
 
       // Create Profile
       await client.query(
         'INSERT INTO worker_profiles (user_id, full_name, display_name, trade) VALUES ($1, $2, $3, $4)',
         [userId, full_name, full_name, trade]
       );
+      console.log('[Register] Profile created');
 
       await client.query('COMMIT');
+      console.log('[Register] Transaction committed');
 
       // Generate JWT
       const token = fastify.jwt.sign({ id: userId, role });
