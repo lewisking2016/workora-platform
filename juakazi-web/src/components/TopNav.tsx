@@ -12,7 +12,7 @@ export function TopNav() {
   const pathname = usePathname();
   const [activeTab, setActiveTab] = useState('Personal');
 
-  if (['/login', '/join', '/forgot'].includes(pathname)) return null;
+  if (['/login', '/join', '/forgot'].includes(pathname) || pathname.startsWith('/dashboard')) return null;
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-[100] bg-white/80 backdrop-blur-xl px-[5%] py-4 border-b border-gray-100">

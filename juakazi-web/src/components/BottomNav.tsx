@@ -22,8 +22,9 @@ const navItems = [
 export function BottomNav() {
   const pathname = usePathname();
   const isAuthPage = ['/login', '/join', '/forgot'].includes(pathname);
+  const isDashboard = pathname.startsWith('/dashboard');
 
-  if (isAuthPage) return null;
+  if (isAuthPage || isDashboard) return null;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/50 bg-background/60 backdrop-blur-xl lg:hidden safe-area-bottom">

@@ -21,9 +21,12 @@ export function BirthdayPicker({ value, onChange }: BirthdayPickerProps) {
   const daysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
   const firstDayOfMonth = (year: number, month: number) => new Date(year, month, 1).getDay();
 
+  const formatDate = (y: number, m: number, d: number) => {
+    return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  };
+
   const handleDateSelect = (day: number) => {
-    const selected = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-    onChange(selected.toISOString().split('T')[0]);
+    onChange(formatDate(currentDate.getFullYear(), currentDate.getMonth(), day));
     setIsOpen(false);
   };
 
@@ -48,7 +51,7 @@ export function BirthdayPicker({ value, onChange }: BirthdayPickerProps) {
     }
 
     for (let d = 1; d <= totalDays; d++) {
-      const isSelected = value === new Date(currentDate.getFullYear(), currentDate.getMonth(), d).toISOString().split('T')[0];
+      const isSelected = value === formatDate(currentDate.getFullYear(), currentDate.getMonth(), d);
       days.push(
         <button
           key={d}

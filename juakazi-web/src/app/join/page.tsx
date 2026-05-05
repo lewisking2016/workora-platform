@@ -91,6 +91,13 @@ export default function JoinPage() {
         throw new Error(data.error || 'Registration failed');
       }
 
+      // Store auth data for dashboard routing
+      if (data.data?.token) {
+        localStorage.setItem('juakazi_token', data.data.token);
+      }
+      localStorage.setItem('juakazi_role', formData.role);
+      localStorage.setItem('juakazi_username', formData.username);
+
       setStep(3); 
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Registration failed';
@@ -315,7 +322,7 @@ export default function JoinPage() {
                 <h1 className="text-2xl font-black tracking-tighter text-zinc-950">You&apos;re in the Network!</h1>
                 <p className="text-zinc-500 font-bold text-sm">Your {teamType === 'team' ? 'team' : 'pro'} passport is ready, @{formData.username}.</p>
               </div>
-              <Link href="/profile" className="h-14 w-full bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-full font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-500/20">Go to my Passport</Link>
+              <Link href="/dashboard" className="h-14 w-full bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-full font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-500/20 flex items-center justify-center">Go to my Dashboard</Link>
             </motion.div>
           )}
 
