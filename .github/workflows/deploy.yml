@@ -15,6 +15,6 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ~/juakazi-platform
+            cd ~/workora-platform
             git pull origin main
             docker-compose up -d --build

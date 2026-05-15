@@ -5,11 +5,11 @@ Investment Memorandum — Confidential
 Contact: Lewis Ndungu  
 Email: info@imeantech.com 
 Phone: +254114971070  
-Website: https://imeantech.com/juakazi 
+Website: https://imeantech.com/workora 
  Date: May 2026 
  
 1. EXECUTIVE SUMMARY 
-JuaKazi is a digital Trust Passport for Africa's invisible workforce—the 80% of 
+Workora is a digital Trust Passport for Africa's invisible workforce—the 80% of 
 workers who operate in the informal economy, unbanked, unverifiable, and unknown 
 to the formal hiring, credit, and insurance markets. 
 We are building a unified mobile ecosystem (video, chat, professional profile, and 
@@ -19,7 +19,7 @@ career. We generate revenue through transaction fees, subscriptions, and licensi
 data to financial institutions. And 20% of all platform revenue is automatically routed 
 into a Bridge Fund that funds apprenticeships and digital skills training for Kenya's 
 most vulnerable. 
-At 1 million users, JuaKazi projects gross monthly revenue of KES 135 million 
+At 1 million users, Workora projects gross monthly revenue of KES 135 million 
 (~USD 1 million), with a net operating revenue of KES 108 million after mission 
 allocation. 
 We are seeking seed investment and strategic partners to launch the pilot and scale 
@@ -54,25 +54,25 @@ The informal economy in Kenya is worth an estimated KES 5 trillion, yet its
 participants are systematically locked out of the digital economy. 
  
 3. THE SOLUTION: JUA KAZI 
-JuaKazi is a single, unified mobile application with four key surfaces that share one 
+Workora is a single, unified mobile application with four key surfaces that share one 
 identity, one trust graph, and one reputation. 
 Surface Description 
-JuaKazi 
+Workora 
 Feed 
 A short-form vertical video feed (like Instagram/TikTok) where workers post 
 proof-of-work content. Every video is tied to a verified completed gig, turning 
 content into unfakeable social proof. 
-JuaKazi 
+Workora 
 Chat 
 Integrated directly with WhatsApp Business API. Workers receive messages on 
 their existing WhatsApp. In-app fallback available. All communication 
 metadata feeds the trust score. 
-JuaKazi 
+Workora 
 Profile 
 A rich, LinkedIn-like professional profile—but built on verified work history, 
 not school certificates. Trust score, badges, voice testimonials, gig timeline, and 
 portable digital credentials. 
-JuaKazi 
+Workora 
 Trust Card 
 A lightweight, shareable web link (jua.kazi/@username) that displays essential 
 trust data. Works on any phone via SMS or WhatsApp—no app download 
@@ -96,13 +96,13 @@ parties rate each other. The worker's trust score updates.
 client opens it on a feature phone, sees the rating and voice testimonials, and 
 hires. 
 6. After 20 completed gigs, the worker qualifies for a KES 5,000 fuel loan, offered 
-through a partner MFI, based solely on their JuaKazi trust data. 
+through a partner MFI, based solely on their Workora trust data. 
 7. A corporate sponsor funds apprenticeships through the Uwezo Fund. A youth 
 without skills learns under a 4.9-rated master craftsperson. Progress is tracked 
 and visible to the donor. 
  
 5. REVENUE MODEL 
-JuaKazi monetizes through 8 diversified, recurring streams, all built on top of a 
+Workora monetizes through 8 diversified, recurring streams, all built on top of a 
 proprietary asset: the Trust Graph. 
 # Stream Mechanism Unit Economics 
 1 Gig Transaction 
@@ -111,11 +111,11 @@ Fee
 released after completed gig 
 Avg. gig KES 2,000 → KES 
 100 fee 
-2 JuaKazi Pro Worker subscription for priority 
+2 Workora Pro Worker subscription for priority 
 listing, verified badge, unlimited 
 applications 
 KES 200/month 
-3 JuaKazi for 
+3 Workora for 
 Business 
 B2B dashboard for bulk hiring, 
 analytics, and API access 
@@ -187,7 +187,7 @@ youth, tracked transparently.
 tech skills. 
  Worker Emergency Relief: Support for high-rated workers facing sudden crises. 
 This is not a CSR afterthought. It's a core differentiator that builds community loyalty, 
-attracts impact investors, and positions JuaKazi as a national digital public good 
+attracts impact investors, and positions Workora as a national digital public good 
 aligned with Kenya's Vision 2030 and digital inclusion goals. 
  
 7. MARKET OPPORTUNITY 
@@ -196,7 +196,7 @@ aligned with Kenya's Vision 2030 and digital inclusion goals.
 connections. 
  East African informal sector: Over 80 million workers. 
  Total African informal economy: Estimated at USD 1.5 trillion. 
-JuaKazi targets an initial market of 2 million active informal workers in Kenyan urban 
+Workora targets an initial market of 2 million active informal workers in Kenyan urban 
 and peri-urban areas, expanding to East Africa within 3 years. 
 
 ---PAGE---
@@ -221,8 +221,8 @@ Current default Not scalable, no data
 Micro-insurers/Banks Proprietary credit 
 scoring 
 Expensive, not interoperable 
-JuaKazi's moat: A horizontal, open-API trust graph built on verified gig data, voice 
-testimonials, and portable credentials. Once workers build their reputation on JuaKazi, 
+Workora's moat: A horizontal, open-API trust graph built on verified gig data, voice 
+testimonials, and portable credentials. Once workers build their reputation on Workora, 
 leaving means starting over from zero. This creates a powerful network effect. 
  
 9. TECHNOLOGY STACK (MVP Built by Founder) 
@@ -284,7 +284,7 @@ Founder:Lewis Ndungu
 Company: ImeanTech 
 Email: info@imeantech.com 
 Phone: +254114971070 
-Live Trust Card Demo: https://imeantech.com/juakazi 
+Live Trust Card Demo: https://imeantech.com/workora 
  
 "The future of work in Africa will be built on trust. We are building the infrastructure to make 
 that trust visible, portable, and bankable." 

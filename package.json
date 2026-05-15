@@ -1,10 +1,10 @@
 {
-  "name": "juakazi-platform",
+  "name": "workora-platform",
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "juakazi-web",
-    "juakazi-backend",
+    "workora-web",
+    "workora-backend",
     "packages/*"
   ]
 }
