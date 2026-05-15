@@ -11,8 +11,8 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.VPS_IP }}
-          username: ${{ secrets.VPS_USER }}
+          host: 4.221.170.153
+          username: lewis
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
             cd ~/workora-platform
