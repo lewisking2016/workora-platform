@@ -13,8 +13,8 @@ jobs:
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.VPS_PASSWORD }}
           script: |
             cd ~/workora-platform
             git pull origin main
-            docker-compose up -d --build
+            sudo docker-compose up -d --build
