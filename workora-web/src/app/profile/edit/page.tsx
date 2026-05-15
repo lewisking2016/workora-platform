@@ -70,8 +70,8 @@ export default function EditProfilePage() {
           <section className="bg-white rounded-[32px] border border-zinc-100 p-8 shadow-sm">
              <div className="flex flex-col md:flex-row items-center gap-8">
                 <div className="relative group">
-                   <div className="h-24 w-24 rounded-full bg-zinc-100 flex items-center justify-center overflow-hidden border-2 border-white shadow-lg">
-                      <Image src="/logo/workora_logo.png" alt="Profile" width={40} height={40} className="opacity-20 grayscale" />
+                   <div className="h-24 w-24 flex items-center justify-center overflow-hidden">
+                      <Image src="/logo/workora_logo.png" alt="Profile" width={96} height={96} className="opacity-20 grayscale" />
                    </div>
                    <button className="absolute bottom-0 right-0 h-8 w-8 bg-white border border-zinc-100 rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform">
                       <Camera size={16} weight="bold" />

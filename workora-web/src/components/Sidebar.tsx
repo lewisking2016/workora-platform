@@ -38,8 +38,8 @@ export function Sidebar() {
     <aside className="hidden lg:flex flex-col justify-between w-[240px] h-full flex-shrink-0 bg-white z-50 pt-8 border-r border-zinc-50">
       <div className="flex flex-col h-full">
         <Link href="/" className="flex items-center gap-3 mb-10 px-6 group">
-          <div className="relative h-7 w-7 transform group-hover:scale-110 transition-transform">
-            <Image src="/logo/workora_logo.png" alt="Workora" fill sizes="28px" className="object-contain" />
+          <div className="relative h-14 w-14 transform group-hover:scale-110 transition-transform">
+            <Image src="/logo/workora_logo.png" alt="Workora" fill sizes="40px" className="object-contain" />
           </div>
           <span className="font-black text-xl tracking-tighter text-[#0066FF]">Workora</span>
         </Link>

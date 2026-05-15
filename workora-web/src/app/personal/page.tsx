@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { 
   ShieldCheck, 
@@ -16,23 +17,22 @@ export default function PersonalPage() {
   return (
     <main className="mx-auto max-w-screen-2xl px-[5%] pt-20 flex flex-col bg-white text-zinc-950 overflow-x-hidden font-display">
       
-      {/* Hero Section */}
-      <section className="relative h-[60vh] w-full mt-4 rounded-[60px] overflow-hidden group bg-zinc-50 border border-zinc-100">
+      <section className="relative h-[700px] w-full mt-4 rounded-[60px] overflow-hidden group bg-zinc-50 border border-zinc-100">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]" />
         
-        <div className="absolute inset-0 flex items-center justify-start px-[8%] z-20">
+        <div className="absolute inset-0 flex items-center justify-between px-[8%] z-20 w-full h-full">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="flex flex-col items-start text-left max-w-[700px]"
+            className="flex flex-col items-start text-left max-w-[600px] z-30"
           >
             <p className="text-[#0066FF] font-black uppercase tracking-[0.3em] text-[10px] mb-8">For Clients & Customers</p>
             <h1 className="text-7xl font-black tracking-tighter text-zinc-950 mb-8 leading-[1.1]">
               Find the perfect <br />
               service for you.
             </h1>
-            <p className="text-zinc-600 text-xl mb-10 leading-relaxed max-w-md font-medium">
+            <p className="text-zinc-600 text-xl mb-10 leading-relaxed max-w-md font-bold">
               Browse verified masters, watch proof-of-work videos, and hire the right expert for any personal or home task with total confidence.
             </p>
             <div className="flex gap-6">
@@ -48,6 +48,21 @@ export default function PersonalPage() {
                 </Link>
               </motion.div>
             </div>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="hidden lg:block relative h-[85%] w-[45%] rounded-[48px] overflow-hidden shadow-2xl right-0 border-[8px] border-white"
+          >
+            <Image 
+              src="/landing/workora 1.png"
+              alt="Workora Personal Services"
+              fill
+              className="object-cover"
+              priority
+            />
           </motion.div>
         </div>
       </section>

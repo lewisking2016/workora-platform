@@ -19,8 +19,8 @@ export function TopNav() {
         
         {/* Left Side: Logo & Primary Tabs */}
         <div className="flex items-center gap-12">
-          <Link href="/" className="relative h-16 w-16 bg-zinc-200/50 backdrop-blur-xl border border-white/50 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110">
-            <div className="relative h-11 w-11">
+          <Link href="/" className="relative flex items-center justify-center transition-transform hover:scale-110">
+            <div className="relative h-20 w-20">
               <Image 
                 src="/logo/workora_logo.png"
                 alt="Workora Logo"

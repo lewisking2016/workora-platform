@@ -11,6 +11,7 @@ import {
 import Link from 'next/link';
 import Image from 'next/image';
 import { EliteErrorCard } from '@/components/EliteErrorCard';
+import WorkoraLoader from '@/components/WorkoraLoader';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -28,6 +29,9 @@ export default function LoginPage() {
     setLoading(true);
     setAuthError(null);
     try {
+      // Artificial delay to showcase the 3-stage loading animation (4 seconds)
+      await new Promise(resolve => setTimeout(resolve, 4000));
+
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -57,7 +61,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col lg:flex-row font-display overflow-hidden">
+    <div className="min-h-screen bg-white flex flex-col lg:flex-row font-display relative overflow-hidden">
+      
+      {/* 0. Fullscreen Loader overlay */}
+      {loading && <WorkoraLoader fullScreen />}
       
       {/* 1. Cinematic Left Side (1:1 Image Strategy) */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-zinc-950 items-center justify-center p-12">
@@ -107,8 +114,8 @@ export default function LoginPage() {
         >
           {/* Header Branding */}
           <div className="mb-12">
-            <Link href="/" className="relative h-16 w-16 bg-zinc-200/50 backdrop-blur-xl border border-white/50 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110">
-              <div className="relative h-11 w-11">
+            <Link href="/" className="relative flex items-center justify-center transition-transform hover:scale-110">
+              <div className="relative h-20 w-20">
                 <Image 
                   src="/logo/workora_logo.png"
                   alt="Workora Logo"

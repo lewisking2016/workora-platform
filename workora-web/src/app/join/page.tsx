@@ -25,6 +25,7 @@ import {
 import Link from 'next/link';
 import Image from 'next/image';
 import { BirthdayPicker } from '@/components/BirthdayPicker';
+import WorkoraLoader from '@/components/WorkoraLoader';
 
 const TRADES = [
   { name: 'Construction', sub: 'Masons, Roofers', icon: Hammer, color: 'text-[#0066FF]' },
@@ -76,6 +77,9 @@ export default function JoinPage() {
     setError(null);
     setLoading(true);
     try {
+      // Artificial delay to showcase the 3-stage loading animation (4 seconds)
+      await new Promise(resolve => setTimeout(resolve, 4000));
+
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -114,10 +118,13 @@ export default function JoinPage() {
   return (
     <div className="min-h-screen bg-white text-zinc-950 flex flex-col items-center pt-20 px-[5%] overflow-x-hidden font-display relative pb-32">
       
+      {/* Fullscreen Loader overlay */}
+      {loading && <WorkoraLoader fullScreen />}
+      
       {/* Header Logo */}
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-        <Link href="/" className="relative h-16 w-16 bg-zinc-200/50 backdrop-blur-xl border border-white/50 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110 mx-auto">
-          <div className="relative h-11 w-11">
+        <Link href="/" className="relative flex items-center justify-center transition-transform hover:scale-110 mx-auto">
+          <div className="relative h-20 w-20">
             <Image src="/logo/workora_logo.png" alt="Workora Logo" fill className="object-contain brightness-0" priority />
           </div>
         </Link>

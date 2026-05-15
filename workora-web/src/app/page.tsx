@@ -46,11 +46,11 @@ export default function Home() {
             className="flex flex-col items-end text-right max-w-[650px]"
           >
             <p className="text-[#0066FF] font-black uppercase tracking-[0.3em] text-[10px] mb-8">The Professional Network</p>
-            <h1 className="text-7xl font-black tracking-tighter text-white mb-8 leading-[1.1]">
+            <h1 className="text-8xl font-black tracking-tighter text-white mb-8 leading-[1.1]">
               The people behind <br />
               <span className="bg-gradient-to-r from-[#0066FF] via-[#7000FF] to-[#0066FF] bg-size-200 animate-gradient-x bg-clip-text text-transparent italic">Workora.</span>
             </h1>
-            <p className="text-zinc-300 text-lg mb-10 leading-relaxed max-w-sm font-medium">
+            <p className="text-white text-xl mb-12 leading-relaxed max-w-md font-bold drop-shadow-md">
               A community of verified, innovative craftsmen dedicated to making a lasting impact across Africa.
             </p>
             <Link 
@@ -193,6 +193,41 @@ export default function Home() {
             sizes="(max-width: 1100px) 100vw, 1100px"
             className="object-cover bg-white"
           />
+          {/* Trust Insight Card (The "Green Section" Note) */}
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            className="absolute bottom-[25%] left-[8%] z-20 max-w-[280px]"
+          >
+            <div className="bg-white/95 backdrop-blur-2xl p-7 rounded-[32px] shadow-[0_30px_100px_rgba(0,0,0,0.2)] border border-white">
+              <div className="flex flex-col gap-4">
+                <div className="text-[#0066FF] font-black text-xs uppercase tracking-[0.2em] flex items-center gap-3">
+                  <div className="h-2 w-2 rounded-full bg-[#0066FF] animate-pulse" />
+                  Elite Verification
+                </div>
+                <p className="text-zinc-950 font-black text-2xl leading-tight tracking-tighter">
+                  Mastery in <br /> 
+                  Custom Woodwork.
+                </p>
+                <div className="mt-4 pt-4 border-t border-zinc-100 flex items-center justify-between">
+                   <div className="flex flex-col">
+                      <span className="text-zinc-400 font-bold text-[10px] uppercase tracking-[0.2em]">Rating</span>
+                      <span className="text-zinc-950 font-black text-xl tracking-tight">5.0 / 5.0</span>
+                   </div>
+                   <div className="h-12 w-12 bg-zinc-50 rounded-2xl flex items-center justify-center border border-zinc-100">
+                      <ShieldCheck size={24} weight="fill" className="text-[#0066FF]" />
+                   </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Contextual Note Below */}
+            <div className="mt-6 px-4">
+               <p className="text-white font-bold text-sm leading-relaxed italic drop-shadow-lg">
+                 &quot;Proof of work is the only way to build absolute trust in the digital age.&quot;
+               </p>
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -211,7 +246,7 @@ export default function Home() {
                    <span className="text-4xl font-black text-[#0066FF]/10 tracking-tighter pt-1">{item.step}</span>
                    <div>
                      <h3 className="text-3xl font-black mb-3 tracking-tight text-zinc-950">{item.title}</h3>
-                     <p className="text-zinc-600 text-lg leading-relaxed font-medium">{item.desc}</p>
+                     <p className="text-zinc-600 text-xl leading-relaxed font-bold">{item.desc}</p>
                    </div>
                  </div>
                ))}
@@ -222,8 +257,8 @@ export default function Home() {
                <div className="h-16 w-16 rounded-[24px] bg-[#0066FF] flex items-center justify-center text-white shadow-lg shadow-[#0066FF]/20">
                  <ShieldCheck size={32} weight="bold" />
                </div>
-               <h3 className="text-[44px] font-black tracking-tighter italic text-zinc-950 leading-tight">Verified by ImeanTech.</h3>
-               <p className="text-zinc-600 text-xl leading-relaxed font-medium">
+               <h3 className="text-[52px] font-black tracking-tighter italic text-zinc-950 leading-tight">Verified by ImeanTech.</h3>
+               <p className="text-zinc-600 text-2xl leading-relaxed font-bold">
                  Our multi-layer verification system ensures that every pro on our platform is 
                  vetted for identity, skill, and history. We don&apos;t just list pros; we back them.
                </p>
@@ -266,8 +301,8 @@ export default function Home() {
       <footer className="bg-white border-t border-zinc-100 py-40 px-[5%]">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-20 mb-32">
           <div className="col-span-2 flex flex-col gap-8">
-            <Link href="/" className="relative h-16 w-16 bg-zinc-200/50 backdrop-blur-xl border border-white/50 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110">
-            <div className="relative h-11 w-11">
+            <Link href="/" className="relative flex items-center justify-center transition-transform hover:scale-110">
+            <div className="relative h-20 w-20">
               <Image 
                 src="/logo/workora_logo.png"
                 alt="Workora Logo"
