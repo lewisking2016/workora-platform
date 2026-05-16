@@ -21,10 +21,9 @@ import {
   Copy,
   Check
 } from '@phosphor-icons/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Sidebar } from '@/components/Sidebar';
+import { motion, AnimatePresence } from 'framer-motion';
 import { VideoPlayer } from '@/components/VideoPlayer';
 
 interface Comment {
@@ -87,6 +86,7 @@ export default function PersonalDashboard() {
   const [sharePost, setSharePost] = useState<Post | null>(null);
   const [copied, setCopied] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   const fetchFeed = async () => {
     try {
@@ -208,13 +208,7 @@ export default function PersonalDashboard() {
   };
 
   return (
-    <div className="h-screen w-full bg-white text-[#1A1A1A] font-display flex flex-col lg:flex-row overflow-hidden">
-      <style jsx global>{`
-        ::-webkit-scrollbar { display: none; }
-        * { -ms-overflow-style: none; scrollbar-width: none; }
-      `}</style>
-
-      <Sidebar />
+    <div className="h-full w-full flex flex-col lg:flex-row overflow-hidden">
 
       {/* Share Modal */}
       {sharePost && (
@@ -222,23 +216,23 @@ export default function PersonalDashboard() {
           <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} className="w-full max-w-md bg-white rounded-t-[32px] sm:rounded-[32px] p-6 sm:p-8 space-y-6 shadow-2xl" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-black tracking-tight">Share</h3>
-              <button onClick={() => setSharePost(null)} className="h-10 w-10 rounded-full bg-zinc-100 flex items-center justify-center"><X size={20} weight="bold" /></button>
+              <button onClick={() => setSharePost(null)} className="h-10 w-10 rounded-full bg-zinc-100 flex items-center justify-center transition-transform hover:scale-110 shadow-sm"><X size={20} weight="bold" /></button>
             </div>
             <div className="grid grid-cols-4 gap-4">
               <a href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`} target="_blank" rel="noopener" className="flex flex-col items-center gap-2">
-                <div className="h-14 w-14 rounded-2xl bg-green-50 flex items-center justify-center"><WhatsappLogo size={28} weight="fill" className="text-green-600" /></div>
+                <div className="h-14 w-14 rounded-2xl bg-green-50 flex items-center justify-center transition-transform hover:scale-110 shadow-sm"><WhatsappLogo size={28} weight="fill" className="text-green-600" /></div>
                 <span className="text-[10px] font-black uppercase tracking-wider opacity-60">WhatsApp</span>
               </a>
               <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener" className="flex flex-col items-center gap-2">
-                <div className="h-14 w-14 rounded-2xl bg-sky-50 flex items-center justify-center"><TwitterLogo size={28} weight="fill" className="text-sky-500" /></div>
+                <div className="h-14 w-14 rounded-2xl bg-sky-50 flex items-center justify-center transition-transform hover:scale-110 shadow-sm"><TwitterLogo size={28} weight="fill" className="text-sky-500" /></div>
                 <span className="text-[10px] font-black uppercase tracking-wider opacity-60">Twitter</span>
               </a>
               <button onClick={copyLink} className="flex flex-col items-center gap-2">
-                <div className="h-14 w-14 rounded-2xl bg-zinc-100 flex items-center justify-center">{copied ? <Check size={28} weight="bold" /> : <Copy size={28} weight="fill" />}</div>
+                <div className="h-14 w-14 rounded-2xl bg-zinc-100 flex items-center justify-center transition-transform hover:scale-110 shadow-sm">{copied ? <Check size={28} weight="bold" /> : <Copy size={28} weight="fill" />}</div>
                 <span className="text-[10px] font-black uppercase tracking-wider opacity-60">{copied ? 'Copied' : 'Copy'}</span>
               </button>
               <a href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`} target="_blank" rel="noopener" className="flex flex-col items-center gap-2">
-                <div className="h-14 w-14 rounded-2xl bg-violet-50 flex items-center justify-center"><LinkIcon size={28} weight="fill" className="text-violet-600" /></div>
+                <div className="h-14 w-14 rounded-2xl bg-violet-50 flex items-center justify-center transition-transform hover:scale-110 shadow-sm"><LinkIcon size={28} weight="fill" className="text-violet-600" /></div>
                 <span className="text-[10px] font-black uppercase tracking-wider opacity-60">Status</span>
               </a>
             </div>
@@ -249,6 +243,63 @@ export default function PersonalDashboard() {
           </motion.div>
         </div>
       )}
+
+      {/* Comments Drawer */}
+      <AnimatePresence>
+        {activeComments && (
+          <div className="fixed inset-0 z-[250] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-md" onClick={() => setActiveComments(null)}>
+            <motion.div 
+              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+              className="w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-[32px] h-[80vh] sm:h-[600px] flex flex-col shadow-2xl overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="p-6 border-b border-zinc-50 flex items-center justify-between shrink-0">
+                <h3 className="text-xl font-black tracking-tight">Comments</h3>
+                <button onClick={() => setActiveComments(null)} className="h-10 w-10 rounded-full bg-zinc-100 flex items-center justify-center hover:bg-zinc-200 transition-colors">
+                  <X size={20} weight="bold" />
+                </button>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                {postComments.length > 0 ? postComments.map((c, i) => (
+                  <div key={i} className="flex gap-4 group">
+                    <div className="h-9 w-9 rounded-full bg-zinc-100 flex items-center justify-center text-[10px] font-black shrink-0 uppercase">{c.username.charAt(0)}</div>
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[13px] font-black">{c.username}</span>
+                        <span className="text-[9px] font-bold text-zinc-400">1h ago</span>
+                      </div>
+                      <p className="text-[13px] text-zinc-600 font-medium leading-relaxed">{c.text}</p>
+                    </div>
+                  </div>
+                )) : (
+                  <div className="h-full flex flex-col items-center justify-center text-center gap-4 py-20">
+                    <ChatCircleDots size={48} weight="duotone" className="text-zinc-200" />
+                    <p className="text-sm font-bold text-zinc-400">No comments yet. Be the first to share your thoughts!</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="p-6 border-t border-zinc-50 flex items-center gap-3 shrink-0">
+                <div className="h-9 w-9 rounded-full bg-zinc-100 flex items-center justify-center text-[10px] font-black shrink-0 uppercase">{currentUser?.username?.charAt(0) || 'U'}</div>
+                <input 
+                  value={newComment} onChange={e => setNewComment(e.target.value)}
+                  placeholder="Add a comment..."
+                  className="flex-1 h-12 bg-zinc-50 rounded-2xl px-4 text-xs font-bold outline-none focus:bg-white focus:border-[#0066FF] transition-all"
+                  onKeyDown={e => e.key === 'Enter' && handleAddComment()}
+                />
+                <button 
+                  onClick={handleAddComment}
+                  disabled={!newComment.trim()}
+                  className="h-12 w-12 bg-[#0066FF] text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20 hover:brightness-110 transition-all disabled:opacity-50"
+                >
+                  <PaperPlaneTilt size={20} weight="fill" />
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <main className="flex-1 h-full overflow-y-auto bg-white flex flex-col items-center pt-4 lg:pt-8 w-full">
         <div className="w-full max-w-[660px] px-4 lg:px-6 pb-20">
@@ -288,7 +339,11 @@ export default function PersonalDashboard() {
                 </div>
 
                 <div className="aspect-[4/5] sm:aspect-square bg-zinc-100 rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)]">
-                  <VideoPlayer src={post.video_url} poster={post.thumbnail_url} className="w-full h-full" />
+                  <VideoPlayer 
+                    src={post.video_url} 
+                    poster={post.thumbnail_url || 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=800'} 
+                    className="w-full h-full" 
+                  />
                 </div>
 
                 <div className="py-6 space-y-4">
@@ -362,14 +417,6 @@ export default function PersonalDashboard() {
           <p className="text-[10px] text-zinc-300 font-black tracking-[0.3em] uppercase">&copy; 2026 WORKORA BY IMEANTECH</p>
         </div>
       </aside>
-
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl p-4 px-8 flex justify-between items-center z-[100] shadow-[0_-10px_40px_rgba(0,0,0,0.03)]">
-        <Link href="/dashboard/feed"><House size={28} weight="fill" className="text-zinc-900" /></Link>
-        <Link href="/dashboard/search"><MagnifyingGlass size={28} /></Link>
-        <div className="bg-[#0066FF] p-2 rounded-xl shadow-lg"><PlusSquare size={28} weight="bold" className="text-white" /></div>
-        <Link href="/notifications"><Heart size={28} /></Link>
-        <Link href="/dashboard/profile" className="h-8 w-8 rounded-full bg-zinc-50 flex items-center justify-center font-black text-[10px] uppercase">{currentUser?.username?.charAt(0) || 'U'}</Link>
-      </nav>
     </div>
   );
 }

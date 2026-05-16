@@ -6,7 +6,8 @@ import {
   House, Briefcase, ChatCircleDots, Bell, MagnifyingGlass,
   PencilSimple, VideoCamera, ChartLineUp, MapPin, Check,
   Moon, Sun, Crown, ShieldCheck, Plus, Trash, GearSix,
-  User, Notebook, Certificate, Sparkle, ArrowRight
+  User, Notebook, Certificate, Sparkle, ArrowRight,
+  CaretRight, FadersHorizontal
 } from '@phosphor-icons/react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -96,35 +97,7 @@ export default function BusinessDashboard() {
   ];
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 font-display ${bg}`}>
-      {/* Top Nav */}
-      <nav className={`sticky top-0 z-50 border-b shadow-sm transition-colors ${isDark ? 'bg-zinc-900/80 backdrop-blur-xl border-zinc-800' : 'bg-white border-zinc-200'}`}>
-        <div className="max-w-[1200px] mx-auto px-4 lg:px-6 flex items-center justify-between h-14">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="relative h-9 w-9"><Image src="/logo/workora_logo.png" alt="W" fill className="object-contain" /></Link>
-            <div className="relative hidden md:block">
-              <MagnifyingGlass size={14} weight="bold" className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
-              <input placeholder="Search" className={`h-9 w-[220px] rounded-lg border-none pl-9 pr-4 text-xs font-bold outline-none ${isDark ? 'bg-zinc-800 text-white' : 'bg-zinc-100'}`} />
-            </div>
-          </div>
-          <div className="flex items-center gap-1">
-            {[{ icon: House, label: 'Home' }, { icon: Briefcase, label: 'Jobs' }, { icon: ChatCircleDots, label: 'Messages', badge: 2 }, { icon: Bell, label: 'Alerts', badge: 5 }].map(i => (
-              <button key={i.label} className={`flex flex-col items-center px-3 py-1 rounded-lg relative ${muted}`}>
-                <div className="relative"><i.icon size={20} />
-                  {i.badge && <span className="absolute -top-1 -right-2 h-4 min-w-4 px-0.5 bg-red-500 text-white rounded-full text-[7px] font-black flex items-center justify-center">{i.badge}</span>}
-                </div>
-                <span className="text-[8px] font-bold mt-0.5 hidden lg:block">{i.label}</span>
-              </button>
-            ))}
-            <div className={`w-px h-6 mx-1 ${isDark ? 'bg-zinc-800' : 'bg-zinc-200'}`} />
-            <button onClick={() => setIsDark(!isDark)} className={`px-2 py-1 ${isDark ? 'text-yellow-400' : 'text-zinc-400'}`}>
-              {isDark ? <Sun size={20} weight="fill" /> : <Moon size={20} weight="fill" />}
-            </button>
-            <div className="h-7 w-7 rounded-full bg-gradient-to-br from-[#0066FF] to-[#7000FF] flex items-center justify-center text-[9px] font-black text-white uppercase">{username.charAt(0)}</div>
-          </div>
-        </div>
-      </nav>
-
+    <div className="h-full w-full">
       {/* Tab Bar */}
       <div className={`border-b ${isDark ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-200 bg-white/50'} backdrop-blur-sm sticky top-14 z-40`}>
         <div className="max-w-[1200px] mx-auto px-4 lg:px-6 flex gap-1 overflow-x-auto no-scrollbar">

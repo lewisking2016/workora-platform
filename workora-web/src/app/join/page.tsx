@@ -85,7 +85,7 @@ export default function JoinPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          phone: `${selectedCountry.code}${formData.phone}`
+          phone_number: `${selectedCountry.code}${formData.phone}`
         }),
       });
 

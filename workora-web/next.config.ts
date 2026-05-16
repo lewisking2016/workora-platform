@@ -36,6 +36,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  experimental: {
+    turbopack: {
+      root: '.',
+    },
+  },
   async headers() {
     return [
       {

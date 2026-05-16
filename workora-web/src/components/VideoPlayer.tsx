@@ -42,15 +42,23 @@ export function VideoPlayer({ src, poster, className = "" }: VideoPlayerProps) {
       onMouseLeave={() => setShowControls(false)}
       onClick={togglePlay}
     >
-      <video
-        ref={videoRef}
-        src={src}
-        poster={poster}
-        className="w-full h-full object-cover"
-        loop
-        muted={isMuted}
-        playsInline
-      />
+      {src ? (
+        <video
+          ref={videoRef}
+          src={src}
+          poster={poster}
+          className="w-full h-full object-cover"
+          loop
+          muted={isMuted}
+          playsInline
+        />
+      ) : (
+        <img 
+          src={poster || 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=800'} 
+          className="w-full h-full object-cover opacity-50 grayscale"
+          alt="Video fallback"
+        />
+      )}
 
       {/* Play/Pause Overlay Icon (Briefly appears on click) */}
       <div className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300 ${!isPlaying ? 'opacity-100' : 'opacity-0'}`}>

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Sidebar } from '@/components/Sidebar';
 import { 
   MagnifyingGlass, 
   SealCheck, 
@@ -61,9 +60,7 @@ export default function SearchPage() {
   }, [selectedCategory]);
 
   return (
-    <div className="h-screen w-full bg-white text-[#1A1A1A] font-display flex overflow-hidden">
-      <Sidebar />
-      
+    <div className="h-full w-full">
       <main className="flex-1 h-full overflow-y-auto bg-white pt-8 px-[5%] lg:px-12">
         <div className="max-w-4xl mx-auto flex flex-col gap-10 pb-32">
           
