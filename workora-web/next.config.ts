@@ -37,7 +37,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  outputFileTracingRoot: path.resolve(process.cwd(), '..'),
+  outputFileTracingRoot: process.env.VERCEL 
+    ? undefined 
+    : path.resolve(process.cwd(), '..'),
   async headers() {
     return [
       {
