@@ -322,7 +322,7 @@ export default function PersonalDashboard() {
           </div>
 
           <div className="space-y-12 lg:space-y-16">
-            {posts.map((post, i) => (
+            {posts.length > 0 ? posts.map((post, i) => (
               <article key={i} className="bg-white">
                 <div className="flex items-center justify-between pb-4">
                   <div className="flex items-center gap-3.5">
@@ -367,7 +367,20 @@ export default function PersonalDashboard() {
                   </div>
                 </div>
               </article>
-            ))}
+            )) : (
+              <div className="py-20 flex flex-col items-center text-center gap-6">
+                <div className="h-24 w-24 rounded-[32px] bg-zinc-50 flex items-center justify-center text-zinc-200">
+                  <PlusSquare size={48} weight="duotone" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-black tracking-tight">Your Feed is Empty</h3>
+                  <p className="text-zinc-400 font-bold text-sm max-w-[280px] mx-auto">Start following pros or share your own work to see content here.</p>
+                </div>
+                <Link href="/dashboard/create" className="px-8 h-12 bg-[#0066FF] text-white rounded-full font-black text-[13px] uppercase tracking-widest shadow-xl shadow-blue-500/20 hover:scale-105 transition-all flex items-center justify-center">
+                  Create First Post
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </main>

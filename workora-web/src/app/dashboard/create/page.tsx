@@ -43,8 +43,48 @@ export default function CreatePage() {
   const handleUpload = async () => {
     if (!file || !selectedType) return;
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+
+    try {
+      const userStr = localStorage.getItem('workora_user');
+      if (!userStr) throw new Error('Not logged in');
+      const user = JSON.parse(userStr);
+
+      // 1. Get worker profile (if business account)
+      const profileRes = await fetch(`/api/profile/${user.id}`);
+      const profile = await profileRes.json();
+      const workerId = profile?.id || null;
+
+      // 2. Upload file to R2/S3
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('user_id', user.id);
+      if (workerId) formData.append('worker_id', workerId);
+      formData.append('media_type', file.type.startsWith('video') ? 'video' : 'thumbnail');
+
+      const uploadRes = await fetch('/api/upload/gig', {
+        method: 'POST',
+        body: formData,
+      });
+      const uploadData = await uploadRes.json();
+      if (!uploadRes.ok) throw new Error(uploadData.error || 'Upload failed');
+
+      // 3. Create Post in Database
+      const postRes = await fetch('/api/gigs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: user.id,
+          worker_id: workerId,
+          title: selectedType === 'work' ? 'Finished Work' : (selectedType === 'tip' ? 'Expert Tip' : 'Status Update'),
+          description: description,
+          video_url: uploadData.url,
+          thumbnail_url: uploadData.url, // For now use same, real app would generate thumbnail
+          category: selectedType
+        }),
+      });
+
+      if (!postRes.ok) throw new Error('Failed to create post record');
+
       setSuccess(true);
       setTimeout(() => {
         setSuccess(false);
@@ -53,7 +93,11 @@ export default function CreatePage() {
         setPreview(null);
         setDescription('');
       }, 3000);
-    }, 2000);
+    } catch (err: any) {
+      alert(err.message || 'Something went wrong');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const OPTIONS = [

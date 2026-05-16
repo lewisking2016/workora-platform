@@ -6,19 +6,19 @@ async function gigRoutes(fastify) {
   // 1. GET FEED (Home Screen Algorithm)
   fastify.get('/feed', async (request, reply) => {
     // Basic Algorithm: Recency + Engagement
-    // In a real app, this would be personalized based on follower_id
     const res = await pool.query(`
       SELECT 
         g.*, 
-        p.full_name as user_name, 
-        p.display_name as handle, 
-        p.trade, 
-        p.is_verified as verified,
+        COALESCE(p.full_name, u.username) as user_name, 
+        u.username as handle, 
+        COALESCE(p.trade, 'Member') as trade, 
+        COALESCE(p.is_verified, false) as verified,
         p.avatar_url,
         (SELECT COUNT(*) FROM gig_likes WHERE gig_id = g.id) as real_likes,
         (SELECT COUNT(*) FROM gig_comments WHERE gig_id = g.id) as real_comments
       FROM gigs g
-      JOIN worker_profiles p ON g.worker_id = p.id
+      JOIN users u ON g.user_id = u.id
+      LEFT JOIN worker_profiles p ON u.id = p.user_id
       ORDER BY g.created_at DESC
       LIMIT 20
     `);
@@ -28,9 +28,10 @@ async function gigRoutes(fastify) {
   // 2. GET EXPLORE (Trending/Discovery)
   fastify.get('/explore', async (request, reply) => {
     const res = await pool.query(`
-      SELECT g.*, p.trade 
+      SELECT g.*, COALESCE(p.trade, 'Member') as trade 
       FROM gigs g
-      JOIN worker_profiles p ON g.worker_id = p.id
+      JOIN users u ON g.user_id = u.id
+      LEFT JOIN worker_profiles p ON u.id = p.user_id
       ORDER BY g.view_count DESC
       LIMIT 30
     `);
@@ -39,11 +40,11 @@ async function gigRoutes(fastify) {
 
   // 3. CREATE GIG
   fastify.post('/', async (request, reply) => {
-    const { worker_id, title, description, video_url, thumbnail_url, category } = request.body;
+    const { user_id, worker_id, title, description, video_url, thumbnail_url, category } = request.body;
     const res = await pool.query(
-      `INSERT INTO gigs (worker_id, title, description, video_url, thumbnail_url, category) 
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [worker_id, title, description, video_url, thumbnail_url, category]
+      `INSERT INTO gigs (user_id, worker_id, title, description, video_url, thumbnail_url, category) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+      [user_id, worker_id, title, description, video_url, thumbnail_url, category]
     );
     return res.rows[0];
   });
@@ -91,15 +92,19 @@ async function gigRoutes(fastify) {
     return res.rows[0];
   });
 
-  // 7. GET STORIES (Latest from verified pros)
+  // 7. GET STORIES (Recent active users)
   fastify.get('/stories', async (request, reply) => {
     const res = await pool.query(`
-      SELECT DISTINCT ON (p.id) p.id, p.full_name as name, p.trade, p.is_verified as verified
-      FROM worker_profiles p
-      JOIN gigs g ON g.worker_id = p.id
-      WHERE p.is_verified = true
-      ORDER BY p.id, g.created_at DESC
-      LIMIT 10
+      SELECT DISTINCT ON (u.id) 
+        u.id, 
+        COALESCE(p.full_name, u.username) as name, 
+        COALESCE(p.trade, 'Member') as trade, 
+        COALESCE(p.is_verified, false) as verified
+      FROM users u
+      JOIN gigs g ON g.user_id = u.id
+      LEFT JOIN worker_profiles p ON u.id = p.user_id
+      ORDER BY u.id, g.created_at DESC
+      LIMIT 12
     `);
     return res.rows;
   });
