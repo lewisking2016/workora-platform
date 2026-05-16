@@ -16,7 +16,7 @@ const navItems = [
   { icon: Compass, label: 'Explore', href: '/explore' },
   { icon: PlusCircle, label: 'Join', href: '/join' },
   { icon: Bell, label: 'Alerts', href: '/notifications' },
-  { icon: User, label: 'Passport', href: '/profile' },
+  { icon: User, label: 'Profile', href: '/login' },
 ];
 
 export function BottomNav() {
@@ -28,7 +28,7 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/50 bg-background/60 backdrop-blur-xl lg:hidden safe-area-bottom">
-      <div className="flex h-20 items-center justify-around px-4">
+      <div className="flex h-16 pb-1 items-center justify-around px-4">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;

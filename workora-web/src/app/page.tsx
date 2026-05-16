@@ -197,7 +197,7 @@ export default function Home() {
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
-            className="absolute bottom-[25%] left-[8%] z-20 max-w-[280px]"
+            className="hidden lg:block absolute bottom-[25%] left-[8%] z-20 max-w-[280px]"
           >
             <div className="bg-white/95 backdrop-blur-2xl p-7 rounded-[32px] shadow-[0_30px_100px_rgba(0,0,0,0.2)] border border-white">
               <div className="flex flex-col gap-4">
@@ -232,10 +232,10 @@ export default function Home() {
       </section>
 
       {/* 6. THE TRUST CYCLE (How it Works) */}
-      <section className="py-32 px-[5%] bg-zinc-50 rounded-[80px] mx-[2%]">
+      <section className="py-16 lg:py-32 px-[5%] bg-zinc-50 rounded-[40px] lg:rounded-[80px] mx-[2%]">
         <div className="flex flex-col lg:flex-row items-center gap-24">
           <div className="flex-1">
-             <h2 className="text-[64px] font-black tracking-tighter mb-12 text-zinc-950 leading-none">How Trust is built.</h2>
+             <h2 className="text-4xl md:text-5xl lg:text-[64px] font-black tracking-tighter mb-8 lg:mb-12 text-zinc-950 leading-none">How Trust is built.</h2>
              <div className="flex flex-col gap-12">
                {[
                  { step: '01', title: 'Discover', desc: 'Browse our universe of verified craftsmen and women.' },
@@ -252,12 +252,12 @@ export default function Home() {
                ))}
              </div>
           </div>
-          <div className="flex-1 bg-white p-16 rounded-[72px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] border border-zinc-100">
+          <div className="flex-1 bg-white p-8 lg:p-16 rounded-[40px] lg:rounded-[72px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] border border-zinc-100">
              <div className="flex flex-col gap-10">
                <div className="h-16 w-16 rounded-[24px] bg-[#0066FF] flex items-center justify-center text-white shadow-lg shadow-[#0066FF]/20">
                  <ShieldCheck size={32} weight="bold" />
                </div>
-               <h3 className="text-[52px] font-black tracking-tighter italic text-zinc-950 leading-tight">Verified by ImeanTech.</h3>
+               <h3 className="text-3xl md:text-4xl lg:text-[52px] font-black tracking-tighter italic text-zinc-950 leading-tight">Verified by ImeanTech.</h3>
                <p className="text-zinc-600 text-2xl leading-relaxed font-bold">
                  Our multi-layer verification system ensures that every pro on our platform is 
                  vetted for identity, skill, and history. We don&apos;t just list pros; we back them.
@@ -274,10 +274,10 @@ export default function Home() {
       </section>
 
       {/* 7. CALL TO ACTION */}
-      <section className="py-40 px-[5%]">
-        <div className="bg-zinc-50 rounded-[80px] p-24 flex flex-col items-center text-center gap-12 relative overflow-hidden border border-zinc-100 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.05)]">
+      <section className="py-20 lg:py-40 px-[5%]">
+        <div className="bg-zinc-50 rounded-[40px] lg:rounded-[80px] p-8 lg:p-24 flex flex-col items-center text-center gap-8 lg:gap-12 relative overflow-hidden border border-zinc-100 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.05)]">
           <div className="absolute inset-0 bg-gradient-to-br from-[#0066FF]/5 to-transparent" />
-          <h2 className="text-[96px] font-black tracking-tighter text-zinc-950 relative z-10 leading-[0.9]">
+          <h2 className="text-4xl md:text-6xl lg:text-[96px] font-black tracking-tighter text-zinc-950 relative z-10 leading-[0.9]">
             Ready to find your <br />
             next master pro?
           </h2>
@@ -298,8 +298,8 @@ export default function Home() {
         </div>
       </section>
       {/* 8. DETAILED FOOTER */}
-      <footer className="bg-white border-t border-zinc-100 py-40 px-[5%]">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-20 mb-32">
+      <footer className="bg-white border-t border-zinc-100 py-16 lg:py-40 px-[5%]">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-10 lg:gap-20 mb-16 lg:mb-32">
           <div className="col-span-2 flex flex-col gap-8">
             <Link href="/" className="relative flex items-center justify-center transition-transform hover:scale-110">
             <div className="relative h-20 w-20">
