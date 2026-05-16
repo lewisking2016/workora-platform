@@ -144,9 +144,32 @@ DO $$ BEGIN
 EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 
+-- 12. Conversations
+CREATE TABLE IF NOT EXISTS conversations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    participant_1 UUID REFERENCES users(id) ON DELETE CASCADE,
+    participant_2 UUID REFERENCES users(id) ON DELETE CASCADE,
+    last_message_text TEXT,
+    last_message_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(participant_1, participant_2)
+);
+
+-- 13. Messages
+CREATE TABLE IF NOT EXISTS messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    conversation_id UUID REFERENCES conversations(id) ON DELETE CASCADE,
+    sender_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    text TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexing for search performance
 CREATE INDEX IF NOT EXISTS idx_worker_trade ON worker_profiles(trade);
 CREATE INDEX IF NOT EXISTS idx_gig_worker ON gigs(worker_id);
 CREATE INDEX IF NOT EXISTS idx_user_username ON users(username);
 CREATE INDEX IF NOT EXISTS idx_worker_skills ON worker_skills(profile_id);
 CREATE INDEX IF NOT EXISTS idx_worker_lang ON worker_languages(profile_id);
+CREATE INDEX IF NOT EXISTS idx_messages_conv ON messages(conversation_id);
+CREATE INDEX IF NOT EXISTS idx_conv_participants ON conversations(participant_1, participant_2);

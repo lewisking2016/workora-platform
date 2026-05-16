@@ -10,6 +10,7 @@ import {
 } from '@phosphor-icons/react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { VideoPlayer } from '@/components/VideoPlayer';
 
 type Tab = 'overview' | 'profile' | 'portfolio' | 'analytics';
 
@@ -183,10 +184,11 @@ export default function BusinessDashboard() {
                 {gigs.length > 0 ? (
                   <div className="grid grid-cols-2 gap-3">{gigs.slice(0, 4).map(g => (
                     <div key={g.id} className="aspect-video rounded-xl bg-zinc-100 overflow-hidden relative">
-                      {g.thumbnail_url && <Image src={g.thumbnail_url} alt={g.title} fill className="object-cover" />}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3">
-                        <p className="text-white text-[10px] font-bold truncate">{g.title}</p>
-                      </div>
+                      <VideoPlayer 
+                        src={g.video_url} 
+                        poster={g.thumbnail_url} 
+                        className="w-full h-full"
+                      />
                     </div>
                   ))}</div>
                 ) : (
@@ -285,37 +287,6 @@ export default function BusinessDashboard() {
                 <button onClick={addSkill} className="h-10 w-10 bg-[#0066FF] text-white rounded-xl flex items-center justify-center"><Plus size={18} weight="bold" /></button>
               </div>
             </div>
-            {/* Experience */}
-            <div className={`rounded-2xl border p-6 ${card}`}>
-              <h3 className="text-sm font-black mb-4 flex items-center gap-2"><Notebook size={18} />Experience</h3>
-              {experience.length > 0 ? experience.map(e => (
-                <div key={e.id} className={`p-4 rounded-xl border mb-3 ${isDark ? 'border-zinc-800' : 'border-zinc-100'}`}>
-                  <p className="text-sm font-black">{e.role_title}</p>
-                  <p className={`text-xs font-bold ${muted}`}>{e.company}</p>
-                  <p className={`text-[10px] font-bold mt-1 ${muted}`}>{e.start_date} - {e.is_current ? 'Present' : e.end_date}</p>
-                </div>
-              )) : <p className={`text-xs font-bold ${muted}`}>No experience added yet</p>}
-            </div>
-            {/* Education */}
-            <div className={`rounded-2xl border p-6 ${card}`}>
-              <h3 className="text-sm font-black mb-4 flex items-center gap-2"><Sparkle size={18} />Education</h3>
-              {education.length > 0 ? education.map(e => (
-                <div key={e.id} className={`p-4 rounded-xl border mb-3 ${isDark ? 'border-zinc-800' : 'border-zinc-100'}`}>
-                  <p className="text-sm font-black">{e.degree}</p>
-                  <p className={`text-xs font-bold ${muted}`}>{e.institution}</p>
-                </div>
-              )) : <p className={`text-xs font-bold ${muted}`}>No education added yet</p>}
-            </div>
-            {/* Certs */}
-            <div className={`rounded-2xl border p-6 ${card}`}>
-              <h3 className="text-sm font-black mb-4 flex items-center gap-2"><Certificate size={18} />Certifications</h3>
-              {certs.length > 0 ? certs.map(c => (
-                <div key={c.id} className={`p-4 rounded-xl border mb-3 ${isDark ? 'border-zinc-800' : 'border-zinc-100'}`}>
-                  <p className="text-sm font-black">{c.cert_name}</p>
-                  <p className={`text-xs font-bold ${muted}`}>{c.issuing_org}</p>
-                </div>
-              )) : <p className={`text-xs font-bold ${muted}`}>No certifications added yet</p>}
-            </div>
           </div>
         )}
 
@@ -328,12 +299,12 @@ export default function BusinessDashboard() {
               {gigs.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {gigs.map(g => (
-                    <div key={g.id} className="group aspect-video rounded-2xl bg-zinc-100 overflow-hidden relative border border-zinc-100">
-                      {g.thumbnail_url && <Image src={g.thumbnail_url} alt={g.title} fill className="object-cover group-hover:scale-105 transition-transform" />}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-4">
-                        <p className="text-white text-xs font-black truncate">{g.title}</p>
-                        <p className="text-white/60 text-[9px] font-bold">{g.view_count} views</p>
-                      </div>
+                    <div key={g.id} className="group aspect-[4/5] rounded-2xl bg-zinc-100 overflow-hidden relative border border-zinc-100 shadow-sm">
+                      <VideoPlayer 
+                        src={g.video_url} 
+                        poster={g.thumbnail_url} 
+                        className="w-full h-full"
+                      />
                     </div>
                   ))}
                 </div>
@@ -341,7 +312,6 @@ export default function BusinessDashboard() {
                 <div className={`h-48 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center gap-3 ${isDark ? 'border-zinc-800 text-zinc-600' : 'border-zinc-200 text-zinc-300'}`}>
                   <VideoCamera size={40} weight="duotone" />
                   <p className="text-xs font-bold">No work uploaded yet</p>
-                  <p className={`text-[10px] font-bold ${muted}`}>Upload your first proof-of-work to get discovered</p>
                 </div>
               )}
             </div>
@@ -365,15 +335,6 @@ export default function BusinessDashboard() {
                   <p className="text-[10px] font-bold text-emerald-500 mt-1">{s.change}</p>
                 </motion.div>
               ))}
-            </div>
-            <div className={`rounded-2xl border p-6 ${card}`}>
-              <h3 className="text-sm font-black mb-4">Performance Overview</h3>
-              <div className={`h-48 rounded-xl flex items-center justify-center ${isDark ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
-                <div className="text-center">
-                  <ChartLineUp size={40} className={muted} />
-                  <p className={`text-xs font-bold mt-2 ${muted}`}>Analytics will populate as you gain traction</p>
-                </div>
-              </div>
             </div>
           </div>
         )}
