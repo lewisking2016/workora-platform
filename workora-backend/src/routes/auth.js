@@ -17,7 +17,12 @@ async function authRoutes(fastify) {
 
   // 1. REGISTER
   fastify.post('/register', async (request, reply) => {
-    const validated = registerSchema.parse(request.body);
+    let validated;
+    try {
+      validated = registerSchema.parse(request.body);
+    } catch (e) {
+      return reply.status(400).send({ message: 'Validation failed', errors: e.errors });
+    }
     const { phone_number, email, username, password, full_name, trade, birthday, role } = validated;
 
     console.log('[Register] Starting for:', phone_number);
