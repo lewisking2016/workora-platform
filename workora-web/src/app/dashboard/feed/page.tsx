@@ -14,7 +14,12 @@ import {
   House,
   MagnifyingGlass,
   PlusSquare,
-  BookmarkSimple
+  BookmarkSimple,
+  WhatsappLogo,
+  Link as LinkIcon,
+  TwitterLogo,
+  Copy,
+  Check
 } from '@phosphor-icons/react';
 import Link from 'next/link';
 
@@ -77,6 +82,8 @@ export default function PersonalDashboard() {
   const [postComments, setPostComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [sharePost, setSharePost] = useState<Post | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const fetchFeed = async () => {
     try {
@@ -119,23 +126,24 @@ export default function PersonalDashboard() {
 
   const fetchSuggested = async () => {
     try {
-      // For now we'll just use some of the seeded users as suggested
-      const res = await fetch('/api/profile/me/1cc7b5fa-2e41-453a-af19-e38eecafe4a7'); // Example pro
+      const res = await fetch('/api/profile/search?q=');
       const data = await res.json();
-      if (data.profile) {
-        setSuggestedPros([{
-          id: data.profile.id,
-          name: data.profile.full_name,
-          trade: data.profile.trade,
-          rating: parseFloat(data.profile.trust_score),
-          is_verified: data.profile.is_verified,
-          initial: data.profile.full_name.charAt(0)
-        }]);
+      if (Array.isArray(data)) {
+        setSuggestedPros(data.slice(0, 5).map((p: any) => ({
+          id: p.id, name: p.full_name, trade: p.trade,
+          rating: parseFloat(p.trust_score || '0'), is_verified: p.is_verified,
+          initial: p.full_name?.charAt(0) || '?'
+        })));
       }
     } catch (err) {
       console.error('Suggested fetch failed:', err);
     }
   };
+
+  const handleShare = (post: Post) => { setSharePost(post); setCopied(false); };
+  const shareUrl = sharePost ? `${typeof window !== 'undefined' ? window.location.origin : ''}/gig/${sharePost.id}` : '';
+  const shareText = sharePost ? `Check out this work by ${sharePost.user_name} on Workora!` : '';
+  const copyLink = () => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
   useEffect(() => {
     // Defer the initial initialization to avoid cascading render warning in strict environments
@@ -226,14 +234,46 @@ export default function PersonalDashboard() {
 
   return (
     <div className="h-screen w-full bg-white text-[#1A1A1A] font-display flex overflow-hidden">
-      
-      {/* Global Scrollbar Suppression */}
       <style jsx global>{`
         ::-webkit-scrollbar { display: none; }
         * { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
 
       <Sidebar />
+
+      {/* Share Modal */}
+      {sharePost && (
+        <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setSharePost(null)}>
+          <div className="w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl p-6 space-y-5" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-black">Share</h3>
+              <button onClick={() => setSharePost(null)} className="h-8 w-8 rounded-full bg-zinc-100 flex items-center justify-center"><X size={16} weight="bold" /></button>
+            </div>
+            <div className="grid grid-cols-4 gap-4">
+              <a href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`} target="_blank" rel="noopener" className="flex flex-col items-center gap-2">
+                <div className="h-14 w-14 rounded-2xl bg-green-50 flex items-center justify-center"><WhatsappLogo size={28} weight="fill" className="text-green-600" /></div>
+                <span className="text-[9px] font-bold">WhatsApp</span>
+              </a>
+              <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener" className="flex flex-col items-center gap-2">
+                <div className="h-14 w-14 rounded-2xl bg-blue-50 flex items-center justify-center"><TwitterLogo size={28} weight="fill" className="text-blue-500" /></div>
+                <span className="text-[9px] font-bold">Twitter</span>
+              </a>
+              <button onClick={copyLink} className="flex flex-col items-center gap-2">
+                <div className="h-14 w-14 rounded-2xl bg-zinc-100 flex items-center justify-center">{copied ? <Check size={28} className="text-green-600" /> : <Copy size={28} className="text-zinc-600" />}</div>
+                <span className="text-[9px] font-bold">{copied ? 'Copied!' : 'Copy Link'}</span>
+              </button>
+              <a href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`} target="_blank" rel="noopener" className="flex flex-col items-center gap-2">
+                <div className="h-14 w-14 rounded-2xl bg-violet-50 flex items-center justify-center"><LinkIcon size={28} className="text-violet-600" /></div>
+                <span className="text-[9px] font-bold">Status</span>
+              </a>
+            </div>
+            <div className="flex items-center gap-3 bg-zinc-50 rounded-xl p-3">
+              <p className="flex-1 text-xs font-bold text-zinc-500 truncate">{shareUrl}</p>
+              <button onClick={copyLink} className="text-[#0066FF] text-xs font-black">{copied ? 'Done' : 'Copy'}</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 2. Isolated Central Feed - Top-Aligned with Sidebar */}
       <main className="flex-1 h-full overflow-y-auto bg-white flex flex-col items-center pt-8">
@@ -306,7 +346,7 @@ export default function PersonalDashboard() {
                         className="hover:text-[#0066FF] cursor-pointer" 
                         onClick={() => fetchComments(post)}
                       />
-                      <ShareFat size={28} className="hover:text-[#0066FF] cursor-pointer" />
+                      <ShareFat size={28} className="hover:text-[#0066FF] cursor-pointer" onClick={() => handleShare(post)} />
                     </div>
                     <BookmarkSimple size={28} className="hover:text-[#0066FF] cursor-pointer" />
                   </div>
@@ -445,7 +485,7 @@ export default function PersonalDashboard() {
           <div className="text-[11px] text-zinc-400 font-bold flex flex-wrap gap-x-3 gap-y-1.5 uppercase tracking-tighter">
             <a href="#">About</a> <a href="#">Help</a> <a href="#">Privacy</a> <a href="#">Terms</a>
           </div>
-          <p className="text-[10px] text-zinc-300 font-black tracking-[0.3em] uppercase pt-4">&copy; 2026 KAZIORA BY IMEANTECH</p>
+          <p className="text-[10px] text-zinc-300 font-black tracking-[0.3em] uppercase pt-4">&copy; 2026 WORKORA BY IMEANTECH</p>
         </div>
       </aside>
 
