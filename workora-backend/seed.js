@@ -22,22 +22,37 @@ async function seed() {
     await client.query('BEGIN');
 
     for (const worker of TEST_WORKERS) {
-      console.log(`Creating ${worker.name}...`);
+      console.log(`Processing ${worker.name}...`);
       
       const salt = await bcrypt.genSalt(10);
       const hash = await bcrypt.hash(worker.pass, salt);
 
-      const userRes = await client.query(
-        'INSERT INTO users (phone_number, username, password_hash, role) VALUES ($1, $2, $3, $4) ON CONFLICT (phone_number) DO UPDATE SET password_hash = $3 RETURNING id',
-        [worker.phone, worker.name.split(' ')[0].toLowerCase(), hash, 'worker']
-      );
-      
-      const userId = userRes.rows[0].id;
+      const existingUser = await client.query('SELECT id FROM users WHERE phone_number = $1', [worker.phone]);
+      let userId;
 
-      await client.query(
-        'INSERT INTO worker_profiles (user_id, full_name, display_name, trade, is_verified, location) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT (user_id) DO UPDATE SET trade = $4',
-        [userId, worker.name, worker.name, worker.trade, true, 'Nairobi, Kenya']
-      );
+      if (existingUser.rows.length > 0) {
+        userId = existingUser.rows[0].id;
+        await client.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hash, userId]);
+      } else {
+        const userRes = await client.query(
+          'INSERT INTO users (phone_number, username, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING id',
+          [worker.phone, worker.name.split(' ')[0].toLowerCase(), hash, 'worker']
+        );
+        userId = userRes.rows[0].id;
+      }
+
+      const existingProfile = await client.query('SELECT id FROM worker_profiles WHERE user_id = $1', [userId]);
+      if (existingProfile.rows.length > 0) {
+        await client.query(
+          'UPDATE worker_profiles SET full_name = $1, trade = $2, is_verified = $3 WHERE user_id = $4',
+          [worker.name, worker.trade, true, userId]
+        );
+      } else {
+        await client.query(
+          'INSERT INTO worker_profiles (user_id, full_name, display_name, trade, is_verified, location) VALUES ($1, $2, $3, $4, $5, $6)',
+          [userId, worker.name, worker.name, worker.trade, true, 'Nairobi, Kenya']
+        );
+      }
     }
 
     await client.query('COMMIT');
