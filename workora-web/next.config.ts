@@ -37,9 +37,7 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    turbopack: {
-      root: '.',
-    },
+    outputFileTracingRoot: '..',
   },
   async headers() {
     return [
