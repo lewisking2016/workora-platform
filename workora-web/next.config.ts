@@ -36,9 +36,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  experimental: {
-    outputFileTracingRoot: '..',
-  },
+  outputFileTracingRoot: 'C:\\Users\\lewis\\Desktop\\workora',
   async headers() {
     return [
       {
