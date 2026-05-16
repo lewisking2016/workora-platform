@@ -7,6 +7,7 @@ const path = require('path');
 // Plugins
 fastify.register(require('@fastify/cors'), { origin: '*' });
 fastify.register(require('@fastify/jwt'), { secret: process.env.JWT_SECRET || 'workora-super-secret-2026' });
+fastify.register(require('@fastify/multipart'), { limits: { fileSize: 50 * 1024 * 1024 } }); // 50MB max
 
 // Helper to clean env variables (strips accidental quotes from Docker/Shell)
 const cleanEnv = (val) => val ? val.replace(/^["'](.+)["']$/, '$1') : val;
@@ -47,6 +48,7 @@ async function autoMigrate() {
 fastify.register(require('./routes/auth'), { prefix: '/auth' });
 fastify.register(require('./routes/profile'), { prefix: '/profile' });
 fastify.register(require('./routes/gigs'), { prefix: '/gigs' });
+fastify.register(require('./routes/upload'), { prefix: '/upload' });
 
 // Health Check
 fastify.get('/health', async () => ({ status: 'ok', service: 'workora-backend' }));
