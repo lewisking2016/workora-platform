@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const securityHeaders = [
   {
@@ -36,7 +37,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  outputFileTracingRoot: 'C:\\Users\\lewis\\Desktop\\workora',
+  outputFileTracingRoot: path.resolve(process.cwd(), '..'),
   async headers() {
     return [
       {
