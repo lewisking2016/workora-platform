@@ -17,18 +17,18 @@ export default function PersonalPage() {
   return (
     <main className="mx-auto max-w-screen-2xl px-[5%] pt-20 flex flex-col bg-white text-zinc-950 overflow-x-hidden font-display">
       
-      <section className="relative h-[700px] w-full mt-4 rounded-[60px] overflow-hidden group bg-zinc-50 border border-zinc-100">
+      <section className="relative min-h-[600px] lg:h-[700px] w-full mt-4 rounded-[40px] lg:rounded-[60px] overflow-hidden group bg-zinc-50 border border-zinc-100 flex flex-col lg:block">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]" />
         
-        <div className="absolute inset-0 flex items-center justify-between px-[8%] z-20 w-full h-full">
+        <div className="relative lg:absolute inset-0 flex flex-col-reverse lg:flex-row items-center justify-between px-[5%] lg:px-[8%] py-10 lg:py-0 z-20 w-full h-full gap-10 lg:gap-0">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="flex flex-col items-start text-left max-w-[600px] z-30"
           >
-            <p className="text-[#0066FF] font-black uppercase tracking-[0.3em] text-[10px] mb-8">For Clients & Customers</p>
-            <h1 className="text-7xl font-black tracking-tighter text-zinc-950 mb-8 leading-[1.1]">
+            <p className="text-[#0066FF] font-black uppercase tracking-[0.3em] text-[10px] mb-8 mt-10 lg:mt-0">For Clients & Customers</p>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter text-zinc-950 mb-8 leading-[1.1]">
               Find the perfect <br />
               service for you.
             </h1>
@@ -54,7 +54,7 @@ export default function PersonalPage() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="hidden lg:block relative h-[85%] w-[45%] rounded-[48px] overflow-hidden shadow-2xl right-0 border-[8px] border-white"
+            className="relative h-[300px] lg:h-[85%] w-full lg:w-[45%] rounded-[32px] lg:rounded-[48px] overflow-hidden shadow-2xl lg:right-0 border-[4px] lg:border-[8px] border-white mt-4 lg:mt-0"
           >
             <Image 
               src="/landing/workora 1.png"

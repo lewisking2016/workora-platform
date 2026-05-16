@@ -25,7 +25,7 @@ export default function Home() {
     <main className="mx-auto max-w-screen-2xl px-[5%] pt-20 flex flex-col bg-white text-zinc-950 overflow-x-hidden font-display">
       
       {/* 1. THE MASTER HERO (Elegant Refinement) */}
-      <section className="relative h-[85vh] w-full mt-4 rounded-[60px] overflow-hidden group">
+      <section className="relative h-[80vh] min-h-[600px] lg:h-[85vh] w-full mt-4 rounded-[40px] lg:rounded-[60px] overflow-hidden group">
         <Image 
           src="/landing/workora hero.jpeg"
           alt="Workora Master Hero"
@@ -46,7 +46,7 @@ export default function Home() {
             className="flex flex-col items-end text-right max-w-[650px]"
           >
             <p className="text-[#0066FF] font-black uppercase tracking-[0.3em] text-[10px] mb-8">The Professional Network</p>
-            <h1 className="text-8xl font-black tracking-tighter text-white mb-8 leading-[1.1]">
+            <h1 className="text-5xl md:text-6xl lg:text-8xl font-black tracking-tighter text-white mb-8 leading-[1.1]">
               The people behind <br />
               <span className="bg-gradient-to-r from-[#0066FF] via-[#7000FF] to-[#0066FF] bg-size-200 animate-gradient-x bg-clip-text text-transparent italic">Workora.</span>
             </h1>
@@ -64,12 +64,12 @@ export default function Home() {
       </section>
 
       {/* 2. THE MACRO DETAIL (Craftsmanship) */}
-      <section className="py-32 px-[5%] flex flex-col lg:flex-row items-center gap-20">
+      <section className="py-20 lg:py-32 px-[5%] flex flex-col lg:flex-row items-center gap-10 lg:gap-20">
         <div className="flex-1 flex flex-col gap-8">
           <div className="h-16 w-16 rounded-3xl bg-zinc-50 flex items-center justify-center shadow-inner">
             <Lightning size={32} weight="duotone" className="text-[#0066FF]" />
           </div>
-          <h2 className="text-[64px] font-black tracking-tighter leading-[0.9] text-zinc-950">
+          <h2 className="text-5xl md:text-[64px] font-black tracking-tighter leading-[0.9] text-zinc-950">
             Precision in <br />
             every connection.
           </h2>
@@ -89,7 +89,7 @@ export default function Home() {
       </section>
 
       {/* 3. THE VERIFIED BADGE (Trust Engine) */}
-      <section className="bg-zinc-50 py-32 rounded-[80px] mx-[2%] px-[5%] flex flex-col-reverse lg:flex-row items-center gap-20">
+      <section className="bg-zinc-50 py-16 lg:py-32 rounded-[40px] lg:rounded-[80px] mx-[2%] px-[5%] flex flex-col-reverse lg:flex-row items-center gap-10 lg:gap-20">
         <div className="flex-1 relative aspect-video w-full rounded-[56px] overflow-hidden shadow-2xl border-[12px] border-white">
           <Image 
             src="/landing/verified badge.jpeg"
@@ -103,7 +103,7 @@ export default function Home() {
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-[#0066FF] text-[11px] font-black uppercase tracking-[0.2em] border border-zinc-200 shadow-sm">
             <ShieldCheck size={20} weight="bold" /> Trusted Network
           </div>
-          <h2 className="text-[64px] font-black tracking-tighter leading-[0.9] text-zinc-950">
+          <h2 className="text-5xl md:text-[64px] font-black tracking-tighter leading-[0.9] text-zinc-950">
             The Digital <br />
             Trust Passport.
           </h2>
@@ -120,7 +120,7 @@ export default function Home() {
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-zinc-950 text-white text-[11px] font-black uppercase tracking-[0.2em]">
              Discover the Craft
           </div>
-          <h2 className="text-[80px] font-black tracking-tighter text-zinc-950 leading-none">The Workora Universe.</h2>
+          <h2 className="text-5xl md:text-6xl lg:text-[80px] font-black tracking-tighter text-zinc-950 leading-none">The Workora Universe.</h2>
           <p className="text-zinc-600 text-2xl max-w-2xl font-medium leading-relaxed">
             Empowering the masters of construction, technology, and artisanal craft.
           </p>
@@ -142,7 +142,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05, duration: 0.8 }}
-              className="relative p-12 rounded-[56px] bg-white border border-zinc-100 transition-all duration-700 hover:-translate-y-3 group cursor-pointer shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] overflow-hidden"
+              className="relative p-8 lg:p-12 rounded-[40px] lg:rounded-[56px] bg-white border border-zinc-100 transition-all duration-700 hover:-translate-y-3 group cursor-pointer shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] overflow-hidden"
             >
               <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')]" />
               
@@ -171,12 +171,12 @@ export default function Home() {
       </section>
 
       {/* 5. THE VIDEO FEEDBACK (Proof Section) */}
-      <section className="py-40 px-[5%] flex flex-col items-center text-center gap-20">
+      <section className="py-20 lg:py-40 px-[5%] flex flex-col items-center text-center gap-10 lg:gap-20">
         <div className="flex flex-col items-center gap-6 max-w-3xl">
           <div className="h-16 w-16 rounded-full bg-zinc-50 flex items-center justify-center text-[#7000FF] shadow-inner">
             <Star size={36} weight="fill" />
           </div>
-          <h2 className="text-[80px] font-black tracking-tighter leading-[0.9] text-zinc-950">
+          <h2 className="text-5xl md:text-[64px] lg:text-[80px] font-black tracking-tighter leading-[0.9] text-zinc-950">
             Proof of Work. <br />
             No guesswork.
           </h2>
