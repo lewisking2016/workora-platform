@@ -6,7 +6,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { trade, fullName, phone, username, password, role, birthday } = body;
+    const { trade, fullName, phone, username, password, role, birthday, phone_number } = body;
 
     let backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
     // If backendUrl is just a name like 'base', fallback to localhost or the known IP
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       signal: controller.signal,
       body: JSON.stringify({
         full_name: fullName,
-        phone_number: phone,
+        phone_number: phone_number || phone,
         username,
         trade: trade || 'Professional',
         password,

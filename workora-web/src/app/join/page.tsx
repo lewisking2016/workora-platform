@@ -278,7 +278,7 @@ export default function JoinPage() {
           {/* Step 4: Kickstart Modal */}
           {step === 4 && (
             <motion.div key="step4" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-zinc-950/20 backdrop-blur-sm text-center">
-               <div className="bg-white rounded-[40px] w-full max-w-[700px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] p-12 overflow-hidden relative">
+               <div className="bg-white rounded-[40px] w-full max-w-[700px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] p-6 md:p-12 overflow-hidden relative">
                   <div className="text-center mb-10">
                      <h2 className="text-3xl font-black tracking-tighter text-zinc-950">It&apos;s official... You&apos;re Workora&apos;s newest pro!</h2>
                      <p className="text-zinc-500 font-bold text-sm mt-3 max-w-lg mx-auto leading-relaxed">Now&apos;s a great time to join Pro Plus Kickstart, our program for pros who are new to Workora. Access the benefits you need to help you get your first order faster.</p>
@@ -294,7 +294,7 @@ export default function JoinPage() {
                      </div>
                      <p className="text-zinc-400 font-bold text-xs mt-4">Fast-track your success with Pro Plus Kickstart&apos;s exclusive tools and resources.</p>
 
-                     <div className="grid grid-cols-2 gap-x-8 gap-y-4 mt-8">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 sm:gap-y-4 mt-8">
                         {[
                           'Guided onboarding', 'Keyword research', 'ID verification', 
                           'AI-generated profile feedback', 'Promotions: Up to 5 orders/month',
@@ -311,9 +311,9 @@ export default function JoinPage() {
                      </div>
                   </div>
 
-                  <div className="flex items-center justify-center gap-4">
-                     <button onClick={() => setStep(5)} className="h-14 px-10 bg-zinc-100 text-zinc-950 rounded-full font-black text-xs uppercase tracking-widest hover:bg-zinc-200 transition-colors">Continue with free tier</button>
-                     <button className="h-14 px-10 bg-zinc-950 text-white rounded-full font-black text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-xl">Join now</button>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                     <button onClick={() => setStep(5)} className="h-14 w-full sm:w-auto px-10 bg-zinc-100 text-zinc-950 rounded-full font-black text-xs uppercase tracking-widest hover:bg-zinc-200 transition-colors">Continue with free tier</button>
+                     <button className="h-14 w-full sm:w-auto px-10 bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-full font-black text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-xl shadow-blue-500/20">Join now</button>
                   </div>
                </div>
             </motion.div>

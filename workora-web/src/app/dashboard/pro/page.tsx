@@ -214,10 +214,10 @@ export default function BusinessDashboard() {
             <div className={`rounded-2xl border p-6 ${card}`}>
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-black">Profile Information</h3>
-                {!editing ? <button onClick={() => setEditing(true)} className="h-9 px-5 bg-[#0066FF] text-white rounded-xl text-[10px] font-black uppercase tracking-widest">Edit</button>
+                {!editing ? <button onClick={() => setEditing(true)} className="h-9 px-5 bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:brightness-110 transition-all">Edit</button>
                   : <div className="flex gap-2">
                     <button onClick={() => setEditing(false)} className={`h-9 px-5 rounded-xl text-[10px] font-black uppercase border ${isDark ? 'border-zinc-700' : 'border-zinc-200'}`}>Cancel</button>
-                    <button onClick={saveProfile} className="h-9 px-5 bg-[#0066FF] text-white rounded-xl text-[10px] font-black uppercase">Save</button>
+                    <button onClick={saveProfile} className="h-9 px-5 bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-xl text-[10px] font-black uppercase hover:brightness-110 transition-all">Save</button>
                   </div>}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -257,7 +257,7 @@ export default function BusinessDashboard() {
                 <input value={newSkill} onChange={e => setNewSkill(e.target.value)} placeholder="Add a skill..."
                   className={`flex-1 h-10 rounded-xl border px-4 text-sm font-bold outline-none ${isDark ? 'bg-zinc-800 border-zinc-700 text-white' : 'bg-zinc-50 border-zinc-200'}`}
                   onKeyDown={e => e.key === 'Enter' && addSkill()} />
-                <button onClick={addSkill} className="h-10 w-10 bg-[#0066FF] text-white rounded-xl flex items-center justify-center"><Plus size={18} weight="bold" /></button>
+                <button onClick={addSkill} className="h-10 w-10 bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-xl flex items-center justify-center hover:brightness-110 transition-all"><Plus size={18} weight="bold" /></button>
               </div>
             </div>
           </div>

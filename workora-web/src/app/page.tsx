@@ -38,19 +38,19 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-l from-black/70 via-black/10 to-transparent" />
         
         {/* Elegant Typography (Right Aligned) */}
-        <div className="absolute inset-0 flex items-center justify-end px-[8%] z-20">
+        <div className="absolute inset-0 flex items-center justify-center lg:justify-end px-[8%] z-20">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="flex flex-col items-end text-right max-w-[650px]"
+            className="flex flex-col items-center text-center lg:items-end lg:text-right max-w-[650px]"
           >
             <p className="text-[#0066FF] font-black uppercase tracking-[0.3em] text-[10px] mb-8">The Professional Network</p>
-            <h1 className="text-5xl md:text-6xl lg:text-8xl font-black tracking-tighter text-white mb-8 leading-[1.1]">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-black tracking-tighter text-white mb-8 leading-[1.1]">
               The people behind <br />
               <span className="bg-gradient-to-r from-[#0066FF] via-[#7000FF] to-[#0066FF] bg-size-200 animate-gradient-x bg-clip-text text-transparent italic">Workora.</span>
             </h1>
-            <p className="text-white text-xl mb-12 leading-relaxed max-w-md font-bold drop-shadow-md">
+            <p className="text-white text-sm sm:text-xl mb-12 leading-relaxed max-w-md font-bold drop-shadow-md">
               A community of verified, innovative craftsmen dedicated to making a lasting impact across Africa.
             </p>
             <Link 
@@ -77,7 +77,7 @@ export default function Home() {
             Our pros don&apos;t just work; they engineer solutions. From intricate wiring to master plumbing, we verify the skill behind the screen.
           </p>
         </div>
-        <div className="flex-1 relative aspect-square w-full max-w-[600px] rounded-[56px] overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] border-8 border-white">
+        <div className="flex-1 relative aspect-square w-full max-w-[600px] rounded-3xl sm:rounded-[56px] overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] border-4 sm:border-8 border-white">
           <Image 
             src="/landing/wiring-1.jpg"
             alt="Macro Wiring Detail"
@@ -90,7 +90,7 @@ export default function Home() {
 
       {/* 3. THE VERIFIED BADGE (Trust Engine) */}
       <section className="bg-zinc-50 py-16 lg:py-32 rounded-[40px] lg:rounded-[80px] mx-[2%] px-[5%] flex flex-col-reverse lg:flex-row items-center gap-10 lg:gap-20">
-        <div className="flex-1 relative aspect-video w-full rounded-[56px] overflow-hidden shadow-2xl border-[12px] border-white">
+        <div className="flex-1 relative aspect-video w-full rounded-3xl sm:rounded-[56px] overflow-hidden shadow-2xl border-4 sm:border-[12px] border-white">
           <Image 
             src="/landing/verified badge.jpeg"
             alt="Verified Badge"
@@ -185,7 +185,7 @@ export default function Home() {
           </p>
         </div>
         
-        <div className="relative w-full max-w-[1100px] aspect-[16/10] rounded-[80px] overflow-hidden shadow-[0_60px_120px_-20px_rgba(0,0,0,0.2)] border-[12px] border-zinc-50">
+        <div className="relative w-full max-w-[1100px] aspect-[16/10] rounded-3xl sm:rounded-[80px] overflow-hidden shadow-[0_60px_120px_-20px_rgba(0,0,0,0.2)] border-4 sm:border-[12px] border-zinc-50">
            <Image 
             src="/landing/The Video Feedback.png"
             alt="The Video Feedback"
@@ -264,7 +264,7 @@ export default function Home() {
                </p>
                <Link 
                  href="/safety"
-                 className="h-14 w-full bg-[#0066FF] text-white rounded-xl font-black text-xs transition-all hover:scale-[1.02] active:scale-[0.98] uppercase tracking-[0.2em] shadow-lg shadow-[#0066FF]/20 whitespace-nowrap flex items-center justify-center"
+                 className="h-14 w-full bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-xl font-black text-xs transition-all hover:scale-[1.02] hover:brightness-110 active:scale-[0.98] uppercase tracking-[0.2em] shadow-lg shadow-[#0066FF]/20 whitespace-nowrap flex items-center justify-center"
                >
                  Learn about Safety
                </Link>
@@ -284,7 +284,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-6 relative z-10 w-full max-w-xl">
              <Link 
               href="/login" 
-              className="h-14 flex-1 flex items-center justify-center bg-[#7000FF] text-white rounded-xl font-black text-xl hover:scale-105 transition-transform shadow-xl shadow-[#7000FF]/20 whitespace-nowrap"
+              className="h-14 flex-1 flex items-center justify-center bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-xl font-black text-xl hover:scale-105 hover:brightness-110 transition-all shadow-xl shadow-[#7000FF]/20 whitespace-nowrap"
             >
               Join as a Pro
             </Link>
@@ -299,8 +299,8 @@ export default function Home() {
       </section>
       {/* 8. DETAILED FOOTER */}
       <footer className="bg-white border-t border-zinc-100 py-16 lg:py-40 px-[5%]">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-10 lg:gap-20 mb-16 lg:mb-32">
-          <div className="col-span-2 flex flex-col gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-10 lg:gap-20 mb-16 lg:mb-32">
+          <div className="sm:col-span-2 flex flex-col gap-8">
             <Link href="/" className="relative flex items-center justify-center transition-transform hover:scale-110">
             <div className="relative h-20 w-20">
               <Image 

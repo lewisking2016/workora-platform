@@ -305,7 +305,7 @@ export default function PersonalDashboard() {
         <div className="w-full max-w-[660px] px-4 lg:px-6 pb-20">
           
           <div className="relative mb-6 lg:mb-10 group overflow-hidden">
-            <div className="flex gap-5 overflow-x-auto pb-4 scrollbar-hide">
+            <div className="flex gap-5 overflow-x-auto pb-4 no-scrollbar">
               {stories.map((story, i) => (
                 <button key={i} className="flex flex-col items-center gap-2.5 min-w-[80px] flex-shrink-0 group/story">
                   <div className="h-16 w-16 rounded-full flex items-center justify-center bg-gradient-to-tr from-[#FFD600] via-[#FF7A00] to-[#FF0069] p-[2px] transform group-hover/story:scale-105 transition-transform">

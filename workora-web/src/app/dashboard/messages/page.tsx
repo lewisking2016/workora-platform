@@ -3,8 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { PaperPlaneTilt, MagnifyingGlass, Check, Checks, ArrowLeft } from '@phosphor-icons/react';
-import Link from 'next/link';
-import { Sidebar } from '@/components/Sidebar';
 
 interface Conversation {
   id: string;
@@ -97,9 +95,7 @@ export default function MessagesPage() {
   const filtered = conversations.filter(c => c.other_username?.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div className="h-screen w-full bg-white text-zinc-950 font-display flex overflow-hidden">
-      <Sidebar />
-
+    <div className="w-full h-full flex overflow-hidden">
       {/* Conversations List */}
       <div className={`${activeConv ? 'hidden lg:flex' : 'flex'} flex-col w-full lg:w-[360px] h-full border-r border-zinc-100 shrink-0`}>
         <div className="p-5 border-b border-zinc-50">
@@ -181,7 +177,7 @@ export default function MessagesPage() {
               <input value={newMsg} onChange={e => setNewMsg(e.target.value)} placeholder="Type a message..."
                 className="flex-1 h-11 rounded-2xl bg-zinc-100 px-4 text-sm font-bold outline-none"
                 onKeyDown={e => e.key === 'Enter' && sendMessage()} />
-              <button onClick={sendMessage} className="h-11 w-11 bg-[#0066FF] text-white rounded-2xl flex items-center justify-center hover:bg-blue-600 transition-colors shrink-0">
+              <button onClick={sendMessage} className="h-11 w-11 bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-2xl flex items-center justify-center hover:brightness-110 transition-all shrink-0">
                 <PaperPlaneTilt size={20} weight="fill" />
               </button>
             </div>
@@ -193,14 +189,6 @@ export default function MessagesPage() {
           </div>
         )}
       </div>
-
-      {/* Mobile Nav */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl p-4 px-8 flex justify-between items-center z-[100] shadow-[0_-10px_40px_rgba(0,0,0,0.03)]">
-        <Link href="/dashboard/feed"><span className="text-zinc-400 text-2xl font-black">H</span></Link>
-        <Link href="/dashboard/search"><MagnifyingGlass size={28} /></Link>
-        <Link href="/dashboard/messages" className="text-[#0066FF]"><PaperPlaneTilt size={28} weight="fill" /></Link>
-        <Link href="/dashboard/profile" className="h-8 w-8 rounded-full bg-zinc-100 flex items-center justify-center font-black text-[10px] uppercase">{username?.charAt(0) || 'U'}</Link>
-      </nav>
     </div>
   );
 }
