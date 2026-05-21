@@ -50,18 +50,18 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="h-full bg-white pt-8 px-[5%] lg:px-12 overflow-y-auto">
+    <div className="h-full bg-white dark:bg-[#0A0E17] pt-8 px-[5%] lg:px-12 overflow-y-auto">
       <div className="max-w-2xl mx-auto flex flex-col gap-10 pb-32">
         
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-black tracking-tighter text-zinc-950 uppercase">Activity</h1>
-          <p className="text-zinc-500 font-bold text-sm tracking-tight uppercase">Every interaction counts in the elite network.</p>
+          <h1 className="text-3xl font-black tracking-tighter text-zinc-950 dark:text-white uppercase">Activity</h1>
+          <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm tracking-tight uppercase">Every interaction counts in the elite network.</p>
         </div>
 
         <div className="flex flex-col gap-1">
           {loading ? (
             [1,2,3,4].map(i => (
-              <div key={i} className="h-24 w-full bg-zinc-50 animate-pulse rounded-[24px] mb-2" />
+              <div key={i} className="h-24 w-full bg-zinc-50 dark:bg-zinc-900 animate-pulse rounded-[24px] mb-2" />
             ))
           ) : notifications.length > 0 ? notifications.map((notif, i) => (
             <motion.div 
@@ -69,38 +69,38 @@ export default function NotificationsPage() {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="p-6 rounded-[32px] hover:bg-zinc-50 transition-all flex items-center justify-between group cursor-pointer"
+              className="p-6 rounded-[32px] hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all flex items-center justify-between group cursor-pointer"
             >
               <div className="flex items-center gap-5">
                 <div className="relative">
-                  <div className="h-12 w-12 rounded-full bg-zinc-100 flex items-center justify-center text-[10px] font-black uppercase">
+                  <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-[10px] font-black uppercase text-zinc-900 dark:text-white">
                      {notif.actor.charAt(0)}
                   </div>
-                  <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-white shadow-sm flex items-center justify-center border border-zinc-50">
+                  <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-white dark:bg-zinc-950 shadow-sm flex items-center justify-center border border-zinc-50 dark:border-zinc-800">
                      {getIcon(notif.type)}
                   </div>
                 </div>
                 
                 <div className="flex flex-col gap-0.5">
                   <div className="flex items-center gap-2">
-                     <p className="text-[14px] font-black text-zinc-950">
+                     <p className="text-[14px] font-black text-zinc-950 dark:text-white">
                        {notif.actor}
                        {notif.verified && <SealCheck size={14} weight="fill" className="text-[#0066FF] inline ml-1.5" />}
                      </p>
-                     <span className="text-zinc-300 font-bold text-[13px]">&bull; {notif.time}</span>
+                     <span className="text-zinc-300 dark:text-zinc-600 font-bold text-[13px]">&bull; {notif.time}</span>
                   </div>
-                  <p className="text-[13px] font-medium text-zinc-500">
+                  <p className="text-[13px] font-medium text-zinc-500 dark:text-zinc-400">
                     {notif.text}
                   </p>
                 </div>
               </div>
               
-              <div className="h-8 w-8 rounded-full bg-zinc-50 flex items-center justify-center text-zinc-200 group-hover:text-zinc-950 transition-colors">
+              <div className="h-8 w-8 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-zinc-200 dark:text-zinc-700 group-hover:text-zinc-950 dark:group-hover:text-white transition-colors">
                 <CaretRight size={16} weight="bold" />
               </div>
             </motion.div>
           )) : (
-            <div className="text-center py-40 text-zinc-300 font-black uppercase tracking-widest text-xs">
+            <div className="text-center py-40 text-zinc-300 dark:text-zinc-700 font-black uppercase tracking-widest text-xs">
               No new activity. Keep sharing your work!
             </div>
           )}

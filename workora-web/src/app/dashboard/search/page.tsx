@@ -61,7 +61,7 @@ export default function SearchPage() {
 
   return (
     <div className="h-full w-full">
-      <main className="flex-1 h-full overflow-y-auto bg-white pt-8 px-[5%] lg:px-12">
+      <main className="flex-1 h-full overflow-y-auto bg-white dark:bg-[#0A0E17] pt-8 px-[5%] lg:px-12">
         <div className="max-w-4xl mx-auto flex flex-col gap-10 pb-32">
           
           {/* Search Header */}
@@ -73,12 +73,12 @@ export default function SearchPage() {
               <input 
                 type="text" 
                 placeholder="Search trades, pros or skills..." 
-                className="w-full h-16 bg-zinc-50 border border-zinc-100 rounded-[24px] pl-16 pr-6 font-bold text-lg focus:bg-white focus:ring-1 focus:ring-blue-100 outline-none transition-all shadow-sm"
+                className="w-full h-16 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[24px] pl-16 pr-6 font-bold text-lg text-zinc-950 dark:text-white focus:bg-white dark:focus:bg-zinc-800 focus:ring-1 focus:ring-blue-100 outline-none transition-all shadow-sm"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
-              <button className="absolute right-6 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-950 transition-colors">
+              <button className="absolute right-6 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors">
                 <FadersHorizontal size={24} weight="bold" />
               </button>
             </div>
@@ -88,7 +88,7 @@ export default function SearchPage() {
                 <button 
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-6 py-3 rounded-full text-[11px] font-black uppercase tracking-widest transition-all border ${selectedCategory === cat ? 'bg-zinc-950 text-white border-zinc-950 shadow-lg' : 'bg-white text-zinc-400 border-zinc-100 hover:border-zinc-300'}`}
+                  className={`px-6 py-3 rounded-full text-[11px] font-black uppercase tracking-widest transition-all border ${selectedCategory === cat ? 'bg-zinc-950 dark:bg-zinc-100 text-white dark:text-zinc-950 border-zinc-950 dark:border-zinc-100 shadow-lg' : 'bg-white dark:bg-[#0A0E17] text-zinc-400 border-zinc-100 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-600'}`}
                 >
                   {cat}
                 </button>
@@ -99,7 +99,7 @@ export default function SearchPage() {
           {/* Results Area */}
           <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-black text-zinc-400 uppercase tracking-widest">
+              <h2 className="text-sm font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
                 {loading ? 'Searching...' : `${results.length} Professionals Found`}
               </h2>
             </div>
@@ -111,15 +111,15 @@ export default function SearchPage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  className="p-6 bg-zinc-50 border border-zinc-100 rounded-[32px] flex items-center justify-between group hover:bg-white hover:shadow-xl transition-all cursor-pointer"
+                  className="p-6 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[32px] flex items-center justify-between group hover:bg-white dark:hover:bg-zinc-800 hover:shadow-xl transition-all cursor-pointer"
                 >
                   <div className="flex items-center gap-5">
-                    <div className="h-16 w-16 rounded-2xl bg-white border border-zinc-100 flex items-center justify-center text-xl font-black text-zinc-300 shadow-sm uppercase">
+                    <div className="h-16 w-16 rounded-2xl bg-white dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 flex items-center justify-center text-xl font-black text-zinc-300 dark:text-zinc-700 shadow-sm uppercase">
                       {pro.user_name.charAt(0)}
                     </div>
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-base font-black text-zinc-900 tracking-tight">{pro.user_name}</span>
+                        <span className="text-base font-black text-zinc-900 dark:text-white tracking-tight">{pro.user_name}</span>
                         {pro.verified && <SealCheck size={18} weight="fill" className="text-[#0066FF]" />}
                       </div>
                       <p className="text-[10px] font-black text-[#0066FF] uppercase tracking-widest">{pro.trade}</p>
@@ -129,7 +129,7 @@ export default function SearchPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center text-zinc-200 group-hover:text-zinc-950 transition-colors shadow-sm">
+                  <div className="h-10 w-10 rounded-full bg-white dark:bg-zinc-950 flex items-center justify-center text-zinc-200 dark:text-zinc-700 group-hover:text-zinc-950 dark:group-hover:text-white transition-colors shadow-sm">
                     <CaretRight size={20} weight="bold" />
                   </div>
                 </motion.div>
@@ -137,7 +137,7 @@ export default function SearchPage() {
 
               {results.length === 0 && !loading && (
                 <div className="col-span-full py-20 text-center flex flex-col items-center gap-4">
-                   <div className="h-16 w-16 rounded-full bg-zinc-50 flex items-center justify-center text-zinc-200">
+                   <div className="h-16 w-16 rounded-full bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-zinc-200 dark:text-zinc-700">
                       <MagnifyingGlass size={32} />
                    </div>
                    <p className="text-zinc-400 font-bold uppercase tracking-widest text-xs">No professionals found for &quot;{query}&quot;</p>

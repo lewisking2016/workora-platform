@@ -29,9 +29,9 @@ interface MetricCardProps {
 }
 
 const MetricCard = ({ icon: Icon, label, value, growth, color }: MetricCardProps) => (
-  <div className="p-8 bg-zinc-50 border border-zinc-100 rounded-[40px] flex flex-col gap-6 group hover:bg-white hover:shadow-xl transition-all">
+  <div className="p-8 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[40px] flex flex-col gap-6 group hover:bg-white dark:hover:bg-zinc-800 hover:shadow-xl transition-all">
     <div className="flex items-center justify-between">
-      <div className={`h-12 w-12 rounded-2xl bg-white border border-zinc-100 flex items-center justify-center ${color} shadow-sm group-hover:scale-110 transition-transform`}>
+      <div className={`h-12 w-12 rounded-2xl bg-white dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 flex items-center justify-center ${color} shadow-sm group-hover:scale-110 transition-transform`}>
         <Icon size={24} weight="fill" />
       </div>
       <div className="flex items-center gap-1 text-green-500 font-black text-xs uppercase tracking-widest">
@@ -40,7 +40,7 @@ const MetricCard = ({ icon: Icon, label, value, growth, color }: MetricCardProps
     </div>
     <div className="flex flex-col gap-1">
       <p className="text-[11px] font-black text-zinc-400 uppercase tracking-[0.2em]">{label}</p>
-      <p className="text-3xl font-black text-zinc-950 tracking-tighter">{value}</p>
+      <p className="text-3xl font-black text-zinc-950 dark:text-white tracking-tighter">{value}</p>
     </div>
   </div>
 );
@@ -67,17 +67,17 @@ export default function AnalyticsPage() {
   }, []);
 
   return (
-    <div className="h-full bg-white pt-8 px-[5%] lg:px-12 overflow-y-auto">
+    <div className="h-full bg-white dark:bg-[#0A0E17] pt-8 px-[5%] lg:px-12 overflow-y-auto">
       <div className="max-w-5xl mx-auto flex flex-col gap-10 pb-32">
         
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-black tracking-tighter text-zinc-950 uppercase">Network Analytics</h1>
-          <p className="text-zinc-500 font-bold text-sm tracking-tight uppercase">Master your professional reach and growth velocity.</p>
+          <h1 className="text-3xl font-black tracking-tighter text-zinc-950 dark:text-white uppercase">Network Analytics</h1>
+          <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm tracking-tight uppercase">Master your professional reach and growth velocity.</p>
         </div>
 
         {loading || !stats ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-             {[1,2,3,4,5,6].map(i => <div key={i} className="h-48 bg-zinc-50 animate-pulse rounded-[40px]" />)}
+             {[1,2,3,4,5,6].map(i => <div key={i} className="h-48 bg-zinc-50 dark:bg-zinc-900 animate-pulse rounded-[40px]" />)}
           </div>
         ) : (
           <div className="flex flex-col gap-12">
@@ -111,19 +111,19 @@ export default function AnalyticsPage() {
                </div>
 
                <div className="flex flex-col gap-6">
-                  <h3 className="text-sm font-black text-zinc-400 uppercase tracking-widest">Engagement Insights</h3>
+                  <h3 className="text-sm font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">Engagement Insights</h3>
                   <div className="flex flex-col gap-3">
                      {[
                        { label: 'Most Viewed Gig', value: 'Full House Wiring', count: '4.2K' },
                        { label: 'Top Trade Category', value: 'Electrical', count: '92%' },
                        { label: 'Repeat Client Rate', value: '15%', count: 'Elite' },
                      ].map((item, i) => (
-                       <div key={i} className="p-6 bg-zinc-50 border border-zinc-100 rounded-[24px] flex items-center justify-between group hover:bg-white hover:shadow-lg transition-all">
+                       <div key={i} className="p-6 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[24px] flex items-center justify-between group hover:bg-white dark:hover:bg-zinc-800 hover:shadow-lg transition-all">
                           <div className="flex flex-col gap-1">
                              <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{item.label}</p>
-                             <p className="text-base font-black text-zinc-900 tracking-tight">{item.value}</p>
+                             <p className="text-base font-black text-zinc-900 dark:text-white tracking-tight">{item.value}</p>
                           </div>
-                          <span className="text-xs font-black text-zinc-950 uppercase tracking-widest">{item.count}</span>
+                          <span className="text-xs font-black text-zinc-950 dark:text-white uppercase tracking-widest">{item.count}</span>
                        </div>
                      ))}
                   </div>

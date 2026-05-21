@@ -119,7 +119,7 @@ export default function DashboardProfile() {
 
   if (loading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-white">
+      <div className="h-screen w-full flex items-center justify-center bg-white dark:bg-[#0A0E17]">
         <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} className="text-[#0066FF]">
           <SpinnerGap size={48} weight="bold" />
         </motion.div>
@@ -149,14 +149,14 @@ export default function DashboardProfile() {
       {/* Creator Hub Cards (Analytics & Saved Items) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Analytics Gateway */}
-        <div className="p-8 rounded-[32px] border border-zinc-100 bg-zinc-50 flex flex-col justify-between gap-6 hover:shadow-xl hover:bg-white transition-all group">
+        <div className="p-8 rounded-[32px] border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 flex flex-col justify-between gap-6 hover:shadow-xl hover:bg-white dark:hover:bg-zinc-800 transition-all group">
           <div className="flex gap-5 items-start">
-            <div className="h-14 w-14 rounded-2xl bg-blue-50 text-[#0066FF] flex items-center justify-center group-hover:scale-105 transition-transform shrink-0 shadow-sm">
+            <div className="h-14 w-14 rounded-2xl bg-blue-50 dark:bg-blue-500/10 text-[#0066FF] flex items-center justify-center group-hover:scale-105 transition-transform shrink-0 shadow-sm">
               <VideoCamera size={28} weight="duotone" />
             </div>
             <div className="flex flex-col gap-1">
-              <h3 className="font-display font-black text-xl text-zinc-950 uppercase tracking-tight">Business Analytics</h3>
-              <p className="text-sm font-medium text-zinc-500 leading-relaxed">
+              <h3 className="font-display font-black text-xl text-zinc-950 dark:text-white uppercase tracking-tight">Business Analytics</h3>
+              <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 leading-relaxed">
                 Track your video views, client reach, profile interactions, and professional gig performance.
               </p>
             </div>
@@ -170,14 +170,14 @@ export default function DashboardProfile() {
         </div>
 
         {/* Saved Items Gateway */}
-        <div className="p-8 rounded-[32px] border border-zinc-100 bg-zinc-50 flex flex-col justify-between gap-6 hover:shadow-xl hover:bg-white transition-all group">
+        <div className="p-8 rounded-[32px] border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 flex flex-col justify-between gap-6 hover:shadow-xl hover:bg-white dark:hover:bg-zinc-800 transition-all group">
           <div className="flex gap-5 items-start">
-            <div className="h-14 w-14 rounded-2xl bg-purple-50 text-[#7000FF] flex items-center justify-center group-hover:scale-105 transition-transform shrink-0 shadow-sm">
+            <div className="h-14 w-14 rounded-2xl bg-purple-50 dark:bg-purple-500/10 text-[#7000FF] flex items-center justify-center group-hover:scale-105 transition-transform shrink-0 shadow-sm">
               <VideoCamera size={28} weight="duotone" className="rotate-90" />
             </div>
             <div className="flex flex-col gap-1">
-              <h3 className="font-display font-black text-xl text-zinc-950 uppercase tracking-tight">Saved & Bookmarks</h3>
-              <p className="text-sm font-medium text-zinc-500 leading-relaxed">
+              <h3 className="font-display font-black text-xl text-zinc-950 dark:text-white uppercase tracking-tight">Saved & Bookmarks</h3>
+              <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 leading-relaxed">
                 Access your pinned works, bookmarked professional profiles, and saved expert tutorials.
               </p>
             </div>
@@ -195,16 +195,16 @@ export default function DashboardProfile() {
         
         <div className="lg:col-span-2 flex flex-col gap-12">
            <div className="flex flex-col gap-4">
-              <h2 className="text-xl font-black text-zinc-900 uppercase tracking-tighter">Professional Bio</h2>
-              <p className="text-[15px] leading-relaxed text-zinc-600 font-medium">
+              <h2 className="text-xl font-black text-zinc-900 dark:text-white uppercase tracking-tighter">Professional Bio</h2>
+              <p className="text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-400 font-medium">
                 {profile?.profile?.bio || 'No bio provided yet. Add a bio to help hirers understand your expertise.'}
               </p>
            </div>
 
            <div className="flex flex-col gap-8">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-black text-zinc-900 uppercase tracking-tighter">Proof of Work</h2>
-                <div className="bg-zinc-50 px-3 py-1 rounded-full text-[10px] font-black uppercase text-zinc-400">
+                <h2 className="text-xl font-black text-zinc-900 dark:text-white uppercase tracking-tighter">Proof of Work</h2>
+                <div className="bg-zinc-50 dark:bg-zinc-900 px-3 py-1 rounded-full text-[10px] font-black uppercase text-zinc-400 dark:text-zinc-500">
                   {gigs.length} Gigs
                 </div>
               </div>
@@ -212,7 +212,7 @@ export default function DashboardProfile() {
               {gigs.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {gigs.map((gig) => (
-                    <div key={gig.id} className="group relative aspect-video bg-zinc-100 rounded-[24px] overflow-hidden shadow-sm border border-zinc-100">
+                    <div key={gig.id} className="group relative aspect-video bg-zinc-100 dark:bg-zinc-900 rounded-[24px] overflow-hidden shadow-sm border border-zinc-100 dark:border-zinc-800">
                       <Image 
                         src={gig.thumbnail_url || 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=600'}
                         alt={gig.title}
@@ -231,7 +231,7 @@ export default function DashboardProfile() {
                   ))}
                 </div>
               ) : (
-                <div className="h-40 border-2 border-dashed border-zinc-100 rounded-[24px] flex flex-col items-center justify-center gap-3 text-zinc-300">
+                <div className="h-40 border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-[24px] flex flex-col items-center justify-center gap-3 text-zinc-300 dark:text-zinc-700">
                    <VideoCamera size={32} weight="duotone" />
                    <span className="text-[10px] font-black uppercase tracking-widest">No gigs uploaded yet</span>
                 </div>
