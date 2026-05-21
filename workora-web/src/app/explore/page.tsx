@@ -25,44 +25,44 @@ export default function ExplorePage() {
   const [location] = useState('Nairobi');
 
   return (
-    <div className="flex flex-col gap-0 pb-24 pt-24 lg:pt-28 px-[5%] max-w-screen-2xl mx-auto">
+    <div className="flex flex-col gap-0 pb-24 pt-24 lg:pt-28 px-[5%] max-w-screen-2xl mx-auto bg-white dark:bg-[#0A0E17] min-h-screen font-display">
 
       {/* Search Header */}
       <div className="flex flex-col gap-5 mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl lg:text-4xl font-black tracking-tight text-zinc-950">Explore</h1>
-            <p className="text-zinc-400 text-sm font-medium mt-1">Discover verified professionals near you</p>
+            <h1 className="text-3xl lg:text-4xl font-black tracking-tight text-zinc-950 dark:text-white">Explore</h1>
+            <p className="text-zinc-400 dark:text-zinc-500 text-sm font-medium mt-1">Discover verified professionals near you</p>
           </div>
-          <button className="h-11 w-11 rounded-2xl bg-zinc-100 flex items-center justify-center hover:bg-zinc-200 transition-colors">
-            <SlidersHorizontal className="h-4 w-4 text-zinc-600" />
+          <button className="h-11 w-11 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
+            <SlidersHorizontal className="h-4 w-4 text-zinc-600 dark:text-zinc-400" />
           </button>
         </div>
 
         {/* Search Bar */}
         <div className="relative group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 transition-colors group-focus-within:text-zinc-950" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 transition-colors group-focus-within:text-zinc-950 dark:group-focus-within:text-white" />
           <input 
             type="text" 
             placeholder="Search skills, services, or professionals..."
-            className="h-13 w-full rounded-2xl bg-zinc-100 pl-11 pr-4 text-sm font-medium text-zinc-950 outline-none focus:ring-2 ring-zinc-950/10 transition-all placeholder:text-zinc-400"
+            className="h-13 w-full rounded-2xl bg-zinc-100 dark:bg-zinc-900 pl-11 pr-4 text-sm font-medium text-zinc-950 dark:text-white outline-none focus:ring-2 ring-zinc-950/10 dark:ring-white/10 transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-600"
           />
         </div>
 
         {/* Location Bar */}
         <div className="flex items-center justify-between">
           <button className="flex items-center gap-2 group">
-            <div className="h-8 w-8 rounded-xl bg-blue-50 flex items-center justify-center">
+            <div className="h-8 w-8 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
               <MapPin className="h-3.5 w-3.5 text-[#0066FF]" />
             </div>
             <div className="flex items-center gap-1">
-              <span className="text-sm font-bold text-zinc-950">{location}</span>
-              <ChevronDown className="h-3 w-3 text-zinc-400" />
+              <span className="text-sm font-bold text-zinc-950 dark:text-white">{location}</span>
+              <ChevronDown className="h-3 w-3 text-zinc-400 dark:text-zinc-500" />
             </div>
           </button>
           <div className="flex items-center gap-2">
-            <TrendingUp className="h-3.5 w-3.5 text-zinc-400" />
-            <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Trending</span>
+            <TrendingUp className="h-3.5 w-3.5 text-zinc-400 dark:text-zinc-500" />
+            <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Trending</span>
           </div>
         </div>
       </div>
@@ -78,8 +78,8 @@ export default function ExplorePage() {
               onClick={() => setActiveCategory(cat.name)}
               className={`whitespace-nowrap rounded-2xl px-4 py-2.5 text-xs font-bold transition-all flex items-center gap-2 ${
                 isActive 
-                  ? 'bg-zinc-950 text-white shadow-lg shadow-zinc-950/20' 
-                  : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200'
+                  ? 'bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 shadow-lg shadow-zinc-950/20 dark:shadow-white/20' 
+                  : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800'
               }`}
             >
               <Icon className="h-3.5 w-3.5" />
@@ -97,29 +97,29 @@ export default function ExplorePage() {
         className="flex flex-col items-center justify-center py-20 lg:py-32"
       >
         <div className="relative mb-8">
-          <div className="h-28 w-28 rounded-full bg-zinc-100 flex items-center justify-center">
-            <Search className="h-10 w-10 text-zinc-300" />
+          <div className="h-28 w-28 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center">
+            <Search className="h-10 w-10 text-zinc-300 dark:text-zinc-700" />
           </div>
-          <div className="absolute -bottom-1 -right-1 h-10 w-10 rounded-full bg-zinc-950 flex items-center justify-center shadow-lg">
-            <Sparkles className="h-5 w-5 text-white" />
+          <div className="absolute -bottom-1 -right-1 h-10 w-10 rounded-full bg-zinc-950 dark:bg-white flex items-center justify-center shadow-lg">
+            <Sparkles className="h-5 w-5 text-white dark:text-zinc-950" />
           </div>
         </div>
 
-        <h2 className="text-2xl font-black tracking-tight text-zinc-950 mb-3 text-center">No professionals yet</h2>
-        <p className="text-zinc-400 text-sm font-medium text-center max-w-sm leading-relaxed mb-8">
+        <h2 className="text-2xl font-black tracking-tight text-zinc-950 dark:text-white mb-3 text-center">No professionals yet</h2>
+        <p className="text-zinc-400 dark:text-zinc-500 text-sm font-medium text-center max-w-sm leading-relaxed mb-8">
           Be among the first to join Workora. Verified professionals will appear here once they create their profiles.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3">
           <a 
             href="/join" 
-            className="h-11 px-8 bg-zinc-950 text-white rounded-2xl font-black text-xs uppercase tracking-[0.15em] flex items-center justify-center transition-all hover:bg-zinc-800 hover:scale-105 active:scale-95"
+            className="h-11 px-8 bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 rounded-2xl font-black text-xs uppercase tracking-[0.15em] flex items-center justify-center transition-all hover:bg-zinc-800 dark:hover:bg-zinc-200 hover:scale-105 active:scale-95"
           >
             Join as a Pro
           </a>
           <a 
             href="/personal" 
-            className="h-11 px-8 bg-zinc-100 text-zinc-950 rounded-2xl font-black text-xs uppercase tracking-[0.15em] flex items-center justify-center transition-all hover:bg-zinc-200 hover:scale-105 active:scale-95"
+            className="h-11 px-8 bg-zinc-100 dark:bg-zinc-900 text-zinc-950 dark:text-white rounded-2xl font-black text-xs uppercase tracking-[0.15em] flex items-center justify-center transition-all hover:bg-zinc-200 dark:hover:bg-zinc-800 hover:scale-105 active:scale-95"
           >
             Learn More
           </a>
@@ -138,10 +138,10 @@ export default function ExplorePage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 + i * 0.1 }}
-            className="flex flex-col items-center gap-1 py-5 rounded-2xl bg-zinc-50 border border-zinc-100"
+            className="flex flex-col items-center gap-1 py-5 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800"
           >
-            <span className="text-xl font-black text-zinc-950">{stat.value}</span>
-            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">{stat.label}</span>
+            <span className="text-xl font-black text-zinc-950 dark:text-white">{stat.value}</span>
+            <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">{stat.label}</span>
           </motion.div>
         ))}
       </div>

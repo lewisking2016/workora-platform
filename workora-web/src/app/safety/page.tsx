@@ -18,11 +18,11 @@ import {
 
 export default function SafetyPage() {
   return (
-    <main className="mx-auto max-w-screen-2xl px-[5%] pt-20 flex flex-col bg-white text-zinc-950 overflow-x-hidden font-display">
+    <main className="mx-auto max-w-screen-2xl px-[5%] pt-20 flex flex-col bg-white dark:bg-[#0A0E17] text-zinc-950 dark:text-zinc-50 overflow-x-hidden font-display min-h-screen">
       
       {/* Hero Section */}
-      <section className="relative h-[50vh] w-full mt-4 rounded-[60px] overflow-hidden group bg-zinc-50 border border-zinc-100">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]" />
+      <section className="relative h-[50vh] w-full mt-4 rounded-[60px] overflow-hidden group bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] dark:opacity-10" />
         
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-[8%] z-20">
           <motion.div 
@@ -31,15 +31,15 @@ export default function SafetyPage() {
             transition={{ duration: 0.8 }}
             className="flex flex-col items-center max-w-[800px]"
           >
-            <div className="h-16 w-16 rounded-3xl bg-white shadow-sm flex items-center justify-center mb-8 border border-zinc-100">
+            <div className="h-16 w-16 rounded-3xl bg-white dark:bg-zinc-800 shadow-sm flex items-center justify-center mb-8 border border-zinc-100 dark:border-zinc-700">
               <ShieldPlus size={32} weight="duotone" className="text-[#0066FF]" />
             </div>
             <p className="text-[#0066FF] font-black uppercase tracking-[0.3em] text-[10px] mb-6">Safety & Security</p>
-            <h1 className="text-7xl font-black tracking-tighter text-zinc-950 mb-8 leading-[1.1]">
+            <h1 className="text-7xl font-black tracking-tighter text-zinc-950 dark:text-white mb-8 leading-[1.1]">
               Your trust is our <br />
               top priority.
             </h1>
-            <p className="text-zinc-600 text-xl mb-10 leading-relaxed max-w-2xl font-medium">
+            <p className="text-zinc-600 dark:text-zinc-400 text-xl mb-10 leading-relaxed max-w-2xl font-medium">
               We&apos;ve built a multi-layered security ecosystem to ensure every interaction on Workora is safe, transparent, and reliable.
             </p>
           </motion.div>
@@ -91,26 +91,26 @@ export default function SafetyPage() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="p-10 rounded-[40px] bg-zinc-50 border border-zinc-100 flex flex-col gap-6"
+            className="p-10 rounded-[40px] bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 flex flex-col gap-6"
           >
-            <div className={`h-14 w-14 rounded-2xl bg-white shadow-sm flex items-center justify-center ${item.color}`}>
+            <div className={`h-14 w-14 rounded-2xl bg-white dark:bg-zinc-800 shadow-sm flex items-center justify-center border border-zinc-100 dark:border-zinc-700 ${item.color}`}>
               <item.icon size={28} weight="duotone" />
             </div>
-            <h3 className="text-2xl font-black tracking-tight">{item.title}</h3>
-            <p className="text-zinc-600 font-medium leading-relaxed">{item.desc}</p>
+            <h3 className="text-2xl font-black tracking-tight text-zinc-950 dark:text-white">{item.title}</h3>
+            <p className="text-zinc-600 dark:text-zinc-400 font-medium leading-relaxed">{item.desc}</p>
           </motion.div>
         ))}
       </section>
 
       {/* Detailed Protocols Section */}
-      <section className="py-32 bg-zinc-50 rounded-[80px] mx-[2%] px-[10%] flex flex-col lg:flex-row items-center gap-24 overflow-hidden relative border border-zinc-100">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02]" />
+      <section className="py-32 bg-zinc-50 dark:bg-zinc-900 rounded-[80px] mx-[2%] px-[10%] flex flex-col lg:flex-row items-center gap-24 overflow-hidden relative border border-zinc-100 dark:border-zinc-800">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02] dark:opacity-10" />
         <div className="flex-1 z-10">
-          <h2 className="text-6xl font-black tracking-tighter text-zinc-950 mb-8 leading-tight">
+          <h2 className="text-6xl font-black tracking-tighter text-zinc-950 dark:text-white mb-8 leading-tight">
             Our Zero-Tolerance <br />
             <span className="text-[#0066FF]">Safety Protocols.</span>
           </h2>
-          <p className="text-zinc-600 text-xl mb-12 leading-relaxed">
+          <p className="text-zinc-600 dark:text-zinc-400 text-xl mb-12 leading-relaxed">
             We maintain the highest standards of conduct. Any violation of our community guidelines results in immediate suspension from the ecosystem.
           </p>
           <div className="grid grid-cols-1 gap-6">
@@ -120,7 +120,7 @@ export default function SafetyPage() {
               "Continuous Performance Monitoring",
               "Escrow-based Financial Protection"
             ].map((text, i) => (
-              <div key={i} className="flex items-center gap-4 text-zinc-950 font-bold bg-white p-6 rounded-2xl border border-zinc-100 shadow-sm">
+              <div key={i} className="flex items-center gap-4 text-zinc-950 dark:text-white font-bold bg-white dark:bg-zinc-800 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-700 shadow-sm">
                 <CheckCircle size={24} className="text-[#0066FF]" weight="fill" />
                 {text}
               </div>
@@ -129,24 +129,24 @@ export default function SafetyPage() {
         </div>
         <div className="flex-1 relative w-full aspect-square max-w-[500px]">
            <div className="absolute inset-0 bg-[#0066FF]/10 blur-[120px] rounded-full" />
-           <div className="relative z-10 bg-white border border-zinc-100 rounded-[40px] p-12 shadow-2xl flex flex-col items-center text-center gap-8">
+           <div className="relative z-10 bg-white dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-[40px] p-12 shadow-2xl flex flex-col items-center text-center gap-8">
               <ShieldCheck size={120} weight="duotone" className="text-[#0066FF]" />
-              <h3 className="text-3xl font-black tracking-tight">Verified by Workora</h3>
-              <p className="text-zinc-500 font-medium">This badge is only awarded to Pros who have passed 100% of our security and skill audits.</p>
+              <h3 className="text-3xl font-black tracking-tight text-zinc-950 dark:text-white">Verified by Workora</h3>
+              <p className="text-zinc-500 dark:text-zinc-400 font-medium">This badge is only awarded to Pros who have passed 100% of our security and skill audits.</p>
            </div>
         </div>
       </section>
 
       {/* CTA Section */}
       <section className="py-40 px-[5%]">
-        <div className="bg-white rounded-[80px] p-20 flex flex-col lg:flex-row items-center justify-between gap-12 relative overflow-hidden border border-zinc-100 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.05)]">
+        <div className="bg-white dark:bg-zinc-900 rounded-[80px] p-20 flex flex-col lg:flex-row items-center justify-between gap-12 relative overflow-hidden border border-zinc-100 dark:border-zinc-800 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.05)]">
           <div className="absolute top-0 right-0 w-1/3 h-full bg-[#0066FF]/5 skew-x-12 translate-x-20" />
-          <div className="relative z-10 text-zinc-950 lg:max-w-xl">
+          <div className="relative z-10 text-zinc-950 dark:text-white lg:max-w-xl">
             <h2 className="text-6xl font-black tracking-tighter mb-8 leading-tight">
               Build with <br />
               total confidence.
             </h2>
-            <p className="text-zinc-600 text-xl font-medium leading-relaxed">
+            <p className="text-zinc-600 dark:text-zinc-400 text-xl font-medium leading-relaxed">
               Whether you&apos;re hiring or working, Workora provides the safest environment for professional artisanal services in Africa.
             </p>
           </div>
@@ -162,7 +162,7 @@ export default function SafetyPage() {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link 
                 href="/help" 
-                className="h-14 px-10 bg-white border-2 border-zinc-100 text-zinc-950 rounded-xl font-black text-base flex items-center justify-center transition-all hover:bg-zinc-50 whitespace-nowrap"
+                className="h-14 px-10 bg-white dark:bg-zinc-800 border-2 border-zinc-100 dark:border-zinc-700 text-zinc-950 dark:text-white rounded-xl font-black text-base flex items-center justify-center transition-all hover:bg-zinc-50 dark:hover:bg-zinc-700 whitespace-nowrap"
               >
                 Help Center <ArrowRight className="ml-2" weight="bold" />
               </Link>
@@ -170,13 +170,6 @@ export default function SafetyPage() {
           </div>
         </div>
       </section>
-
-      <footer className="py-20 border-t border-zinc-100 flex flex-col items-center gap-8">
-        <Link href="/" className="relative h-12 w-12 bg-zinc-200/50 backdrop-blur-xl border border-white/50 rounded-full shadow-lg flex items-center justify-center">
-           <div className="h-8 w-8 bg-black rounded-full" />
-        </Link>
-        <p className="text-zinc-400 font-black uppercase tracking-[0.3em] text-[10px]">© 2026 Workora Safety</p>
-      </footer>
 
     </main>
   );

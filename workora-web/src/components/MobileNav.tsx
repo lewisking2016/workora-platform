@@ -22,7 +22,7 @@ export function MobileNav() {
   ];
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-2xl py-3 px-6 flex justify-around items-center z-[300] shadow-[0_-10px_40px_rgba(0,0,0,0.06)] border-t border-zinc-100/60 safe-area-bottom">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-2xl py-3 px-6 flex justify-around items-center z-[300] shadow-[0_-10px_40px_rgba(0,0,0,0.06)] border-t border-zinc-100/60 dark:border-zinc-800 safe-area-bottom">
       {navItems.map((item) => {
         const isActive = pathname === item.href;
         
@@ -48,7 +48,7 @@ export function MobileNav() {
               className={`transition-colors duration-200 ${
                 isActive 
                   ? "text-[#0066FF]" 
-                  : "text-zinc-400 group-hover:text-zinc-600"
+                  : "text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300"
               }`} 
             />
 
@@ -56,7 +56,7 @@ export function MobileNav() {
             <span className={`text-[9px] font-black uppercase tracking-wider transition-colors duration-200 ${
               isActive 
                 ? "bg-gradient-to-r from-[#0066FF] to-[#7000FF] bg-clip-text text-transparent" 
-                : "text-zinc-400 group-hover:text-zinc-600"
+                : "text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300"
             }`}>
               {item.label}
             </span>

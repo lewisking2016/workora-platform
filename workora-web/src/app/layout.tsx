@@ -4,6 +4,8 @@ import './globals.css';
 import { Providers } from '@/components/Providers';
 import { BottomNav } from '@/components/BottomNav';
 import { TopNav } from '@/components/TopNav';
+import { Footer } from '@/components/Footer';
+import Script from 'next/script';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -56,8 +58,26 @@ export default function RootLayout({
           <main>
             {children}
           </main>
+          <Footer />
           <BottomNav />
         </Providers>
+
+        <div id="google_translate_element" style={{ display: 'none' }}></div>
+        <Script
+          src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+          strategy="afterInteractive"
+        />
+        <Script id="google-translate-init" strategy="afterInteractive">
+          {`
+            function googleTranslateElementInit() {
+              new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,sw',
+                autoDisplay: false
+              }, 'google_translate_element');
+            }
+          `}
+        </Script>
       </body>
     </html>
   );

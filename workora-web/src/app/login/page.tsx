@@ -6,7 +6,8 @@ import {
   House,
   ShieldCheck,
   Eye,
-  EyeSlash
+  EyeSlash,
+  Check
 } from '@phosphor-icons/react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -22,6 +23,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogin = async () => {
     if (!formData.phone || !formData.password) return;
@@ -37,7 +39,8 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           phone_number: formData.phone,
-          password: formData.password
+          password: formData.password,
+          rememberMe: rememberMe
         }),
       });
 
@@ -47,8 +50,9 @@ export default function LoginPage() {
         throw new Error('The credentials provided do not match our records. Please verify your phone number or password.');
       }
 
-      // Store Auth Data
-      localStorage.setItem('workora_token', data.token);
+      // Proxy handles setting the secure token cookie automatically based on rememberMe.
+      // We can securely store user metadata like role/username if needed for quick UI rendering, 
+      // but not the actual token.
       localStorage.setItem('workora_user', JSON.stringify(data.user));
 
       // Redirect to Dashboard
@@ -61,7 +65,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col lg:flex-row font-display relative overflow-hidden">
+    <div className="min-h-screen bg-white dark:bg-[#0A0E17] flex flex-col lg:flex-row font-display relative overflow-hidden">
       
       {/* 0. Fullscreen Loader overlay */}
       {loading && <WorkoraLoader fullScreen />}
@@ -98,11 +102,11 @@ export default function LoginPage() {
       </div>
 
       {/* 2. Elite Gateway Right Side */}
-      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-[5%] relative bg-white">
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-[5%] relative bg-white dark:bg-[#0A0E17]">
         
         {/* Navigation Portal */}
         <div className="absolute top-8 left-8 lg:left-auto lg:right-12 flex items-center gap-4">
-           <Link href="/" className="h-12 w-12 bg-zinc-50 border border-zinc-100 text-zinc-950 rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform">
+           <Link href="/" className="h-12 w-12 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 text-zinc-950 dark:text-white rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform">
               <House size={20} weight="fill" />
            </Link>
         </div>
@@ -120,7 +124,7 @@ export default function LoginPage() {
                   src="/logo/workora_logo.png"
                   alt="Workora Logo"
                   fill
-                  className="object-contain brightness-0"
+                  className="object-contain brightness-0 dark:invert"
                   priority
                 />
               </div>
@@ -134,8 +138,8 @@ export default function LoginPage() {
           />
 
           <div className="flex flex-col gap-2 text-center mb-10">
-            <h2 className="text-2xl font-black tracking-tight text-zinc-950 leading-none">Log into Workora</h2>
-            <p className="text-zinc-500 font-bold text-sm">WELCOME BACK TO THE ELITE TRUST NETWORK.</p>
+            <h2 className="text-2xl font-black tracking-tight text-zinc-950 dark:text-white leading-none">Log into Workora</h2>
+            <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm">WELCOME BACK TO THE ELITE TRUST NETWORK.</p>
           </div>
 
           <div className="w-full flex flex-col gap-4">
@@ -143,7 +147,7 @@ export default function LoginPage() {
               <input 
                 type="text" 
                 placeholder="Phone number, username or email"
-                className="h-12 w-full rounded-xl bg-zinc-50 border border-zinc-200 px-4 outline-none focus:bg-white focus:border-[#0066FF] transition-all font-bold text-xs text-zinc-950"
+                className="h-12 w-full rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-4 outline-none focus:bg-white dark:focus:bg-zinc-800 focus:border-[#0066FF] transition-all font-bold text-xs text-zinc-950 dark:text-white dark:placeholder-zinc-500"
                 value={formData.phone}
                 onChange={(e) => {
                   setFormData({ ...formData, phone: e.target.value });
@@ -154,7 +158,7 @@ export default function LoginPage() {
                 <input 
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
-                  className="h-12 w-full rounded-xl bg-zinc-50 border border-zinc-200 px-4 outline-none focus:bg-white focus:border-[#0066FF] transition-all font-bold text-xs text-zinc-950"
+                  className="h-12 w-full rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-4 outline-none focus:bg-white dark:focus:bg-zinc-800 focus:border-[#0066FF] transition-all font-bold text-xs text-zinc-950 dark:text-white dark:placeholder-zinc-500"
                   value={formData.password}
                   onChange={(e) => {
                     setFormData({ ...formData, password: e.target.value });
@@ -164,12 +168,29 @@ export default function LoginPage() {
                 <button 
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-950 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors"
                 >
                   {showPassword ? <EyeSlash size={20} weight="bold" /> : <Eye size={20} weight="bold" />}
                 </button>
               </div>
             </div>
+
+            <label className="flex items-center gap-3 cursor-pointer group select-none">
+              <div className="relative flex items-center justify-center w-5 h-5">
+                <input 
+                  type="checkbox" 
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="peer appearance-none w-5 h-5 border-2 border-zinc-200 dark:border-zinc-700 rounded-[6px] checked:border-[#0066FF] checked:bg-[#0066FF] transition-all cursor-pointer"
+                />
+                <div className="absolute text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none">
+                  <Check size={12} weight="bold" />
+                </div>
+              </div>
+              <span className="text-xs font-bold text-zinc-500 group-hover:text-zinc-950 dark:group-hover:text-white transition-colors">
+                Remember me for 30 days
+              </span>
+            </label>
 
             <motion.button 
               disabled={!formData.phone || !formData.password || loading}
@@ -192,17 +213,17 @@ export default function LoginPage() {
             </motion.button>
 
             <div className="flex flex-col gap-3 mt-6 items-center">
-               <Link href="/forgot" className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-950 transition-colors">
+               <Link href="/forgot" className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors">
                  Forgot password?
                </Link>
-               <Link href="/forgot" className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-950 transition-colors">
+               <Link href="/forgot" className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors">
                  Forgot account username?
                </Link>
             </div>
           </div>
 
-          <div className="w-full mt-12 pt-12 border-t border-zinc-100 flex flex-col gap-8">
-             <Link href="/join" className="h-12 w-full border border-zinc-200 rounded-full flex items-center justify-center text-xs font-black text-zinc-950 hover:bg-zinc-50 transition-colors shadow-sm">
+          <div className="w-full mt-12 pt-12 border-t border-zinc-100 dark:border-zinc-800 flex flex-col gap-8">
+             <Link href="/join" className="h-12 w-full border border-zinc-200 dark:border-zinc-700 rounded-full flex items-center justify-center text-xs font-black text-zinc-950 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors shadow-sm">
                Create new account
              </Link>
              <div className="flex items-center justify-center gap-2 text-zinc-300 font-black tracking-tight text-[10px] uppercase tracking-[0.2em]">
@@ -213,12 +234,12 @@ export default function LoginPage() {
 
         {/* Support Links Footer */}
         <div className="mt-20 flex flex-wrap justify-center gap-x-4 gap-y-2 text-[9px] font-bold text-zinc-400 uppercase tracking-widest">
-           <Link href="#" className="hover:text-zinc-950 transition-colors">ImeanTech</Link>
-           <Link href="#" className="hover:text-zinc-950 transition-colors">About</Link>
-           <Link href="#" className="hover:text-zinc-950 transition-colors">Blog</Link>
-           <Link href="#" className="hover:text-zinc-950 transition-colors">Help</Link>
-           <Link href="#" className="hover:text-zinc-950 transition-colors">Privacy</Link>
-           <Link href="#" className="hover:text-zinc-950 transition-colors">Terms</Link>
+           <Link href="#" className="hover:text-zinc-950 dark:hover:text-white transition-colors">ImeanTech</Link>
+           <Link href="#" className="hover:text-zinc-950 dark:hover:text-white transition-colors">About</Link>
+           <Link href="#" className="hover:text-zinc-950 dark:hover:text-white transition-colors">Blog</Link>
+           <Link href="#" className="hover:text-zinc-950 dark:hover:text-white transition-colors">Help</Link>
+           <Link href="#" className="hover:text-zinc-950 dark:hover:text-white transition-colors">Privacy</Link>
+           <Link href="#" className="hover:text-zinc-950 dark:hover:text-white transition-colors">Terms</Link>
         </div>
       </div>
     </div>

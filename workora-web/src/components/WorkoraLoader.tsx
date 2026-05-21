@@ -28,8 +28,8 @@ export default function WorkoraLoader({ fullScreen = false }: { fullScreen?: boo
   const phases = [
     {
       id: 'cut',
-      icon: <Scissors size={28} weight="fill" className="text-zinc-950 -rotate-90" />,
-      trackStyle: 'border-b-2 border-dashed border-zinc-950',
+      icon: <Scissors size={28} weight="fill" className="text-zinc-950 dark:text-white -rotate-90" />,
+      trackStyle: 'border-b-2 border-dashed border-zinc-950 dark:border-white',
       gap: 6, // Separates
       iconAnim: { rotate: [-90, -45, -90, -45, -90, -45, -90], transition: { duration: 1.3 } }
     },
@@ -37,7 +37,7 @@ export default function WorkoraLoader({ fullScreen = false }: { fullScreen?: boo
       id: 'build',
       icon: <Hammer size={28} weight="fill" className="text-[#0066FF]" />,
       // Track style looking like nails/dots
-      trackStyle: 'bg-[radial-gradient(circle,currentColor_2px,transparent_2px)] bg-[length:12px_12px] h-[4px] text-zinc-950',
+      trackStyle: 'bg-[radial-gradient(circle,currentColor_2px,transparent_2px)] bg-[length:12px_12px] h-[4px] text-zinc-950 dark:text-white',
       gap: 0, // Closes tight
       iconAnim: { rotate: [0, -45, 0, -45, 0, -45, 0], transition: { duration: 1.3 } }
     },
@@ -65,7 +65,7 @@ export default function WorkoraLoader({ fullScreen = false }: { fullScreen?: boo
           className="absolute inset-0 flex items-center justify-center overflow-hidden"
           style={{ clipPath: 'inset(0 0 50% 0)' }}
         >
-          <span className="text-5xl sm:text-6xl font-black tracking-tighter text-zinc-950">workora</span>
+          <span className="text-5xl sm:text-6xl font-black tracking-tighter text-zinc-950 dark:text-white">workora</span>
         </motion.div>
 
         {/* Bottom Half of Text */}
@@ -75,7 +75,7 @@ export default function WorkoraLoader({ fullScreen = false }: { fullScreen?: boo
           className="absolute inset-0 flex items-center justify-center overflow-hidden"
           style={{ clipPath: 'inset(50% 0 0 0)' }}
         >
-          <span className="text-5xl sm:text-6xl font-black tracking-tighter text-zinc-950">workora</span>
+          <span className="text-5xl sm:text-6xl font-black tracking-tighter text-zinc-950 dark:text-white">workora</span>
         </motion.div>
 
         {/* The Animated Track (progresses left to right) */}
@@ -96,7 +96,7 @@ export default function WorkoraLoader({ fullScreen = false }: { fullScreen?: boo
             initial={{ left: '0%' }}
             animate={{ left: '100%' }}
             transition={{ duration: 1.3, ease: "linear" }}
-            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center justify-center bg-white rounded-full p-1 shadow-sm border border-zinc-100"
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center justify-center bg-white dark:bg-[#0A0E17] rounded-full p-1 shadow-sm border border-zinc-100 dark:border-zinc-800"
           >
             <motion.div animate={currentPhase.iconAnim.rotate || currentPhase.iconAnim.scale ? currentPhase.iconAnim : {}}>
               {currentPhase.icon}
@@ -118,7 +118,7 @@ export default function WorkoraLoader({ fullScreen = false }: { fullScreen?: boo
 
   if (fullScreen) {
     return (
-      <div className="fixed inset-0 z-[9999] bg-white/80 backdrop-blur-md flex items-center justify-center">
+      <div className="fixed inset-0 z-[9999] bg-white/80 dark:bg-[#0A0E17]/80 backdrop-blur-md flex items-center justify-center">
         {loaderContent}
       </div>
     );

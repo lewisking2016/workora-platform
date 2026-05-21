@@ -17,10 +17,10 @@ import {
 
 export default function PlatformPage() {
   return (
-    <main className="mx-auto max-w-screen-2xl px-[5%] pt-20 flex flex-col bg-white text-zinc-950 overflow-x-hidden font-display">
+    <main className="mx-auto max-w-screen-2xl px-[5%] pt-20 flex flex-col bg-white dark:bg-[#0A0E17] text-zinc-950 dark:text-zinc-50 overflow-x-hidden font-display">
       
       {/* Platform Hero */}
-      <section className="relative h-[60vh] w-full mt-4 rounded-[60px] overflow-hidden group bg-white border border-zinc-100">
+      <section className="relative h-[60vh] w-full mt-4 rounded-[60px] overflow-hidden group bg-white dark:bg-[#0A0E17] border border-zinc-100 dark:border-zinc-800">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cube.png')] opacity-[0.03]" />
         
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-[8%] z-20">
@@ -30,15 +30,15 @@ export default function PlatformPage() {
             transition={{ duration: 0.8 }}
             className="flex flex-col items-center max-w-[800px]"
           >
-            <div className="h-16 w-16 rounded-3xl bg-zinc-50 shadow-sm flex items-center justify-center mb-8 border border-zinc-100">
+            <div className="h-16 w-16 rounded-3xl bg-zinc-50 dark:bg-zinc-900 shadow-sm flex items-center justify-center mb-8 border border-zinc-100 dark:border-zinc-800">
               <SquaresFour size={32} weight="duotone" className="text-[#0066FF]" />
             </div>
             <p className="text-[#0066FF] font-black uppercase tracking-[0.3em] text-[10px] mb-6">Unified Ecosystem</p>
-            <h1 className="text-7xl font-black tracking-tighter text-zinc-950 mb-8 leading-[1.1]">
+            <h1 className="text-7xl font-black tracking-tighter text-zinc-950 dark:text-white mb-8 leading-[1.1]">
               One platform. <br />
               Unlimited potential.
             </h1>
-            <p className="text-zinc-600 text-xl mb-10 leading-relaxed max-w-2xl font-medium">
+            <p className="text-zinc-600 dark:text-zinc-400 text-xl mb-10 leading-relaxed max-w-2xl font-medium">
               Workora is more than a marketplace. It&apos;s a digital infrastructure built to empower Africa&apos;s workforce and simplify service delivery for everyone.
             </p>
           </motion.div>
@@ -62,13 +62,13 @@ export default function PlatformPage() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="p-8 rounded-[32px] bg-white border border-zinc-100 hover:shadow-xl transition-all group"
+            className="p-8 rounded-[32px] bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 hover:shadow-xl transition-all group"
           >
-            <div className="h-12 w-12 rounded-2xl bg-zinc-50 flex items-center justify-center text-zinc-950 mb-6 group-hover:bg-[#0066FF] group-hover:text-white transition-colors">
+            <div className="h-12 w-12 rounded-2xl bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center text-zinc-950 dark:text-white mb-6 group-hover:bg-[#0066FF] group-hover:text-white transition-colors">
               <item.icon size={24} weight="bold" />
             </div>
-            <h3 className="text-xl font-black mb-3">{item.title}</h3>
-            <p className="text-zinc-500 font-medium leading-relaxed">{item.desc}</p>
+            <h3 className="text-xl font-black text-zinc-950 dark:text-white mb-3">{item.title}</h3>
+            <p className="text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed">{item.desc}</p>
           </motion.div>
         ))}
       </section>
@@ -82,9 +82,9 @@ export default function PlatformPage() {
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="relative overflow-hidden p-16 rounded-[60px] bg-zinc-50 text-zinc-950 flex flex-col h-full border border-zinc-100"
+            className="relative overflow-hidden p-16 rounded-[60px] bg-zinc-50 dark:bg-zinc-900 text-zinc-950 dark:text-white flex flex-col h-full border border-zinc-100 dark:border-zinc-800"
           >
-            <div className="absolute top-0 right-0 p-12 opacity-5">
+            <div className="absolute top-0 right-0 p-12 opacity-5 dark:opacity-10">
               <Storefront size={200} weight="fill" />
             </div>
             
@@ -92,8 +92,8 @@ export default function PlatformPage() {
               <div className="h-14 w-14 rounded-2xl bg-[#7000FF] flex items-center justify-center mb-10 shadow-lg shadow-[#7000FF]/20 text-white">
                 <Briefcase size={28} weight="bold" />
               </div>
-              <h2 className="text-5xl font-black tracking-tighter mb-6">I have the skills</h2>
-              <p className="text-zinc-500 text-lg mb-12 font-medium leading-relaxed max-w-md">
+              <h2 className="text-5xl font-black tracking-tighter text-zinc-950 dark:text-white mb-6">I have the skills</h2>
+              <p className="text-zinc-500 dark:text-zinc-400 text-lg mb-12 font-medium leading-relaxed max-w-md">
                 Post your work, showcase your expertise through video content, and connect with clients looking for professional services.
               </p>
               
@@ -115,9 +115,9 @@ export default function PlatformPage() {
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="relative overflow-hidden p-16 rounded-[60px] bg-zinc-50 text-zinc-950 flex flex-col h-full border border-zinc-100"
+            className="relative overflow-hidden p-16 rounded-[60px] bg-zinc-50 dark:bg-zinc-900 text-zinc-950 dark:text-white flex flex-col h-full border border-zinc-100 dark:border-zinc-800"
           >
-            <div className="absolute top-0 right-0 p-12 opacity-5">
+            <div className="absolute top-0 right-0 p-12 opacity-5 dark:opacity-10">
               <UserCircle size={200} weight="fill" />
             </div>
 
@@ -125,8 +125,8 @@ export default function PlatformPage() {
               <div className="h-14 w-14 rounded-2xl bg-[#0066FF] flex items-center justify-center mb-10 shadow-lg shadow-[#0066FF]/20 text-white">
                 <UserCircle size={28} weight="bold" />
               </div>
-              <h2 className="text-5xl font-black tracking-tighter mb-6">I need a service</h2>
-              <p className="text-zinc-500 text-lg mb-12 font-medium leading-relaxed max-w-md">
+              <h2 className="text-5xl font-black tracking-tighter text-zinc-950 dark:text-white mb-6">I need a service</h2>
+              <p className="text-zinc-500 dark:text-zinc-400 text-lg mb-12 font-medium leading-relaxed max-w-md">
                 Find the right expert for any task. Browse verified professionals, watch proof-of-work videos, and hire with total confidence.
               </p>
               
@@ -145,15 +145,6 @@ export default function PlatformPage() {
 
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="py-20 border-t border-zinc-100 flex flex-col items-center gap-8">
-        <Link href="/" className="relative h-12 w-12 bg-zinc-200/50 backdrop-blur-xl border border-white/50 rounded-full shadow-lg flex items-center justify-center">
-           <div className="h-8 w-8 bg-black rounded-full" />
-        </Link>
-        <p className="text-zinc-400 font-black uppercase tracking-[0.3em] text-[10px]">© 2026 Workora Platform</p>
-      </footer>
-
     </main>
   );
 }

@@ -42,18 +42,18 @@ export default function ExplorePage() {
   }, []);
 
   return (
-    <div className="h-full bg-white pt-8 px-[5%] lg:px-12">
+    <div className="h-full bg-white dark:bg-[#0A0E17] pt-8 px-[5%] lg:px-12">
       <div className="max-w-6xl mx-auto flex flex-col gap-10 pb-32">
         
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-black tracking-tighter text-zinc-950 uppercase">Explore the Network</h1>
-          <p className="text-zinc-500 font-bold text-sm tracking-tight uppercase">Trending proof-of-work from the elite pros.</p>
+          <h1 className="text-3xl font-black tracking-tighter text-zinc-950 dark:text-white uppercase">Explore the Network</h1>
+          <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm tracking-tight uppercase">Trending proof-of-work from the elite pros.</p>
         </div>
 
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {[1,2,3,4,5,6,7,8].map(i => (
-              <div key={i} className="aspect-[4/5] bg-zinc-50 animate-pulse rounded-[24px]" />
+              <div key={i} className="aspect-[4/5] bg-zinc-50 dark:bg-zinc-900 animate-pulse rounded-[24px]" />
             ))}
           </div>
         ) : gigs.length > 0 ? (
@@ -64,7 +64,7 @@ export default function ExplorePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="group relative aspect-[4/5] bg-zinc-100 rounded-[24px] overflow-hidden cursor-pointer shadow-sm"
+                className="group relative aspect-[4/5] bg-zinc-100 dark:bg-zinc-900 rounded-[24px] overflow-hidden cursor-pointer shadow-sm"
               >
                 <Image 
                   src={gig.thumbnail_url || 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=600'}
@@ -89,7 +89,7 @@ export default function ExplorePage() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-40 text-zinc-300 font-black uppercase tracking-widest text-xs">
+          <div className="text-center py-40 text-zinc-300 dark:text-zinc-700 font-black uppercase tracking-widest text-xs">
             The network is quiet. Be the first to post.
           </div>
         )}

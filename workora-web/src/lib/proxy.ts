@@ -13,9 +13,11 @@ export async function proxyRequest(targetPath: string, request: Request) {
     const method = request.method;
     
     let body = undefined;
+    let parsedBody: any = {};
     if (method !== 'GET' && method !== 'HEAD') {
       try {
-        body = JSON.stringify(await request.json());
+        parsedBody = await request.json();
+        body = JSON.stringify(parsedBody);
       } catch {
         // Body might not be JSON or empty
       }
@@ -44,7 +46,25 @@ export async function proxyRequest(targetPath: string, request: Request) {
       );
     }
 
-    return NextResponse.json(data);
+    const nextResponse = NextResponse.json(data);
+
+    // If login or register was successful, capture token and set cookie
+    if (response.ok && data?.token && (targetPath === '/auth/login' || targetPath === '/auth/register')) {
+      const rememberMe = parsedBody?.rememberMe === true;
+      const maxAge = rememberMe ? 60 * 60 * 24 * 30 : 60 * 60; // 30 days or 1 hour
+
+      nextResponse.cookies.set({
+        name: 'token',
+        value: data.token,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: maxAge,
+        path: '/',
+      });
+    }
+
+    return nextResponse;
   } catch (error) {
     console.error(`Proxy Error [${targetPath}]:`, error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

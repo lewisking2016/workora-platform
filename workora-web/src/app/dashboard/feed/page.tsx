@@ -210,13 +210,12 @@ export default function PersonalDashboard() {
   return (
     <div className="h-full w-full flex flex-col lg:flex-row overflow-hidden">
 
-      {/* Share Modal */}
       {sharePost && (
         <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-md" onClick={() => setSharePost(null)}>
-          <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} className="w-full max-w-md bg-white rounded-t-[32px] sm:rounded-[32px] p-6 sm:p-8 space-y-6 shadow-2xl" onClick={e => e.stopPropagation()}>
+          <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-t-[32px] sm:rounded-[32px] p-6 sm:p-8 space-y-6 shadow-2xl border border-white/10" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between">
-              <h3 className="text-xl font-black tracking-tight">Share</h3>
-              <button onClick={() => setSharePost(null)} className="h-10 w-10 rounded-full bg-zinc-100 flex items-center justify-center transition-transform hover:scale-110 shadow-sm"><X size={20} weight="bold" /></button>
+              <h3 className="text-xl font-black tracking-tight text-zinc-950 dark:text-white">Share</h3>
+              <button onClick={() => setSharePost(null)} className="h-10 w-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center transition-transform hover:scale-110 shadow-sm text-zinc-950 dark:text-white"><X size={20} weight="bold" /></button>
             </div>
             <div className="grid grid-cols-4 gap-4">
               <a href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`} target="_blank" rel="noopener" className="flex flex-col items-center gap-2">
@@ -228,16 +227,16 @@ export default function PersonalDashboard() {
                 <span className="text-[10px] font-black uppercase tracking-wider opacity-60">Twitter</span>
               </a>
               <button onClick={copyLink} className="flex flex-col items-center gap-2">
-                <div className="h-14 w-14 rounded-2xl bg-zinc-100 flex items-center justify-center transition-transform hover:scale-110 shadow-sm">{copied ? <Check size={28} weight="bold" /> : <Copy size={28} weight="fill" />}</div>
-                <span className="text-[10px] font-black uppercase tracking-wider opacity-60">{copied ? 'Copied' : 'Copy'}</span>
+                <div className="h-14 w-14 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center transition-transform hover:scale-110 shadow-sm text-zinc-950 dark:text-white">{copied ? <Check size={28} weight="bold" /> : <Copy size={28} weight="fill" />}</div>
+                <span className="text-[10px] font-black uppercase tracking-wider opacity-60 text-zinc-950 dark:text-white">{copied ? 'Copied' : 'Copy'}</span>
               </button>
               <a href={`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`} target="_blank" rel="noopener" className="flex flex-col items-center gap-2">
                 <div className="h-14 w-14 rounded-2xl bg-violet-50 flex items-center justify-center transition-transform hover:scale-110 shadow-sm"><LinkIcon size={28} weight="fill" className="text-violet-600" /></div>
                 <span className="text-[10px] font-black uppercase tracking-wider opacity-60">Status</span>
               </a>
             </div>
-            <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100 flex items-center gap-3">
-              <p className="flex-1 text-[13px] font-bold text-zinc-500 truncate">{shareUrl}</p>
+            <div className="bg-zinc-50 dark:bg-zinc-950 rounded-2xl p-4 border border-zinc-100 dark:border-zinc-800 flex items-center gap-3">
+              <p className="flex-1 text-[13px] font-bold text-zinc-500 dark:text-zinc-400 truncate">{shareUrl}</p>
               <button onClick={copyLink} className="text-[#0066FF] text-[13px] font-black uppercase tracking-widest">{copied ? 'Done' : 'Copy'}</button>
             </div>
           </motion.div>
@@ -250,12 +249,12 @@ export default function PersonalDashboard() {
           <div className="fixed inset-0 z-[250] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-md" onClick={() => setActiveComments(null)}>
             <motion.div 
               initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-              className="w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-[32px] h-[80vh] sm:h-[600px] flex flex-col shadow-2xl overflow-hidden"
+              className="w-full max-w-lg bg-white dark:bg-zinc-900 rounded-t-[32px] sm:rounded-[32px] h-[80vh] sm:h-[600px] flex flex-col shadow-2xl overflow-hidden border border-white/10"
               onClick={e => e.stopPropagation()}
             >
-              <div className="p-6 border-b border-zinc-50 flex items-center justify-between shrink-0">
-                <h3 className="text-xl font-black tracking-tight">Comments</h3>
-                <button onClick={() => setActiveComments(null)} className="h-10 w-10 rounded-full bg-zinc-100 flex items-center justify-center hover:bg-zinc-200 transition-colors">
+              <div className="p-6 border-b border-zinc-50 dark:border-zinc-800 flex items-center justify-between shrink-0">
+                <h3 className="text-xl font-black tracking-tight text-zinc-950 dark:text-white">Comments</h3>
+                <button onClick={() => setActiveComments(null)} className="h-10 w-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors text-zinc-950 dark:text-white">
                   <X size={20} weight="bold" />
                 </button>
               </div>
@@ -263,13 +262,13 @@ export default function PersonalDashboard() {
               <div className="flex-1 overflow-y-auto p-6 space-y-6">
                 {postComments.length > 0 ? postComments.map((c, i) => (
                   <div key={i} className="flex gap-4 group">
-                    <div className="h-9 w-9 rounded-full bg-zinc-100 flex items-center justify-center text-[10px] font-black shrink-0 uppercase">{c.username.charAt(0)}</div>
+                    <div className="h-9 w-9 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-950 dark:text-white flex items-center justify-center text-[10px] font-black shrink-0 uppercase">{c.username.charAt(0)}</div>
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-[13px] font-black">{c.username}</span>
+                        <span className="text-[13px] font-black text-zinc-950 dark:text-white">{c.username}</span>
                         <span className="text-[9px] font-bold text-zinc-400">1h ago</span>
                       </div>
-                      <p className="text-[13px] text-zinc-600 font-medium leading-relaxed">{c.text}</p>
+                      <p className="text-[13px] text-zinc-600 dark:text-zinc-300 font-medium leading-relaxed">{c.text}</p>
                     </div>
                   </div>
                 )) : (
@@ -280,12 +279,12 @@ export default function PersonalDashboard() {
                 )}
               </div>
 
-              <div className="p-6 border-t border-zinc-50 flex items-center gap-3 shrink-0">
-                <div className="h-9 w-9 rounded-full bg-zinc-100 flex items-center justify-center text-[10px] font-black shrink-0 uppercase">{currentUser?.username?.charAt(0) || 'U'}</div>
+              <div className="p-6 border-t border-zinc-50 dark:border-zinc-800 flex items-center gap-3 shrink-0">
+                <div className="h-9 w-9 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-950 dark:text-white flex items-center justify-center text-[10px] font-black shrink-0 uppercase">{currentUser?.username?.charAt(0) || 'U'}</div>
                 <input 
                   value={newComment} onChange={e => setNewComment(e.target.value)}
                   placeholder="Add a comment..."
-                  className="flex-1 h-12 bg-zinc-50 rounded-2xl px-4 text-xs font-bold outline-none focus:bg-white focus:border-[#0066FF] transition-all"
+                  className="flex-1 h-12 bg-zinc-50 dark:bg-zinc-950 rounded-2xl px-4 text-xs font-bold outline-none text-zinc-950 dark:text-white dark:placeholder-zinc-500 focus:bg-white dark:focus:bg-zinc-900 border border-transparent dark:border-zinc-800 focus:border-[#0066FF] transition-all"
                   onKeyDown={e => e.key === 'Enter' && handleAddComment()}
                 />
                 <button 
@@ -301,7 +300,7 @@ export default function PersonalDashboard() {
         )}
       </AnimatePresence>
 
-      <main className="flex-1 h-full overflow-y-auto bg-white flex flex-col items-center pt-4 lg:pt-8 w-full">
+      <main className="flex-1 h-full overflow-y-auto bg-white dark:bg-[#0A0E17] flex flex-col items-center pt-4 lg:pt-8 w-full">
         <div className="w-full max-w-[660px] px-4 lg:px-6 pb-20">
           
           <div className="relative mb-6 lg:mb-10 group overflow-hidden">
@@ -323,22 +322,22 @@ export default function PersonalDashboard() {
 
           <div className="space-y-12 lg:space-y-16">
             {posts.length > 0 ? posts.map((post, i) => (
-              <article key={i} className="bg-white">
+              <article key={i} className="bg-white dark:bg-[#0A0E17]">
                 <div className="flex items-center justify-between pb-4">
                   <div className="flex items-center gap-3.5">
-                    <div className="h-10 w-10 rounded-full bg-zinc-50 flex items-center justify-center text-xs font-black shadow-sm cursor-pointer" onClick={() => startConversation(post.worker_id)}>{post.user_name.charAt(0)}</div>
+                    <div className="h-10 w-10 rounded-full bg-zinc-50 dark:bg-zinc-900 text-zinc-950 dark:text-white flex items-center justify-center text-xs font-black shadow-sm cursor-pointer" onClick={() => startConversation(post.worker_id)}>{post.user_name.charAt(0)}</div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="text-[14px] font-black text-zinc-900 cursor-pointer" onClick={() => startConversation(post.worker_id)}>{post.user_name}</p>
+                        <p className="text-[14px] font-black text-zinc-900 dark:text-white cursor-pointer" onClick={() => startConversation(post.worker_id)}>{post.user_name}</p>
                         {post.verified && <SealCheck size={16} weight="fill" className="text-[#0066FF]" />}
                       </div>
                       <p className="text-[10px] text-[#0066FF] font-black uppercase tracking-[0.2em]">{post.trade}</p>
                     </div>
                   </div>
-                  <button className="text-zinc-300 hover:text-zinc-900"><DotsThree size={32} weight="bold" /></button>
+                  <button className="text-zinc-300 dark:text-zinc-600 hover:text-zinc-900 dark:hover:text-white"><DotsThree size={32} weight="bold" /></button>
                 </div>
 
-                <div className="aspect-[4/5] sm:aspect-square bg-zinc-100 rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)]">
+                <div className="aspect-[4/5] sm:aspect-square bg-zinc-100 dark:bg-zinc-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
                   <VideoPlayer 
                     src={post.video_url} 
                     poster={post.thumbnail_url || 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=800'} 
@@ -348,20 +347,20 @@ export default function PersonalDashboard() {
 
                 <div className="py-6 space-y-4">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-7">
+                    <div className="flex items-center gap-7 text-zinc-950 dark:text-white">
                       <Heart size={28} weight={post.liked_by_me ? "fill" : "regular"} className={`${post.liked_by_me ? "text-red-500" : "hover:text-red-500"} cursor-pointer transition-colors`} onClick={() => handleLike(post.id)} />
                       <ChatCircleDots size={28} className="hover:text-[#0066FF] cursor-pointer" onClick={() => fetchComments(post)} />
                       <ShareFat size={28} className="hover:text-[#0066FF] cursor-pointer" onClick={() => handleShare(post)} />
                     </div>
-                    <BookmarkSimple size={28} className="hover:text-[#0066FF] cursor-pointer" />
+                    <BookmarkSimple size={28} className="hover:text-[#0066FF] cursor-pointer text-zinc-950 dark:text-white" />
                   </div>
                   <div className="space-y-1.5">
-                    <p className="text-[14px] font-black text-zinc-900">{post.likes_count.toLocaleString()} likes</p>
-                    <p className="text-[14px] leading-relaxed text-zinc-600">
-                      <span className="font-black mr-2 text-zinc-900">@{post.handle}</span>
+                    <p className="text-[14px] font-black text-zinc-900 dark:text-white">{post.likes_count.toLocaleString()} likes</p>
+                    <p className="text-[14px] leading-relaxed text-zinc-600 dark:text-zinc-300">
+                      <span className="font-black mr-2 text-zinc-900 dark:text-white">@{post.handle}</span>
                       {post.description}
                     </p>
-                    <button className="text-zinc-400 text-[13px] font-bold hover:text-zinc-600 pt-2" onClick={() => fetchComments(post)}>
+                    <button className="text-zinc-400 text-[13px] font-bold hover:text-zinc-600 dark:hover:text-zinc-300 pt-2" onClick={() => fetchComments(post)}>
                       View all {post.comments_count} comments
                     </button>
                   </div>
@@ -369,11 +368,11 @@ export default function PersonalDashboard() {
               </article>
             )) : (
               <div className="py-20 flex flex-col items-center text-center gap-6">
-                <div className="h-24 w-24 rounded-[32px] bg-zinc-50 flex items-center justify-center text-zinc-200">
+                <div className="h-24 w-24 rounded-[32px] bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-zinc-200 dark:text-zinc-700">
                   <PlusSquare size={48} weight="duotone" />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-xl font-black tracking-tight">Your Feed is Empty</h3>
+                  <h3 className="text-xl font-black tracking-tight text-zinc-950 dark:text-white">Your Feed is Empty</h3>
                   <p className="text-zinc-400 font-bold text-sm max-w-[280px] mx-auto">Start following pros or share your own work to see content here.</p>
                 </div>
                 <Link href="/dashboard/create" className="px-8 h-12 bg-[#0066FF] text-white rounded-full font-black text-[13px] uppercase tracking-widest shadow-xl shadow-blue-500/20 hover:scale-105 transition-all flex items-center justify-center">
@@ -385,14 +384,14 @@ export default function PersonalDashboard() {
         </div>
       </main>
 
-      <aside className="hidden xl:flex flex-col w-[400px] h-full flex-shrink-0 bg-white border-l border-zinc-50 space-y-10 pt-8 px-6 overflow-y-auto">
-        <div className="w-full flex items-center justify-between group cursor-pointer p-4 bg-zinc-50/50 rounded-2xl hover:bg-zinc-50 transition-all">
+      <aside className="hidden xl:flex flex-col w-[400px] h-full flex-shrink-0 bg-white dark:bg-[#0A0E17] border-l border-zinc-50 dark:border-zinc-800 space-y-10 pt-8 px-6 overflow-y-auto">
+        <div className="w-full flex items-center justify-between group cursor-pointer p-4 bg-zinc-50/50 dark:bg-zinc-900/50 rounded-2xl hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all">
           <div className="flex items-center gap-5">
-            <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[#0066FF] to-[#7000FF] flex items-center justify-center text-white text-xl font-black shadow-xl shadow-blue-50 border-4 border-white uppercase">
+            <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[#0066FF] to-[#7000FF] flex items-center justify-center text-white text-xl font-black shadow-xl shadow-blue-50 dark:shadow-blue-900/20 border-4 border-white dark:border-zinc-800 uppercase">
               {currentUser?.username?.charAt(0) || 'U'}
             </div>
             <div className="flex flex-col">
-              <p className="text-[16px] font-black text-zinc-900 tracking-tight leading-none">{currentUser?.username || 'Guest'}</p>
+              <p className="text-[16px] font-black text-zinc-900 dark:text-white tracking-tight leading-none">{currentUser?.username || 'Guest'}</p>
               <p className="text-[14px] text-zinc-400 font-bold tracking-wide mt-1 uppercase">{currentUser?.role || 'User'}</p>
             </div>
           </div>
@@ -402,17 +401,17 @@ export default function PersonalDashboard() {
         <div className="space-y-10">
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <p className="text-[15px] font-black text-zinc-400 tracking-tight uppercase">Suggested For You</p>
-              <button className="text-[12px] font-black text-zinc-900">See All</button>
+              <p className="text-[15px] font-black text-zinc-400 dark:text-zinc-500 tracking-tight uppercase">Suggested For You</p>
+              <button className="text-[12px] font-black text-zinc-900 dark:text-white">See All</button>
             </div>
             <div className="space-y-6">
               {suggestedPros.map((pro, i) => (
                 <div key={i} className="flex items-center justify-between group">
                   <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-white border border-zinc-50 flex items-center justify-center text-[11px] font-black text-zinc-400 shadow-sm">{pro.initial}</div>
+                    <div className="h-12 w-12 rounded-full bg-white dark:bg-zinc-900 border border-zinc-50 dark:border-zinc-800 flex items-center justify-center text-[11px] font-black text-zinc-400 dark:text-zinc-500 shadow-sm">{pro.initial}</div>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
-                        <p className="text-[15px] font-black text-zinc-900 tracking-tight">{pro.name}</p>
+                        <p className="text-[15px] font-black text-zinc-900 dark:text-white tracking-tight">{pro.name}</p>
                         {pro.is_verified && <SealCheck size={16} weight="fill" className="text-[#0066FF]" />}
                       </div>
                       <div className="flex items-center gap-2 text-[11px] font-bold text-zinc-400">

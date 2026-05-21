@@ -3,20 +3,15 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Compass, PlusCircle, Bell, User } from 'lucide-react';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+import { House, Compass, UserPlus, Bell, UserCircle } from '@phosphor-icons/react';
+import { motion } from 'framer-motion';
 
 const navItems = [
-  { icon: Home, label: 'Home', href: '/' },
-  { icon: Compass, label: 'Explore', href: '/explore' },
-  { icon: PlusCircle, label: 'Join', href: '/join' },
-  { icon: Bell, label: 'Alerts', href: '/notifications' },
-  { icon: User, label: 'Profile', href: '/login' },
+  { icon: House, label: 'Home', href: '/' },
+  { icon: Compass, label: 'Explore', href: '/platform' },
+  { icon: UserPlus, label: 'Join', href: '/join' },
+  { icon: Bell, label: 'Alerts', href: '/login' },
+  { icon: UserCircle, label: 'Profile', href: '/login' },
 ];
 
 export function BottomNav() {
@@ -27,35 +22,49 @@ export function BottomNav() {
   if (isAuthPage || isDashboard) return null;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/50 bg-background/60 backdrop-blur-xl lg:hidden safe-area-bottom">
-      <div className="flex h-16 pb-1 items-center justify-around px-4">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
-          const Icon = item.icon;
+    <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50">
+      <nav className="bg-white/90 dark:bg-[#0A0E17]/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden">
+        <div className="flex h-[72px] items-center justify-around px-2">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            const Icon = item.icon;
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'flex flex-col items-center justify-center gap-1.5 transition-all duration-300 relative',
-                isActive ? 'text-brand scale-110' : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              <Icon className={cn('h-6 w-6 transition-all', isActive && 'stroke-[2.5px]')} />
-              <span className={cn(
-                'text-[9px] font-bold uppercase tracking-wider transition-all',
-                isActive ? 'opacity-100' : 'opacity-60'
-              )}>
-                {item.label}
-              </span>
-              {isActive && (
-                <div className="absolute -top-2 h-1 w-1 rounded-full bg-brand shadow-[0_0_8px_rgba(0,102,255,0.8)]" />
-              )}
-            </Link>
-          );
-        })}
-      </div>
-    </nav>
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                className="relative flex flex-col items-center justify-center w-full h-full gap-1 group"
+              >
+                {isActive && (
+                  <motion.div 
+                    layoutId="bottomNavIndicator"
+                    className="absolute top-0 w-8 h-1 bg-gradient-to-r from-[#0066FF] to-[#7000FF] rounded-b-full shadow-[0_4px_12px_rgba(0,102,255,0.4)]"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+                
+                <Icon 
+                  size={24} 
+                  weight={isActive ? "fill" : "regular"} 
+                  className={`transition-colors duration-300 ${
+                    isActive 
+                      ? "text-[#0066FF] dark:text-[#00D1FF]" 
+                      : "text-zinc-400 group-hover:text-zinc-950 dark:group-hover:text-white"
+                  }`} 
+                />
+                
+                <span className={`text-[10px] font-black uppercase tracking-widest transition-colors duration-300 ${
+                  isActive 
+                    ? "text-zinc-950 dark:text-white" 
+                    : "text-zinc-400 group-hover:text-zinc-950 dark:group-hover:text-white"
+                }`}>
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+    </div>
   );
 }

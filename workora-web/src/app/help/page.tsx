@@ -50,11 +50,11 @@ export default function HelpCenterPage() {
   ];
 
   return (
-    <main className="mx-auto max-w-screen-2xl px-[5%] pt-20 flex flex-col bg-white text-zinc-950 overflow-x-hidden font-display">
+    <main className="mx-auto max-w-screen-2xl px-[5%] pt-20 flex flex-col bg-white dark:bg-[#0A0E17] text-zinc-950 dark:text-zinc-50 overflow-x-hidden font-display min-h-screen">
       
       {/* Help Hero */}
-      <section className="relative h-[55vh] w-full mt-4 rounded-[60px] overflow-hidden group bg-white border border-zinc-100">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]" />
+      <section className="relative h-[55vh] w-full mt-4 rounded-[60px] overflow-hidden group bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] dark:opacity-10" />
         
         {/* Decorative Background Elements */}
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#0066FF]/5 blur-[120px] rounded-full" />
@@ -71,14 +71,14 @@ export default function HelpCenterPage() {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="h-20 w-20 rounded-[32px] bg-zinc-50 shadow-inner flex items-center justify-center mb-10 border border-zinc-100"
+              className="h-20 w-20 rounded-[32px] bg-zinc-50 dark:bg-zinc-800 shadow-inner flex items-center justify-center mb-10 border border-zinc-100 dark:border-zinc-700"
             >
               <Question size={40} weight="duotone" className="text-[#0066FF]" />
             </motion.div>
             
             <p className="text-[#0066FF] font-black uppercase tracking-[0.4em] text-[11px] mb-8">Workora Concierge</p>
             
-            <h1 className="text-[80px] font-black tracking-tighter text-zinc-950 mb-10 leading-[0.95]">
+            <h1 className="text-[80px] font-black tracking-tighter text-zinc-950 dark:text-white mb-10 leading-[0.95]">
               How can we <br />
               <span className="italic text-[#0066FF]">assist</span> you?
             </h1>
@@ -95,7 +95,7 @@ export default function HelpCenterPage() {
                 <input 
                   type="text" 
                   placeholder="Search for articles, guides, or keywords..." 
-                  className="h-16 w-full bg-white border border-zinc-200 rounded-[22px] pl-16 pr-8 text-lg font-medium outline-none focus:border-[#0066FF] transition-all shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)]"
+                  className="h-16 w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-[22px] pl-16 pr-8 text-lg font-medium outline-none focus:border-[#0066FF] dark:focus:border-[#0066FF] text-zinc-950 dark:text-white transition-all shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] dark:shadow-black"
                 />
               </div>
             </motion.div>
@@ -115,14 +115,14 @@ export default function HelpCenterPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-20">
           <div className="lg:col-span-1">
              <h2 className="text-5xl font-black tracking-tighter mb-8 leading-tight">Frequently Asked <br /> Questions.</h2>
-             <p className="text-zinc-500 text-lg font-medium leading-relaxed mb-12">
+             <p className="text-zinc-500 dark:text-zinc-400 text-lg font-medium leading-relaxed mb-12">
                Find quick answers to common questions about accounts, payments, and platform safety.
              </p>
              <div className="flex flex-col gap-6">
-                <div className="flex items-center gap-4 p-6 rounded-2xl bg-zinc-50 border border-zinc-100">
+                <div className="flex items-center gap-4 p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
                   <ChatTeardropText size={32} weight="duotone" className="text-[#0066FF]" />
                   <div>
-                    <p className="text-sm font-black uppercase tracking-widest text-zinc-400">Live Support</p>
+                    <p className="text-sm font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">Live Support</p>
                     <p className="font-bold">Available 24/7</p>
                   </div>
                 </div>
@@ -140,19 +140,19 @@ export default function HelpCenterPage() {
                    {cat.questions.map((faq, fIdx) => {
                      const isOpened = openFaq === (idx * 10 + fIdx);
                      return (
-                       <div key={fIdx} className="border-b border-zinc-100 pb-4">
+                       <div key={fIdx} className="border-b border-zinc-100 dark:border-zinc-800 pb-4">
                          <button 
                            onClick={() => setOpenFaq(isOpened ? null : idx * 10 + fIdx)}
                            className="w-full flex items-center justify-between text-left group"
                          >
-                           <span className={`text-lg font-bold transition-colors ${isOpened ? 'text-[#0066FF]' : 'text-zinc-700 group-hover:text-zinc-950'}`}>{faq.q}</span>
+                           <span className={`text-lg font-bold transition-colors ${isOpened ? 'text-[#0066FF]' : 'text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-950 dark:group-hover:text-white'}`}>{faq.q}</span>
                            {isOpened ? <Minus weight="bold" /> : <Plus weight="bold" />}
                          </button>
                          {isOpened && (
                            <motion.div 
                              initial={{ opacity: 0, height: 0 }}
                              animate={{ opacity: 1, height: 'auto' }}
-                             className="pt-4 text-zinc-500 font-medium leading-relaxed"
+                             className="pt-4 text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed"
                            >
                              {faq.a}
                            </motion.div>
@@ -168,32 +168,32 @@ export default function HelpCenterPage() {
       </section>
 
       {/* Contact Form Section */}
-      <section className="py-32 bg-zinc-50 rounded-[80px] mx-[2%] px-[10%] flex flex-col lg:flex-row items-start gap-24 overflow-hidden relative border border-zinc-100 mb-40">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02]" />
+      <section className="py-32 bg-zinc-50 dark:bg-zinc-900 rounded-[80px] mx-[2%] px-[10%] flex flex-col lg:flex-row items-start gap-24 overflow-hidden relative border border-zinc-100 dark:border-zinc-800 mb-40">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02] dark:opacity-10" />
         <div className="flex-1 z-10">
-          <h2 className="text-6xl font-black tracking-tighter text-zinc-950 mb-8 leading-tight">
+          <h2 className="text-6xl font-black tracking-tighter text-zinc-950 dark:text-white mb-8 leading-tight">
             Still have <br />
             <span className="text-[#0066FF]">Questions?</span>
           </h2>
-          <p className="text-zinc-600 text-xl mb-12 leading-relaxed">
+          <p className="text-zinc-600 dark:text-zinc-400 text-xl mb-12 leading-relaxed">
             If you couldn&apos;t find what you were looking for, send us a message and our support team will get back to you within 24 hours.
           </p>
           <div className="flex flex-col gap-8">
             <div className="flex items-center gap-6">
-              <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center shadow-sm border border-zinc-100">
+              <div className="h-12 w-12 rounded-2xl bg-white dark:bg-zinc-800 flex items-center justify-center shadow-sm border border-zinc-100 dark:border-zinc-700">
                 <EnvelopeSimple size={24} weight="duotone" className="text-[#0066FF]" />
               </div>
               <div>
-                <p className="text-xs font-black uppercase tracking-widest text-zinc-400">Email Us</p>
+                <p className="text-xs font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">Email Us</p>
                 <p className="font-bold">info@imeantech.com</p>
               </div>
             </div>
             <div className="flex items-center gap-6">
-              <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center shadow-sm border border-zinc-100">
+              <div className="h-12 w-12 rounded-2xl bg-white dark:bg-zinc-800 flex items-center justify-center shadow-sm border border-zinc-100 dark:border-zinc-700">
                 <Phone size={24} weight="duotone" className="text-[#0066FF]" />
               </div>
               <div>
-                <p className="text-xs font-black uppercase tracking-widest text-zinc-400">Call Us</p>
+                <p className="text-xs font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">Call Us</p>
                 <p className="font-bold">+254 114 971 070</p>
               </div>
             </div>
@@ -201,24 +201,24 @@ export default function HelpCenterPage() {
         </div>
 
         <div className="flex-1 w-full z-10">
-          <form className="bg-white p-10 rounded-[40px] shadow-2xl shadow-black/5 border border-zinc-100 flex flex-col gap-6">
+          <form className="bg-white dark:bg-[#0A0E17] p-10 rounded-[40px] shadow-2xl shadow-black/5 dark:shadow-black border border-zinc-100 dark:border-zinc-800 flex flex-col gap-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-black uppercase tracking-widest text-zinc-400 ml-1">Name</label>
-                <input type="text" placeholder="John Doe" className="h-14 w-full bg-zinc-50 border border-zinc-100 rounded-2xl px-6 outline-none focus:ring-4 ring-[#0066FF]/5 font-medium transition-all" />
+                <label className="text-sm font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 ml-1">Name</label>
+                <input type="text" placeholder="John Doe" className="h-14 w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl px-6 outline-none focus:ring-4 ring-[#0066FF]/5 dark:ring-[#0066FF]/10 text-zinc-950 dark:text-white font-medium transition-all" />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-black uppercase tracking-widest text-zinc-400 ml-1">Email</label>
-                <input type="email" placeholder="john@example.com" className="h-14 w-full bg-zinc-50 border border-zinc-100 rounded-2xl px-6 outline-none focus:ring-4 ring-[#0066FF]/5 font-medium transition-all" />
+                <label className="text-sm font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 ml-1">Email</label>
+                <input type="email" placeholder="john@example.com" className="h-14 w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl px-6 outline-none focus:ring-4 ring-[#0066FF]/5 dark:ring-[#0066FF]/10 text-zinc-950 dark:text-white font-medium transition-all" />
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-black uppercase tracking-widest text-zinc-400 ml-1">Subject</label>
-              <input type="text" placeholder="How can we help?" className="h-14 w-full bg-zinc-50 border border-zinc-100 rounded-2xl px-6 outline-none focus:ring-4 ring-[#0066FF]/5 font-medium transition-all" />
+              <label className="text-sm font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 ml-1">Subject</label>
+              <input type="text" placeholder="How can we help?" className="h-14 w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-2xl px-6 outline-none focus:ring-4 ring-[#0066FF]/5 dark:ring-[#0066FF]/10 text-zinc-950 dark:text-white font-medium transition-all" />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-black uppercase tracking-widest text-zinc-400 ml-1">Message</label>
-              <textarea placeholder="Tell us more about your issue..." rows={4} className="w-full bg-zinc-50 border border-zinc-100 rounded-3xl p-6 outline-none focus:ring-4 ring-[#0066FF]/5 font-medium transition-all resize-none"></textarea>
+              <label className="text-sm font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500 ml-1">Message</label>
+              <textarea placeholder="Tell us more about your issue..." rows={4} className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-3xl p-6 outline-none focus:ring-4 ring-[#0066FF]/5 dark:ring-[#0066FF]/10 text-zinc-950 dark:text-white font-medium transition-all resize-none"></textarea>
             </div>
             <motion.button 
               whileHover={{ scale: 1.02 }}
@@ -231,13 +231,6 @@ export default function HelpCenterPage() {
           </form>
         </div>
       </section>
-
-      <footer className="py-20 border-t border-zinc-100 flex flex-col items-center gap-8">
-        <Link href="/" className="relative h-12 w-12 bg-zinc-200/50 backdrop-blur-xl border border-white/50 rounded-full shadow-lg flex items-center justify-center">
-           <div className="h-8 w-8 bg-black rounded-full" />
-        </Link>
-        <p className="text-zinc-400 font-black uppercase tracking-[0.3em] text-[10px]">© 2026 Workora Help Center</p>
-      </footer>
 
     </main>
   );
