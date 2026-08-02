@@ -271,7 +271,14 @@ export default function PersonalDashboard() {
   };
 
   return (
-    <div className="h-full w-full flex flex-col lg:flex-row overflow-hidden">
+    <div className="h-full w-full flex flex-col overflow-hidden bg-white dark:bg-black">
+      
+      {/* Instagram-style Top Header - Mobile Only */}
+      <div className="lg:hidden sticky top-0 z-50 bg-white dark:bg-black border-b border-zinc-100 dark:border-zinc-900 px-4 py-3 flex items-center justify-between">
+        <PlusSquare size={28} weight="regular" className="text-zinc-950 dark:text-white" />
+        <h1 className="font-['Billabong',cursive] text-3xl text-zinc-950 dark:text-white">Workora</h1>
+        <Heart size={28} weight="regular" className="text-zinc-950 dark:text-white" />
+      </div>
 
       {sharePost && (
         <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-md" onClick={() => setSharePost(null)}>
@@ -363,174 +370,223 @@ export default function PersonalDashboard() {
         )}
       </AnimatePresence>
 
-      <main className="flex-1 h-full overflow-y-auto bg-white dark:bg-[#0A0E17] flex flex-col items-center pt-4 lg:pt-8 w-full">
-        <div className="w-full max-w-[660px] px-4 lg:px-6 pb-20">
-          
-          <div className="relative mb-6 lg:mb-10 group overflow-hidden">
-            <div className="flex gap-5 overflow-x-auto pb-4 no-scrollbar">
-              {stories.map((story, i) => (
-                <button key={i} className="flex flex-col items-center gap-2.5 min-w-[80px] flex-shrink-0 group/story">
-                  <div className="h-16 w-16 rounded-full flex items-center justify-center bg-gradient-to-tr from-[#FFD600] via-[#FF7A00] to-[#FF0069] p-[2px] transform group-hover/story:scale-105 transition-transform">
-                    <div className="h-full w-full rounded-full bg-white flex items-center justify-center p-[2px]">
-                      <div className={`h-full w-full rounded-full flex items-center justify-center ${story.color} shadow-inner`}>
-                        <span className="text-lg font-black">{story.initial}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-[11px] font-bold text-zinc-400 tracking-tight text-center truncate w-full">{story.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-12 lg:space-y-16">
-            {loading ? (
-              <div className="space-y-10">
-                {[1, 2].map((item) => (
-                  <div key={item} className="space-y-4">
-                    <div className="flex items-center justify-between pb-4">
-                      <div className="flex items-center gap-3.5">
-                        <div className="h-10 w-10 rounded-full bg-zinc-100 dark:bg-zinc-900 animate-pulse" />
-                        <div className="space-y-2">
-                          <div className="h-4 w-28 bg-zinc-100 dark:bg-zinc-900 rounded-full animate-pulse" />
-                          <div className="h-3 w-16 bg-zinc-100 dark:bg-zinc-900 rounded-full animate-pulse" />
+      <main className="flex-1 h-full overflow-y-auto bg-white dark:bg-black flex flex-col lg:flex-row">
+        {/* Feed Content */}
+        <div className="flex-1 flex flex-col items-center w-full">
+          <div className="w-full max-w-[660px] lg:px-6">
+            
+            {/* Stories Row */}
+            <div className="relative py-4 border-b border-zinc-100 dark:border-zinc-900 bg-white dark:bg-black">
+              <div className="flex gap-4 overflow-x-auto px-4 no-scrollbar">
+                {stories.map((story, i) => (
+                  <button key={i} className="flex flex-col items-center gap-1.5 min-w-[72px] flex-shrink-0 group/story">
+                    <div className="h-16 w-16 rounded-full flex items-center justify-center bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] p-[2.5px] transform group-hover/story:scale-105 transition-transform">
+                      <div className="h-full w-full rounded-full bg-white dark:bg-black flex items-center justify-center p-[3px]">
+                        <div className={`h-full w-full rounded-full flex items-center justify-center ${story.color} shadow-inner`}>
+                          <span className="text-base font-black">{story.initial}</span>
                         </div>
                       </div>
-                      <div className="h-8 w-8 bg-zinc-100 dark:bg-zinc-900 rounded-full animate-pulse" />
                     </div>
-                    <div className="aspect-[4/5] sm:aspect-square bg-zinc-100 dark:bg-zinc-900 rounded-2xl sm:rounded-3xl animate-pulse" />
-                    <div className="space-y-3">
-                      <div className="h-5 w-32 bg-zinc-100 dark:bg-zinc-900 rounded-full animate-pulse" />
-                      <div className="h-4 w-full bg-zinc-100 dark:bg-zinc-900 rounded-full animate-pulse" />
-                      <div className="h-4 w-3/4 bg-zinc-100 dark:bg-zinc-900 rounded-full animate-pulse" />
+                    <span className="text-[11px] font-medium text-zinc-950 dark:text-white text-center truncate w-full max-w-[72px]">
+                      {story.name.split(' ')[0]}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Posts Feed */}
+            <div className="divide-y divide-zinc-100 dark:divide-zinc-900">
+              {loading ? (
+                <div className="space-y-0">
+                  {[1, 2].map((item) => (
+                    <div key={item} className="py-4 space-y-3">
+                      <div className="flex items-center gap-3 px-4">
+                        <div className="h-8 w-8 rounded-full bg-zinc-100 dark:bg-zinc-900 animate-pulse" />
+                        <div className="h-3 w-24 bg-zinc-100 dark:bg-zinc-900 rounded-full animate-pulse" />
+                      </div>
+                      <div className="aspect-square bg-zinc-100 dark:bg-zinc-900 animate-pulse" />
+                      <div className="px-4 space-y-2">
+                        <div className="h-4 w-20 bg-zinc-100 dark:bg-zinc-900 rounded-full animate-pulse" />
+                        <div className="h-3 w-full bg-zinc-100 dark:bg-zinc-900 rounded-full animate-pulse" />
+                      </div>
                     </div>
+                  ))}
+                </div>
+              ) : posts.length > 0 ? posts.map((post, i) => (
+                <article key={i} className="bg-white dark:bg-black py-2">
+                  {/* Post Header */}
+                  <div className="flex items-center justify-between px-3 py-2">
+                    <div className="flex items-center gap-3">
+                      <div 
+                        className="h-8 w-8 rounded-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] p-[2px] cursor-pointer" 
+                        onClick={() => startConversation(post.user_id || post.worker_id)}
+                      >
+                        <div className="h-full w-full rounded-full bg-white dark:bg-black flex items-center justify-center">
+                          <div className="h-full w-full rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-[10px] font-black text-zinc-950 dark:text-white">
+                            {post.user_name.charAt(0)}
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-[13px] font-semibold text-zinc-950 dark:text-white cursor-pointer" onClick={() => startConversation(post.user_id || post.worker_id)}>
+                            {post.user_name.toLowerCase().replace(' ', '')}
+                          </p>
+                          {post.verified && <SealCheck size={12} weight="fill" className="text-[#0066FF]" />}
+                        </div>
+                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 font-normal">{post.trade}</p>
+                      </div>
+                    </div>
+                    <button className="text-zinc-950 dark:text-white">
+                      <DotsThree size={24} weight="bold" />
+                    </button>
+                  </div>
+
+                  {/* Post Video/Image */}
+                  <div className="aspect-square bg-black w-full">
+                    <VideoPlayer 
+                      src={post.video_url} 
+                      poster={post.thumbnail_url || APP_CONFIG.defaults.thumbnail} 
+                      className="w-full h-full object-cover" 
+                    />
+                  </div>
+
+                  {/* Post Actions */}
+                  <div className="px-3 pt-2 pb-1 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <Heart 
+                          size={26} 
+                          weight={post.liked_by_me ? "fill" : "regular"} 
+                          className={`${post.liked_by_me ? "text-red-500" : "text-zinc-950 dark:text-white"} cursor-pointer active:scale-90 transition-transform`} 
+                          onClick={() => handleLike(post.id)} 
+                        />
+                        <ChatCircleDots 
+                          size={26} 
+                          weight="regular"
+                          className="text-zinc-950 dark:text-white cursor-pointer active:scale-90 transition-transform" 
+                          onClick={() => fetchComments(post)} 
+                        />
+                        <ShareFat 
+                          size={26}
+                          weight="regular" 
+                          className="text-zinc-950 dark:text-white cursor-pointer active:scale-90 transition-transform" 
+                          onClick={() => handleShare(post)} 
+                        />
+                      </div>
+                      <BookmarkSimple 
+                        size={26} 
+                        weight={post.saved_by_me ? "fill" : "regular"} 
+                        className={`${post.saved_by_me ? 'text-zinc-950 dark:text-white' : 'text-zinc-950 dark:text-white'} cursor-pointer active:scale-90 transition-transform`} 
+                        onClick={() => handleSave(post)} 
+                      />
+                    </div>
+                    
+                    {/* Likes Count */}
+                    <div className="text-[13px] font-semibold text-zinc-950 dark:text-white">
+                      {post.likes_count.toLocaleString()} likes
+                    </div>
+                    
+                    {/* Caption */}
+                    <div className="text-[13px] leading-[18px] text-zinc-950 dark:text-white">
+                      <span className="font-semibold mr-1.5">{post.handle}</span>
+                      <span className="font-normal">{post.description}</span>
+                    </div>
+                    
+                    {/* View Comments */}
+                    {post.comments_count > 0 && (
+                      <button 
+                        className="text-zinc-500 dark:text-zinc-400 text-[13px] font-normal" 
+                        onClick={() => fetchComments(post)}
+                      >
+                        View all {post.comments_count} comments
+                      </button>
+                    )}
+                    
+                    {/* Time Ago */}
+                    <div className="text-[10px] text-zinc-400 dark:text-zinc-500 uppercase font-normal tracking-wide">
+                      {timeAgo(post.created_at)}
+                    </div>
+                  </div>
+                </article>
+              )) : (
+                <div className="py-20 flex flex-col items-center text-center gap-6 px-4">
+                  <div className="h-24 w-24 rounded-full border-4 border-zinc-950 dark:border-white flex items-center justify-center">
+                    <PlusSquare size={48} weight="regular" className="text-zinc-950 dark:text-white" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-black text-zinc-950 dark:text-white">No Posts Yet</h3>
+                    <p className="text-zinc-500 dark:text-zinc-400 font-normal text-sm max-w-[280px] mx-auto">
+                      When people you follow share work, you'll see their posts here.
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              {/* Load More */}
+              {posts.length > 0 && hasMoreFeed && (
+                <div className="flex justify-center py-6">
+                  <button
+                    onClick={loadMoreFeed}
+                    disabled={loadingMoreFeed}
+                    className="text-[#0066FF] text-sm font-semibold disabled:opacity-50"
+                  >
+                    {loadingMoreFeed ? 'Loading...' : 'Load more'}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Sidebar - Hidden on Mobile */}
+        <aside className="hidden xl:block w-[420px] border-l border-zinc-100 dark:border-zinc-900 bg-white dark:bg-black p-8 space-y-8 sticky top-0 h-screen overflow-y-auto">
+          <div className="w-full flex items-center justify-between group cursor-pointer p-4 bg-zinc-50/50 dark:bg-zinc-900/50 rounded-2xl hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all">
+            <div className="flex items-center gap-5">
+              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[#0066FF] to-[#7000FF] flex items-center justify-center text-white text-xl font-black shadow-xl shadow-blue-50 dark:shadow-blue-900/20 border-4 border-white dark:border-zinc-800 uppercase">
+                {currentUser?.username?.charAt(0) || 'U'}
+              </div>
+              <div className="flex flex-col">
+                <p className="text-[16px] font-black text-zinc-900 dark:text-white tracking-tight leading-none">{currentUser?.username || 'Guest'}</p>
+                <p className="text-[14px] text-zinc-400 font-bold tracking-wide mt-1 uppercase">{currentUser?.role || 'User'}</p>
+              </div>
+            </div>
+            <Link href="/login" className="text-[#0066FF] text-[13px] font-black">Switch</Link>
+          </div>
+
+          <div className="space-y-10">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <p className="text-[15px] font-black text-zinc-400 dark:text-zinc-500 tracking-tight uppercase">Suggested For You</p>
+                <button className="text-[12px] font-black text-zinc-900 dark:text-white">See All</button>
+              </div>
+              <div className="space-y-6">
+                {suggestedPros.map((pro, i) => (
+                  <div key={i} className="flex items-center justify-between group">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-full bg-white dark:bg-zinc-900 border border-zinc-50 dark:border-zinc-800 flex items-center justify-center text-[11px] font-black text-zinc-400 dark:text-zinc-500 shadow-sm">{pro.initial}</div>
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                          <p className="text-[15px] font-black text-zinc-900 dark:text-white tracking-tight">{pro.name}</p>
+                          {pro.is_verified && <SealCheck size={16} weight="fill" className="text-[#0066FF]" />}
+                        </div>
+                        <div className="flex items-center gap-2 text-[11px] font-bold text-zinc-400">
+                          <span className="flex items-center gap-0.5 text-amber-500"><Star size={12} weight="fill" /> {pro.rating}</span>
+                          <span>&bull;</span>
+                          <span className="text-[9px] uppercase tracking-tighter">{pro.trade}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <button className="text-[#0066FF] text-[13px] font-black" onClick={() => startConversation(pro.user_id || pro.id)}>Connect</button>
                   </div>
                 ))}
               </div>
-            ) : posts.length > 0 ? posts.map((post, i) => (
-              <article key={i} className="bg-white dark:bg-[#0A0E17]">
-                <div className="flex items-center justify-between pb-4">
-                  <div className="flex items-center gap-3.5">
-                    <div className="h-10 w-10 rounded-full bg-zinc-50 dark:bg-zinc-900 text-zinc-950 dark:text-white flex items-center justify-center text-xs font-black shadow-sm cursor-pointer" onClick={() => startConversation(post.user_id || post.worker_id)}>{post.user_name.charAt(0)}</div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="text-[14px] font-black text-zinc-900 dark:text-white cursor-pointer" onClick={() => startConversation(post.user_id || post.worker_id)}>{post.user_name}</p>
-                        {post.verified && <SealCheck size={16} weight="fill" className="text-[#0066FF]" />}
-                      </div>
-                      <p className="text-[10px] text-[#0066FF] font-black uppercase tracking-[0.2em]">{post.trade}</p>
-                    </div>
-                  </div>
-                  <button className="text-zinc-300 dark:text-zinc-600 hover:text-zinc-900 dark:hover:text-white"><DotsThree size={32} weight="bold" /></button>
-                </div>
-
-                <div className="aspect-[4/5] sm:aspect-square bg-zinc-100 dark:bg-zinc-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
-                  <VideoPlayer 
-                    src={post.video_url} 
-                    poster={post.thumbnail_url || APP_CONFIG.defaults.thumbnail} 
-                    className="w-full h-full" 
-                  />
-                </div>
-
-                <div className="py-6 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-7 text-zinc-950 dark:text-white">
-                      <Heart size={28} weight={post.liked_by_me ? "fill" : "regular"} className={`${post.liked_by_me ? "text-red-500" : "hover:text-red-500"} cursor-pointer transition-colors`} onClick={() => handleLike(post.id)} />
-                      <ChatCircleDots size={28} className="hover:text-[#0066FF] cursor-pointer" onClick={() => fetchComments(post)} />
-                      <ShareFat size={28} className="hover:text-[#0066FF] cursor-pointer" onClick={() => handleShare(post)} />
-                    </div>
-                    <BookmarkSimple 
-                      size={28} 
-                      weight={post.saved_by_me ? "fill" : "regular"} 
-                      className={`${post.saved_by_me ? 'text-[#0066FF]' : 'hover:text-[#0066FF] text-zinc-950 dark:text-white'} cursor-pointer`} 
-                      onClick={() => handleSave(post)} 
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <p className="text-[14px] font-black text-zinc-900 dark:text-white">{post.likes_count.toLocaleString()} likes</p>
-                    <p className="text-[14px] leading-relaxed text-zinc-600 dark:text-zinc-300">
-                      <span className="font-black mr-2 text-zinc-900 dark:text-white">@{post.handle}</span>
-                      {post.description}
-                    </p>
-                    <button className="text-zinc-400 text-[13px] font-bold hover:text-zinc-600 dark:hover:text-zinc-300 pt-2" onClick={() => fetchComments(post)}>
-                      View all {post.comments_count} comments
-                    </button>
-                  </div>
-                </div>
-              </article>
-            )) : (
-              <div className="py-20 flex flex-col items-center text-center gap-6">
-                <div className="h-24 w-24 rounded-[32px] bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-zinc-200 dark:text-zinc-700">
-                  <PlusSquare size={48} weight="duotone" />
-                </div>
-                <div className="space-y-2">
-                  <h3 className="text-xl font-black tracking-tight text-zinc-950 dark:text-white">Your Feed is Empty</h3>
-                  <p className="text-zinc-400 font-bold text-sm max-w-[280px] mx-auto">Start following pros or share your own work to see content here.</p>
-                </div>
-                <Link href="/dashboard/create" className="px-8 h-12 bg-[#0066FF] text-white rounded-full font-black text-[13px] uppercase tracking-widest shadow-xl shadow-blue-500/20 hover:scale-105 transition-all flex items-center justify-center">
-                  Create First Post
-                </Link>
-              </div>
-            )}
-            {posts.length > 0 && hasMoreFeed && (
-              <div className="flex justify-center pt-4">
-                <button
-                  onClick={loadMoreFeed}
-                  disabled={loadingMoreFeed}
-                  className="h-12 px-6 rounded-full bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-[12px] font-black uppercase tracking-[0.2em] shadow-lg shadow-black/10 disabled:opacity-50"
-                >
-                  {loadingMoreFeed ? 'Loading more' : 'Load more posts'}
-                </button>
-              </div>
-            )}
+            </div>
+            <p className="text-[10px] text-zinc-300 font-black tracking-[0.3em] uppercase">&copy; 2026 WORKORA BY IMEANTECH</p>
           </div>
-        </div>
+        </aside>
       </main>
-
-      <aside className="hidden xl:flex flex-col w-[400px] h-full flex-shrink-0 bg-white dark:bg-[#0A0E17] border-l border-zinc-50 dark:border-zinc-800 space-y-10 pt-8 px-6 overflow-y-auto">
-        <div className="w-full flex items-center justify-between group cursor-pointer p-4 bg-zinc-50/50 dark:bg-zinc-900/50 rounded-2xl hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all">
-          <div className="flex items-center gap-5">
-            <div className="h-16 w-16 rounded-full bg-gradient-to-br from-[#0066FF] to-[#7000FF] flex items-center justify-center text-white text-xl font-black shadow-xl shadow-blue-50 dark:shadow-blue-900/20 border-4 border-white dark:border-zinc-800 uppercase">
-              {currentUser?.username?.charAt(0) || 'U'}
-            </div>
-            <div className="flex flex-col">
-              <p className="text-[16px] font-black text-zinc-900 dark:text-white tracking-tight leading-none">{currentUser?.username || 'Guest'}</p>
-              <p className="text-[14px] text-zinc-400 font-bold tracking-wide mt-1 uppercase">{currentUser?.role || 'User'}</p>
-            </div>
-          </div>
-          <Link href="/login" className="text-[#0066FF] text-[13px] font-black">Switch</Link>
-        </div>
-
-        <div className="space-y-10">
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <p className="text-[15px] font-black text-zinc-400 dark:text-zinc-500 tracking-tight uppercase">Suggested For You</p>
-              <button className="text-[12px] font-black text-zinc-900 dark:text-white">See All</button>
-            </div>
-            <div className="space-y-6">
-              {suggestedPros.map((pro, i) => (
-                <div key={i} className="flex items-center justify-between group">
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-white dark:bg-zinc-900 border border-zinc-50 dark:border-zinc-800 flex items-center justify-center text-[11px] font-black text-zinc-400 dark:text-zinc-500 shadow-sm">{pro.initial}</div>
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-2">
-                        <p className="text-[15px] font-black text-zinc-900 dark:text-white tracking-tight">{pro.name}</p>
-                        {pro.is_verified && <SealCheck size={16} weight="fill" className="text-[#0066FF]" />}
-                      </div>
-                      <div className="flex items-center gap-2 text-[11px] font-bold text-zinc-400">
-                        <span className="flex items-center gap-0.5 text-amber-500"><Star size={12} weight="fill" /> {pro.rating}</span>
-                        <span>&bull;</span>
-                        <span className="text-[9px] uppercase tracking-tighter">{pro.trade}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <button className="text-[#0066FF] text-[13px] font-black" onClick={() => startConversation(pro.user_id || pro.id)}>Connect</button>
-                </div>
-              ))}
-            </div>
-          </div>
-          <p className="text-[10px] text-zinc-300 font-black tracking-[0.3em] uppercase">&copy; 2026 WORKORA BY IMEANTECH</p>
-        </div>
-      </aside>
     </div>
   );
 }
