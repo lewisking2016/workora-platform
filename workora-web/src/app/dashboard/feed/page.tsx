@@ -111,8 +111,13 @@ export default function PersonalDashboard() {
         setLoadingMoreFeed(true);
       }
 
+      console.log('Fetching feed from:', `/api/gigs/feed?page=${page}&limit=${FEED_PAGE_SIZE}`);
       const res = await fetch(`/api/gigs/feed?page=${page}&limit=${FEED_PAGE_SIZE}`);
+      console.log('Feed response status:', res.status);
       const data = await res.json();
+      console.log('Feed data received:', data);
+      console.log('Feed data length:', Array.isArray(data) ? data.length : 'not array');
+      
       const nextPosts = Array.isArray(data) ? data : [];
       setPosts(prev => append ? [...prev, ...nextPosts] : nextPosts);
       setHasMoreFeed(nextPosts.length === FEED_PAGE_SIZE);
