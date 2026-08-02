@@ -1,23 +1,6 @@
-@import "tailwindcss";
-
-@custom-variant dark (&:where(.dark, .dark *));
-
-@theme {
-  --color-brand: #0066FF; /* ImeanTech Electric Blue */
-  --color-brand-light: #00D1FF;
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  
-  --font-sans: var(--font-inter);
-  --font-display: var(--font-space-grotesk);
-
-  --radius-xl: 1.5rem;
-  --radius-2xl: 2rem;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: #ffffff;
@@ -26,10 +9,12 @@
   --card-foreground: #0A0E17;
   --muted: #F1F5F9;
   --muted-foreground: #64748B;
+  --brand: #0066FF;
+  --brand-light: #00D1FF;
 }
 
 .dark {
-  --background: #0A0E17; /* Deep Obsidian */
+  --background: #0A0E17;
   --foreground: #F8FAFC;
   --card: #161E2C;
   --card-foreground: #F8FAFC;
@@ -40,11 +25,9 @@
 @layer base {
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: var(--font-inter);
   }
 
   h1, h2, h3, h4 {
-    font-family: var(--font-space-grotesk);
     @apply font-bold tracking-tight;
   }
 }
