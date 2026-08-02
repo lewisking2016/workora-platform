@@ -12,7 +12,7 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: 4.221.170.153
-          username: lewis
+          username: azureuser
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
             cd ~/workora-platform
