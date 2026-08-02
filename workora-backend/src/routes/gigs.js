@@ -5,6 +5,11 @@ const { parsePagination } = require('../lib/pagination');
 async function gigRoutes(fastify) {
   const { pool } = fastify;
   const resolveActorId = (request) => request.user?.id;
+  const gigAuthorJoins = `
+      LEFT JOIN worker_profiles wp ON wp.id = g.worker_id
+      LEFT JOIN worker_profiles up ON up.user_id = g.user_id
+      LEFT JOIN users u ON u.id = COALESCE(g.user_id, wp.user_id, up.user_id)
+  `;
 
   // 1. GET FEED (Home Screen Algorithm) - DIRECT QUERY (CACHE DISABLED)
   fastify.get('/feed', async (request, reply) => {
@@ -13,11 +18,11 @@ async function gigRoutes(fastify) {
     const res = await pool.query(`
       SELECT 
         g.*, 
-        COALESCE(p.full_name, u.username) as user_name, 
-        u.username as handle, 
-        COALESCE(p.trade, 'Member') as trade, 
-        COALESCE(p.is_verified, false) as verified,
-        p.avatar_url,
+        COALESCE(wp.full_name, up.full_name, u.username, 'Member') as user_name, 
+        COALESCE(u.username, 'member') as handle, 
+        COALESCE(wp.trade, up.trade, g.category, 'Member') as trade, 
+        COALESCE(wp.is_verified, up.is_verified, false) as verified,
+        COALESCE(wp.avatar_url, up.avatar_url) as avatar_url,
         CASE
           WHEN $1::uuid IS NULL THEN false
           ELSE EXISTS (
@@ -25,11 +30,12 @@ async function gigRoutes(fastify) {
             WHERE sg.gig_id = g.id AND sg.user_id = $1
           )
         END as saved_by_me,
-        (SELECT COUNT(*) FROM gig_likes WHERE gig_id = g.id) as real_likes,
-        (SELECT COUNT(*) FROM gig_comments WHERE gig_id = g.id) as real_comments
+        (SELECT COUNT(*)::int FROM gig_likes WHERE gig_id = g.id) as likes_count,
+        (SELECT COUNT(*)::int FROM gig_comments WHERE gig_id = g.id) as comments_count,
+        (SELECT COUNT(*)::int FROM gig_likes WHERE gig_id = g.id) as real_likes,
+        (SELECT COUNT(*)::int FROM gig_comments WHERE gig_id = g.id) as real_comments
       FROM gigs g
-      JOIN users u ON g.user_id = u.id
-      LEFT JOIN worker_profiles p ON u.id = p.user_id
+      ${gigAuthorJoins}
       ORDER BY g.created_at DESC
       LIMIT $2 OFFSET $3
     `, [resolveActorId(request) || null, limit, offset]);
@@ -43,15 +49,16 @@ async function gigRoutes(fastify) {
     
     const res = await pool.query(`
       SELECT g.*, 
-        COALESCE(p.full_name, u.username) as user_name,
-        u.username as handle,
-        COALESCE(p.trade, 'Member') as trade,
-        COALESCE(p.is_verified, false) as verified,
-        (SELECT COUNT(*) FROM gig_likes WHERE gig_id = g.id) as real_likes,
-        (SELECT COUNT(*) FROM gig_comments WHERE gig_id = g.id) as real_comments
+        COALESCE(wp.full_name, up.full_name, u.username, 'Member') as user_name,
+        COALESCE(u.username, 'member') as handle,
+        COALESCE(wp.trade, up.trade, g.category, 'Member') as trade,
+        COALESCE(wp.is_verified, up.is_verified, false) as verified,
+        (SELECT COUNT(*)::int FROM gig_likes WHERE gig_id = g.id) as likes_count,
+        (SELECT COUNT(*)::int FROM gig_comments WHERE gig_id = g.id) as comments_count,
+        (SELECT COUNT(*)::int FROM gig_likes WHERE gig_id = g.id) as real_likes,
+        (SELECT COUNT(*)::int FROM gig_comments WHERE gig_id = g.id) as real_comments
       FROM gigs g
-      JOIN users u ON g.user_id = u.id
-      LEFT JOIN worker_profiles p ON u.id = p.user_id
+      ${gigAuthorJoins}
       ORDER BY g.view_count DESC
       LIMIT $1 OFFSET $2
     `, [limit, offset]);
@@ -119,15 +126,16 @@ async function gigRoutes(fastify) {
   // 7. GET STORIES (Recent active users)
   fastify.get('/stories', async (request, reply) => {
     const res = await pool.query(`
-      SELECT DISTINCT ON (u.id) 
-        u.id, 
-        COALESCE(p.full_name, u.username) as name, 
-        COALESCE(p.trade, 'Member') as trade, 
-        COALESCE(p.is_verified, false) as verified
-      FROM users u
-      JOIN gigs g ON g.user_id = u.id
-      LEFT JOIN worker_profiles p ON u.id = p.user_id
-      ORDER BY u.id, g.created_at DESC
+      SELECT DISTINCT ON (COALESCE(g.user_id, wp.user_id, up.user_id)) 
+        COALESCE(g.user_id, wp.user_id, up.user_id) as id, 
+        COALESCE(wp.full_name, up.full_name, u.username, 'Member') as name, 
+        COALESCE(wp.trade, up.trade, 'Member') as trade, 
+        COALESCE(wp.is_verified, up.is_verified, false) as verified
+      FROM gigs g
+      LEFT JOIN worker_profiles wp ON wp.id = g.worker_id
+      LEFT JOIN worker_profiles up ON up.user_id = g.user_id
+      LEFT JOIN users u ON u.id = COALESCE(g.user_id, wp.user_id, up.user_id)
+      ORDER BY COALESCE(g.user_id, wp.user_id, up.user_id), g.created_at DESC
       LIMIT 12
     `);
     return res.rows;
@@ -152,17 +160,20 @@ async function gigRoutes(fastify) {
     const res = await pool.query(`
       SELECT 
         g.*,
-        COALESCE(p.full_name, u.username) as user_name,
-        u.username as handle,
-        COALESCE(p.trade, 'Member') as trade,
-        COALESCE(p.is_verified, false) as verified,
+        COALESCE(wp.full_name, up.full_name, u.username, 'Member') as user_name,
+        COALESCE(u.username, 'member') as handle,
+        COALESCE(wp.trade, up.trade, g.category, 'Member') as trade,
+        COALESCE(wp.is_verified, up.is_verified, false) as verified,
         sg.created_at as saved_at,
-        (SELECT COUNT(*) FROM gig_likes WHERE gig_id = g.id) as real_likes,
-        (SELECT COUNT(*) FROM gig_comments WHERE gig_id = g.id) as real_comments
+        (SELECT COUNT(*)::int FROM gig_likes WHERE gig_id = g.id) as likes_count,
+        (SELECT COUNT(*)::int FROM gig_comments WHERE gig_id = g.id) as comments_count,
+        (SELECT COUNT(*)::int FROM gig_likes WHERE gig_id = g.id) as real_likes,
+        (SELECT COUNT(*)::int FROM gig_comments WHERE gig_id = g.id) as real_comments
       FROM saved_gigs sg
       JOIN gigs g ON g.id = sg.gig_id
-      JOIN users u ON g.user_id = u.id
-      LEFT JOIN worker_profiles p ON u.id = p.user_id
+      LEFT JOIN worker_profiles wp ON wp.id = g.worker_id
+      LEFT JOIN worker_profiles up ON up.user_id = g.user_id
+      LEFT JOIN users u ON u.id = COALESCE(g.user_id, wp.user_id, up.user_id)
       WHERE sg.user_id = $1
       ORDER BY sg.created_at DESC
     `, [userId]);

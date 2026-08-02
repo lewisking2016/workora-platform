@@ -43,6 +43,8 @@ interface Post {
   description: string;
   likes_count: number;
   comments_count: number;
+  real_likes?: number;
+  real_comments?: number;
   view_count: number;
   video_url: string;
   thumbnail_url: string;
@@ -223,18 +225,21 @@ export default function PersonalDashboard() {
     }
   };
 
-  const loadMoreFeed = async () => {
-    if (loadingMoreFeed || !hasMoreFeed) return;
-    await fetchFeed(feedPage + 1, true);
-  };
-
   const fetchComments = async (post: Post) => {
     setActiveComments(post);
     try {
       const res = await fetch(`/api/gigs/${post.id}/comments`);
       const data = await res.json();
-      setPostComments(data);
-    } catch (err) { console.error(err); }
+      setPostComments(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error(err);
+      setPostComments([]);
+    }
+  };
+
+  const loadMoreFeed = async () => {
+    if (loadingMoreFeed || !hasMoreFeed) return;
+    await fetchFeed(feedPage + 1, true);
   };
 
   const handleAddComment = async () => {
@@ -474,7 +479,7 @@ export default function PersonalDashboard() {
                           size={26} 
                           weight="regular"
                           className="text-zinc-950 dark:text-white cursor-pointer active:scale-90 transition-transform" 
-                          onClick={() => router.push(`/dashboard/post/${post.id}`)} 
+                          onClick={() => fetchComments(post)} 
                         />
                         <ShareFat 
                           size={26}
@@ -493,7 +498,7 @@ export default function PersonalDashboard() {
                     
                     {/* Likes Count */}
                     <div className="text-[13px] font-semibold text-zinc-950 dark:text-white">
-                      {post.likes_count.toLocaleString()} likes
+                      {(post.likes_count ?? post.real_likes ?? 0).toLocaleString()} likes
                     </div>
                     
                     {/* Caption */}
@@ -503,12 +508,12 @@ export default function PersonalDashboard() {
                     </div>
                     
                     {/* View Comments */}
-                    {post.comments_count > 0 && (
+                    {((post.comments_count ?? post.real_comments ?? 0) > 0) && (
                       <button 
                         className="text-zinc-500 dark:text-zinc-400 text-[13px] font-normal" 
-                        onClick={() => router.push(`/dashboard/post/${post.id}`)}
+                        onClick={() => fetchComments(post)}
                       >
-                        View all {post.comments_count} comments
+                        View all {(post.comments_count ?? post.real_comments ?? 0)} comments
                       </button>
                     )}
                     
@@ -526,7 +531,7 @@ export default function PersonalDashboard() {
                   <div className="space-y-2">
                     <h3 className="text-xl font-black text-zinc-950 dark:text-white">No Posts Yet</h3>
                     <p className="text-zinc-500 dark:text-zinc-400 font-normal text-sm max-w-[280px] mx-auto">
-                      When people you follow share work, you'll see their posts here.
+                      When people you follow share work, you&apos;ll see their posts here.
                     </p>
                   </div>
                 </div>
