@@ -12,6 +12,7 @@ import {
 import Link from 'next/link';
 import Image from 'next/image';
 import { VideoPlayer } from '@/components/VideoPlayer';
+import { fetchCurrentUser } from '@/lib/session';
 
 type Tab = 'overview' | 'profile' | 'portfolio' | 'analytics';
 
@@ -31,16 +32,27 @@ export default function BusinessDashboard() {
   const [newSkill, setNewSkill] = useState('');
 
   useEffect(() => {
-    const stored = localStorage.getItem('workora_username');
-    if (stored) setUsername(stored);
-    const userStr = localStorage.getItem('workora_user');
-    if (userStr) {
-      try {
-        const u = JSON.parse(userStr);
-        setUserId(u.id);
-        fetchAll(u.id);
-      } catch { /* */ }
-    }
+    let mounted = true;
+
+    const bootstrap = async () => {
+      const user = await fetchCurrentUser();
+      if (!mounted) return;
+
+      if (!user) {
+        window.location.href = '/login';
+        return;
+      }
+
+      setUsername(user.username);
+      setUserId(user.id);
+      fetchAll(user.id);
+    };
+
+    bootstrap();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const fetchAll = async (uid: string) => {
@@ -122,7 +134,7 @@ export default function BusinessDashboard() {
                   { label: 'Total Gigs', value: profile?.total_gigs || 0, color: 'text-[#0066FF]' },
                   { label: 'Trust Score', value: profile?.trust_score ? Number(profile.trust_score).toFixed(1) : '0.0', color: 'text-emerald-500' },
                   { label: 'Profile Views', value: '14', color: 'text-violet-500' },
-                  { label: 'Est. Earnings', value: `KSh ${((profile?.total_gigs || 0) * 2500).toLocaleString()}`, color: 'text-amber-500' },
+                  { label: 'Total Earnings', value: `KSh ${profile?.total_earnings?.toLocaleString() || '0'}`, color: 'text-amber-500' },
                 ].map((s, i) => (
                   <motion.div key={s.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
                     className={`rounded-2xl border p-5 ${card}`}>

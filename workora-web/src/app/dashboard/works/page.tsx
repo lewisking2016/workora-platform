@@ -2,28 +2,32 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Heart, 
-  ChatCircleDots, 
+import {
+  Heart,
+  ChatCircleDots,
   BookmarkSimple,
   SealCheck,
   MusicNotes,
   UserCirclePlus
 } from '@phosphor-icons/react';
+import { fetchCurrentUser } from '@/lib/session';
 
 interface Work {
   id: string;
+  user_id: string;
   user_name: string;
   trade: string;
   verified: boolean;
   description: string;
   likes_count: number;
   comments_count: number;
+  saved_by_me?: boolean;
 }
 
 export default function WorksPage() {
   const [works, setWorks] = useState<Work[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState<{ id: string; username: string; role: string } | null>(null);
 
   const fetchWorks = async () => {
     try {
@@ -42,12 +46,39 @@ export default function WorksPage() {
     }
   };
 
+  const handleSave = async (work: Work) => {
+    if (!currentUser) return;
+
+    try {
+      const res = await fetch(`/api/gigs/${work.id}/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      setWorks(prev => prev.map(item => item.id === work.id ? { ...item, saved_by_me: data.saved } : item));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
-    // Defer initialization to avoid cascading render warning in strict environments
-    const timer = setTimeout(() => {
+    let mounted = true;
+
+    const bootstrap = async () => {
+      const user = await fetchCurrentUser();
+      if (!mounted) return;
+      setCurrentUser(user);
       fetchWorks();
+    };
+
+    const timer = setTimeout(() => {
+      bootstrap();
     }, 0);
-    return () => clearTimeout(timer);
+
+    return () => {
+      mounted = false;
+      clearTimeout(timer);
+    };
   }, []);
 
   return (
@@ -91,7 +122,12 @@ export default function WorksPage() {
                   <span className="text-[11px] font-black">{work.comments_count}</span>
                 </div>
 
-                <BookmarkSimple size={34} weight="fill" className="text-white hover:text-yellow-500 transition-colors cursor-pointer" />
+                <BookmarkSimple
+                  size={34}
+                  weight={work.saved_by_me ? "fill" : "regular"}
+                  className={`${work.saved_by_me ? 'text-[#0066FF]' : 'text-white hover:text-yellow-500'} transition-colors cursor-pointer`}
+                  onClick={() => handleSave(work)}
+                />
                 
                 <motion.div 
                   animate={{ rotate: 360 }}

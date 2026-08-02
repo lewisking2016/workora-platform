@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { CameraUI } from '@/components/CameraUI';
 import { useRouter } from 'next/navigation';
+import { fetchCurrentUser } from '@/lib/session';
 
 export default function CreatePage() {
   const router = useRouter();
@@ -11,9 +12,8 @@ export default function CreatePage() {
   const handleCapture = async (file: File | Blob, type: string) => {
     setIsUploading(true);
     try {
-      const userStr = localStorage.getItem('workora_user');
-      if (!userStr) throw new Error('Not logged in');
-      const user = JSON.parse(userStr);
+      const user = await fetchCurrentUser();
+      if (!user) throw new Error('Not logged in');
 
       const formData = new FormData();
       formData.append('file', file, type === 'video' ? 'video.webm' : 'photo.jpg');

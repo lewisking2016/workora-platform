@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { PaperPlaneTilt, MagnifyingGlass, Check, Checks, ArrowLeft } from '@phosphor-icons/react';
+import { fetchCurrentUser } from '@/lib/session';
 
 interface Conversation {
   id: string;
@@ -33,14 +34,27 @@ export default function MessagesPage() {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const userStr = localStorage.getItem('workora_user');
-    const uname = localStorage.getItem('workora_username');
-    if (userStr) {
-      const u = JSON.parse(userStr);
-      setUserId(u.id);
-      setUsername(uname || u.username || '');
-      fetchConversations(u.id);
-    }
+    let mounted = true;
+
+    const bootstrap = async () => {
+      const user = await fetchCurrentUser();
+      if (!mounted) return;
+
+      if (!user) {
+        window.location.href = '/login';
+        return;
+      }
+
+      setUserId(user.id);
+      setUsername(user.username || '');
+      fetchConversations(user.id);
+    };
+
+    bootstrap();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const fetchConversations = async (uid: string) => {

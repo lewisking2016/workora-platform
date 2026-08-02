@@ -10,28 +10,48 @@ import {
   CaretRight,
   FadersHorizontal
 } from '@phosphor-icons/react';
-const CATEGORIES = ['All', 'Electrical', 'Construction', 'Automotive', 'Fashion', 'Domestic', 'Beauty'];
 
 interface SearchResult {
   id: string;
   user_name: string;
   trade: string;
-  verified: boolean;
+  is_verified: boolean;
+  trust_score: number | string;
+  location: string;
 }
 
 export default function SearchPage() {
   const [query, setQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [categories, setCategories] = useState<string[]>(['All']);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchTrades() {
+      try {
+        const res = await fetch('/api/trades');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            setCategories(['All', ...data]);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch trades:', err);
+      }
+    }
+    fetchTrades();
+  }, []);
 
   const handleSearch = React.useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/gigs/feed');
+      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}&category=${encodeURIComponent(selectedCategory)}`);
       const data = await res.json();
       
       let filtered = data;
+
       if (selectedCategory !== 'All') {
         filtered = data.filter((p: SearchResult) => p.trade.includes(selectedCategory));
       }
@@ -51,13 +71,11 @@ export default function SearchPage() {
   }, [query, selectedCategory]);
 
   useEffect(() => {
-    // Defer the initial fetch to avoid cascading render warnings in strict environments
     const timer = setTimeout(() => {
       handleSearch();
-    }, 0);
+    }, 250);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCategory]);
+  }, [query, selectedCategory, handleSearch]);
 
   return (
     <div className="h-full w-full">
@@ -84,7 +102,7 @@ export default function SearchPage() {
             </div>
 
             <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
-              {CATEGORIES.map(cat => (
+              {categories.map(cat => (
                 <button 
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
@@ -120,12 +138,12 @@ export default function SearchPage() {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
                         <span className="text-base font-black text-zinc-900 dark:text-white tracking-tight">{pro.user_name}</span>
-                        {pro.verified && <SealCheck size={18} weight="fill" className="text-[#0066FF]" />}
+                        {pro.is_verified && <SealCheck size={18} weight="fill" className="text-brand" />}
                       </div>
-                      <p className="text-[10px] font-black text-[#0066FF] uppercase tracking-widest">{pro.trade}</p>
+                      <p className="text-[10px] font-black text-brand uppercase tracking-widest">{pro.trade}</p>
                       <div className="flex items-center gap-3 text-[10px] font-bold text-zinc-400 mt-1">
-                        <span className="flex items-center gap-1 text-amber-500"><Star size={12} weight="fill" /> 4.9</span>
-                        <span className="flex items-center gap-1"><MapPin size={12} /> Nairobi</span>
+                        <span className="flex items-center gap-1 text-amber-500"><Star size={12} weight="fill" /> {Number(pro.trust_score || 0).toFixed(1)}</span>
+                        <span className="flex items-center gap-1"><MapPin size={12} /> {pro.location || 'Kenya'}</span>
                       </div>
                     </div>
                   </div>

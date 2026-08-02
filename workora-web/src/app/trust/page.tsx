@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { 
@@ -14,8 +14,60 @@ import {
   Certificate,
   TrendUp
 } from '@phosphor-icons/react';
+import { fetchCurrentUser } from '@/lib/session';
+
+interface ProfileData {
+  full_name: string;
+  trade: string;
+  location: string;
+  trust_score: string;
+  total_gigs: number;
+  rating: string;
+  initial: string;
+}
 
 export default function TrustPassportPage() {
+  const [profile, setProfile] = useState<ProfileData>({
+    full_name: 'Workora Pro',
+    trade: 'Master Electrician',
+    location: 'Nairobi',
+    trust_score: '98%',
+    total_gigs: 147,
+    rating: '4.9',
+    initial: 'WP'
+  });
+
+  useEffect(() => {
+    async function loadProfile() {
+      const user = await fetchCurrentUser();
+      if (user) {
+        try {
+          const res = await fetch(`/api/profile/me/${user.id}`);
+          const data = await res.json();
+          if (data.profile) {
+            
+            // Also fetch ratings to get the average
+            const ratingsRes = await fetch(`/api/profile/ratings/${data.profile.id}`);
+            const ratingsData = await ratingsRes.json();
+
+            setProfile({
+              full_name: data.profile.full_name || user.username,
+              trade: data.profile.trade || 'Professional',
+              location: data.profile.location || 'Kenya',
+              trust_score: `${Math.min(100, Math.round(Number(ratingsData.average || data.profile.trust_score || 0) * 20))}%`,
+              total_gigs: data.profile.total_gigs || 0,
+              rating: Number(ratingsData.average || data.profile.trust_score || 0).toFixed(1),
+              initial: (data.profile.full_name || user.username).charAt(0).toUpperCase()
+            });
+          }
+        } catch (err) {
+          console.error('Failed to load profile for trust card', err);
+        }
+      }
+    }
+    loadProfile();
+  }, []);
+
   return (
     <main className="mx-auto max-w-screen-2xl px-[5%] pt-20 flex flex-col bg-white dark:bg-[#0A0E17] text-zinc-950 dark:text-zinc-50 overflow-x-hidden font-display min-h-screen">
       
@@ -78,11 +130,11 @@ export default function TrustPassportPage() {
           <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[40px] lg:rounded-[56px] p-8 lg:p-12 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] dark:shadow-black/50">
             <div className="flex items-center gap-6 mb-10">
               <div className="h-20 w-20 rounded-[24px] bg-gradient-to-br from-[#0066FF] to-[#7000FF] flex items-center justify-center text-white font-black text-2xl shadow-lg">
-                WP
+                {profile.initial}
               </div>
               <div>
-                <h3 className="text-2xl font-black text-zinc-950 dark:text-white tracking-tight">Workora Pro</h3>
-                <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm">Master Electrician · Nairobi</p>
+                <h3 className="text-2xl font-black text-zinc-950 dark:text-white tracking-tight">{profile.full_name}</h3>
+                <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm">{profile.trade} · {profile.location}</p>
               </div>
               <div className="ml-auto">
                 <div className="h-10 w-10 rounded-xl bg-[#0066FF]/10 dark:bg-[#0066FF]/20 flex items-center justify-center">
@@ -92,9 +144,9 @@ export default function TrustPassportPage() {
             </div>
             <div className="grid grid-cols-3 gap-4 mb-8">
               {[
-                { label: 'Trust Score', value: '98%' },
-                { label: 'Jobs Done', value: '147' },
-                { label: 'Rating', value: '4.9' },
+                { label: 'Trust Score', value: profile.trust_score },
+                { label: 'Jobs Done', value: profile.total_gigs.toString() },
+                { label: 'Rating', value: profile.rating },
               ].map((stat) => (
                 <div key={stat.label} className="bg-white dark:bg-zinc-800 rounded-2xl p-4 text-center border border-zinc-100 dark:border-zinc-700">
                   <p className="text-2xl font-black text-zinc-950 dark:text-white">{stat.value}</p>

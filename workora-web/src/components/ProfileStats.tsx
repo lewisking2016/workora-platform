@@ -14,7 +14,7 @@ const StatItem = ({ icon: Icon, label, value, color }: StatItemProps) => (
       <Icon size={16} weight="duotone" className={color} />
       <span className="text-[9px] font-black uppercase tracking-[0.2em]">{label}</span>
     </div>
-    <span className="text-base font-black tracking-tight text-zinc-950">{value}</span>
+    <span className="text-base font-black tracking-tight text-zinc-950 dark:text-white">{value}</span>
   </div>
 );
 

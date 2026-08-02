@@ -26,6 +26,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { BirthdayPicker } from '@/components/BirthdayPicker';
 import WorkoraLoader from '@/components/WorkoraLoader';
+import { persistLegacySession } from '@/lib/session';
+import { APP_CONFIG } from '@/lib/config';
 
 const TRADES = [
   { name: 'Construction', sub: 'Masons, Roofers', icon: Hammer, color: 'text-[#0066FF]' },
@@ -100,9 +102,11 @@ export default function JoinPage() {
         throw new Error(data.error || 'Registration failed');
       }
 
-      // Store basic auth data for dashboard routing, but proxy sets the secure token cookie
-      localStorage.setItem('workora_role', formData.role);
-      localStorage.setItem('workora_username', formData.username);
+      persistLegacySession({
+        id: String(data.user?.id || ''),
+        username: String(data.user?.username || formData.username),
+        role: String(data.user?.role || (formData.role === 'pro' ? 'worker' : 'hirer')),
+      });
 
       setStep(3); 
     } catch (err: unknown) {
@@ -307,20 +311,14 @@ export default function JoinPage() {
                      <span className="absolute top-6 right-8 bg-[#0066FF]/10 text-[#0066FF] text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest">Elite</span>
                      <h3 className="text-xl font-black text-zinc-950 dark:text-white">get verified and &quot;Kickstart your business&quot;</h3>
                      <div className="flex items-baseline gap-2 mt-2">
-                        <span className="text-sm font-bold text-zinc-950 dark:text-white mr-1">Ksh</span>
-                        <span className="text-3xl font-black text-zinc-950 dark:text-white">300</span>
+                        <span className="text-sm font-bold text-zinc-950 dark:text-white mr-1">{APP_CONFIG.proPlus.currency}</span>
+                        <span className="text-3xl font-black text-zinc-950 dark:text-white">{APP_CONFIG.proPlus.monthlyPrice}</span>
                         <span className="text-zinc-400 font-bold text-sm">/month</span>
                      </div>
                      <p className="text-zinc-400 font-bold text-xs mt-4">Fast-track your success with Pro Plus Kickstart&apos;s exclusive tools and resources.</p>
 
                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 sm:gap-y-4 mt-8">
-                        {[
-                          'Guided onboarding', 'Keyword research', 'ID verification', 
-                          'AI-generated profile feedback', 'Promotions: Up to 5 orders/month',
-                          'Coupons: 5/month', 'Follow-up messages: 5/month',
-                          'Buyer activity insights', 'Priority support', 'Live walkthrough sessions',
-                          'Tips and insights'
-                        ].map(item => (
+                        {APP_CONFIG.proPlus.features.map(item => (
                           <div key={item} className="flex items-center gap-2">
                              <Check size={14} weight="bold" className="text-zinc-950 dark:text-white" />
                              <span className="text-[11px] font-bold text-zinc-600 dark:text-zinc-400">{item}</span>

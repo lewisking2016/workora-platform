@@ -1,9 +1,14 @@
 async function messageRoutes(fastify) {
   const { pool } = fastify;
+  const resolveActorId = (request) => request.user?.id;
 
   // 1. GET CONVERSATIONS for a user
-  fastify.get('/conversations/:userId', async (request, reply) => {
+  fastify.get('/conversations/:userId', { preHandler: fastify.authenticate }, async (request, reply) => {
     const { userId } = request.params;
+    const actorId = resolveActorId(request);
+    if (actorId && actorId !== userId) {
+      return reply.status(403).send({ message: 'Forbidden' });
+    }
     const res = await pool.query(`
       SELECT c.*, 
         CASE WHEN c.participant_1 = $1 THEN u2.username ELSE u1.username END as other_username,
@@ -19,8 +24,9 @@ async function messageRoutes(fastify) {
   });
 
   // 2. GET or CREATE conversation between two users
-  fastify.post('/conversations', async (request, reply) => {
-    const { user_id, other_user_id } = request.body;
+  fastify.post('/conversations', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const { other_user_id } = request.body;
+    const user_id = resolveActorId(request);
     
     // Check if conversation exists
     const existing = await pool.query(`
@@ -39,7 +45,7 @@ async function messageRoutes(fastify) {
   });
 
   // 3. GET MESSAGES in a conversation
-  fastify.get('/:conversationId', async (request, reply) => {
+  fastify.get('/:conversationId', { preHandler: fastify.authenticate }, async (request, reply) => {
     const { conversationId } = request.params;
     const res = await pool.query(`
       SELECT m.*, u.username as sender_name
@@ -52,9 +58,10 @@ async function messageRoutes(fastify) {
   });
 
   // 4. SEND MESSAGE
-  fastify.post('/:conversationId/send', async (request, reply) => {
+  fastify.post('/:conversationId/send', { preHandler: fastify.authenticate }, async (request, reply) => {
     const { conversationId } = request.params;
-    const { sender_id, text } = request.body;
+    const { text } = request.body;
+    const sender_id = resolveActorId(request);
 
     const res = await pool.query(
       'INSERT INTO messages (conversation_id, sender_id, text) VALUES ($1, $2, $3) RETURNING *',
@@ -71,9 +78,9 @@ async function messageRoutes(fastify) {
   });
 
   // 5. MARK MESSAGES AS READ
-  fastify.patch('/:conversationId/read', async (request, reply) => {
+  fastify.patch('/:conversationId/read', { preHandler: fastify.authenticate }, async (request, reply) => {
     const { conversationId } = request.params;
-    const { user_id } = request.body;
+    const user_id = resolveActorId(request);
     await pool.query(
       'UPDATE messages SET is_read = true WHERE conversation_id = $1 AND sender_id != $2 AND is_read = false',
       [conversationId, user_id]

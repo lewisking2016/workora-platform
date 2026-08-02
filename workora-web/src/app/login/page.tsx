@@ -13,6 +13,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { EliteErrorCard } from '@/components/EliteErrorCard';
 import WorkoraLoader from '@/components/WorkoraLoader';
+import { persistLegacySession } from '@/lib/session';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -31,9 +32,6 @@ export default function LoginPage() {
     setLoading(true);
     setAuthError(null);
     try {
-      // Artificial delay to showcase the 3-stage loading animation (4 seconds)
-      await new Promise(resolve => setTimeout(resolve, 4000));
-
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -50,10 +48,11 @@ export default function LoginPage() {
         throw new Error('The credentials provided do not match our records. Please verify your phone number or password.');
       }
 
-      // Proxy handles setting the secure token cookie automatically based on rememberMe.
-      // We can securely store user metadata like role/username if needed for quick UI rendering, 
-      // but not the actual token.
-      localStorage.setItem('workora_user', JSON.stringify(data.user));
+      persistLegacySession({
+        id: String(data.user?.id || ''),
+        username: String(data.user?.username || ''),
+        role: String(data.user?.role || 'worker'),
+      });
 
       // Redirect to Dashboard
       window.location.href = '/dashboard/feed';

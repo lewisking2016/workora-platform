@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { BookmarkSimple, Play, Heart, ChatCircleDots } from '@phosphor-icons/react';
+import { fetchCurrentUser } from '@/lib/session';
 
 interface Gig {
   id: string;
@@ -11,6 +12,7 @@ interface Gig {
   thumbnail_url: string;
   likes_count: number;
   comments_count: number;
+  saved_at?: string;
 }
 
 export default function SavedPage() {
@@ -20,11 +22,16 @@ export default function SavedPage() {
   useEffect(() => {
     const fetchSaved = async () => {
       try {
-        // For now we'll show some sample gigs as "Saved"
-        const res = await fetch('/api/gigs/feed');
+        const user = await fetchCurrentUser();
+        if (!user) {
+          window.location.href = '/login';
+          return;
+        }
+
+        const res = await fetch(`/api/gigs/saved/${user.id}`);
         const data = await res.json();
         if (Array.isArray(data)) {
-          setGigs(data.slice(0, 2)); // Just a couple of items for the mock-to-live transition
+          setGigs(data);
         } else {
           setGigs([]);
         }

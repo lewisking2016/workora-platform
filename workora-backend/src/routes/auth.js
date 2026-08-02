@@ -94,14 +94,46 @@ async function authRoutes(fastify) {
     return { token, user: { id: user.id, username: user.username, role: user.role } };
   });
 
-  // 3. UPDATE TEAM TYPE
+  // 3. CURRENT USER
+  fastify.get('/me', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const userId = request.user?.id;
+
+    if (!userId) {
+      return reply.status(401).send({ message: 'Unauthorized' });
+    }
+
+    const res = await pool.query(
+      'SELECT id, username, phone_number, email, role, birthday, team_type, subscription, created_at FROM users WHERE id = $1',
+      [userId]
+    );
+
+    const user = res.rows[0];
+    if (!user) {
+      return reply.status(404).send({ message: 'User not found' });
+    }
+
+    return {
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        phone_number: user.phone_number,
+        email: user.email,
+        team_type: user.team_type,
+        subscription: user.subscription,
+        created_at: user.created_at,
+      },
+    };
+  });
+
+  // 4. UPDATE TEAM TYPE
   fastify.patch('/team', async (request, reply) => {
     const { userId, team_type } = request.body;
     await pool.query('UPDATE users SET team_type = $1 WHERE id = $2', [team_type, userId]);
     return { success: true };
   });
 
-  // 4. UPDATE SUBSCRIPTION
+  // 5. UPDATE SUBSCRIPTION
   fastify.patch('/subscription', async (request, reply) => {
     const { userId, subscription } = request.body;
     await pool.query('UPDATE users SET subscription = $1 WHERE id = $2', [subscription, userId]);

@@ -21,12 +21,12 @@ async function uploadRoutes(fastify) {
   const { pool } = fastify;
 
   // 1. UPLOAD AVATAR
-  fastify.post('/avatar', async (request, reply) => {
+  fastify.post('/avatar', { preHandler: fastify.authenticate }, async (request, reply) => {
     try {
       const data = await request.file();
       if (!data) return reply.status(400).send({ error: 'No file uploaded' });
 
-      const userId = data.fields.user_id?.value;
+      const userId = request.user?.id;
       if (!userId) return reply.status(400).send({ error: 'user_id is required' });
 
       const ext = path.extname(data.filename) || '.jpg';
@@ -57,12 +57,12 @@ async function uploadRoutes(fastify) {
   });
 
   // 2. UPLOAD GIG MEDIA (video or thumbnail)
-  fastify.post('/gig', async (request, reply) => {
+  fastify.post('/gig', { preHandler: fastify.authenticate }, async (request, reply) => {
     try {
       const data = await request.file();
       if (!data) return reply.status(400).send({ error: 'No file uploaded' });
 
-      const workerId = data.fields.worker_id?.value;
+      const workerId = request.user?.id;
       const mediaType = data.fields.media_type?.value || 'thumbnail'; // 'video' or 'thumbnail'
       if (!workerId) return reply.status(400).send({ error: 'worker_id is required' });
 

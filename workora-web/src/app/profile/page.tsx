@@ -15,6 +15,7 @@ import {
   VideoCamera
 } from '@phosphor-icons/react';
 import Link from 'next/link';
+import { APP_CONFIG } from '@/lib/config';
 
 interface UserProfile {
   id: string;
@@ -94,8 +95,8 @@ export default function ProfilePage() {
       <ProfileHero
         name={profile.full_name}
         trade={profile.trade}
-        location={profile.location || 'Nairobi, Kenya'}
-        imageUrl={profile.profile_image_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800'}
+        location={profile.location || APP_CONFIG.defaults.location}
+        imageUrl={profile.profile_image_url || APP_CONFIG.defaults.avatar}
         isVerified={profile.is_verified}
       />
 

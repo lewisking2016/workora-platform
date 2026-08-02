@@ -10,9 +10,6 @@ import {
   Star,
   X,
   PaperPlaneTilt,
-  Play,
-  House,
-  MagnifyingGlass,
   PlusSquare,
   BookmarkSimple,
   WhatsappLogo,
@@ -21,10 +18,12 @@ import {
   Copy,
   Check
 } from '@phosphor-icons/react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { VideoPlayer } from '@/components/VideoPlayer';
+import { fetchCurrentUser } from '@/lib/session';
+import { APP_CONFIG } from '@/lib/config';
 
 interface Comment {
   id: string;
@@ -35,6 +34,7 @@ interface Comment {
 
 interface Post {
   id: string;
+  user_id: string;
   worker_id: string;
   user_name: string;
   handle: string;
@@ -48,6 +48,7 @@ interface Post {
   thumbnail_url: string;
   created_at: string;
   liked_by_me?: boolean;
+  saved_by_me?: boolean;
 }
 
 interface Story {
@@ -61,6 +62,7 @@ interface Story {
 
 interface SuggestedPro {
   id: string;
+  user_id: string;
   name: string;
   trade: string;
   rating: number;
@@ -74,11 +76,25 @@ interface User {
   role: string;
 }
 
+const timeAgo = (d: string) => {
+  const diff = Date.now() - new Date(d).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+};
+
 export default function PersonalDashboard() {
+  const FEED_PAGE_SIZE = 20;
   const [posts, setPosts] = useState<Post[]>([]);
   const [stories, setStories] = useState<Story[]>([]);
   const [suggestedPros, setSuggestedPros] = useState<SuggestedPro[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMoreFeed, setLoadingMoreFeed] = useState(false);
+  const [feedPage, setFeedPage] = useState(1);
+  const [hasMoreFeed, setHasMoreFeed] = useState(true);
   const [activeComments, setActiveComments] = useState<Post | null>(null);
   const [postComments, setPostComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
@@ -86,17 +102,29 @@ export default function PersonalDashboard() {
   const [sharePost, setSharePost] = useState<Post | null>(null);
   const [copied, setCopied] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
 
-  const fetchFeed = async () => {
+  const fetchFeed = async (page = 1, append = false) => {
     try {
-      const res = await fetch('/api/gigs/feed');
+      if (page === 1) {
+        setLoading(true);
+      } else {
+        setLoadingMoreFeed(true);
+      }
+
+      const res = await fetch(`/api/gigs/feed?page=${page}&limit=${FEED_PAGE_SIZE}`);
       const data = await res.json();
-      setPosts(Array.isArray(data) ? data : []);
+      const nextPosts = Array.isArray(data) ? data : [];
+      setPosts(prev => append ? [...prev, ...nextPosts] : nextPosts);
+      setHasMoreFeed(nextPosts.length === FEED_PAGE_SIZE);
+      setFeedPage(page);
     } catch (err) {
       console.error('Feed fetch failed:', err);
     } finally {
-      setLoading(false);
+      if (page === 1) {
+        setLoading(false);
+      } else {
+        setLoadingMoreFeed(false);
+      }
     }
   };
 
@@ -119,11 +147,15 @@ export default function PersonalDashboard() {
 
   const fetchSuggested = async () => {
     try {
+      if (typeof window !== 'undefined' && !window.matchMedia('(min-width: 1280px)').matches) {
+        return;
+      }
+
       const res = await fetch('/api/profile/search?q=');
       const data = await res.json();
       if (Array.isArray(data)) {
-        setSuggestedPros(data.slice(0, 5).map((p: any) => ({
-          id: p.id, name: p.full_name, trade: p.trade,
+        setSuggestedPros(data.slice(0, 5).map((p: { id: string; user_id: string; full_name: string; trade: string; trust_score?: string; is_verified: boolean; }) => ({
+          id: p.id, user_id: p.user_id, name: p.full_name, trade: p.trade,
           rating: parseFloat(p.trust_score || '0'), is_verified: p.is_verified,
           initial: p.full_name?.charAt(0) || '?'
         })));
@@ -134,13 +166,23 @@ export default function PersonalDashboard() {
   };
 
   useEffect(() => {
-    const userStr = localStorage.getItem('workora_user');
-    if (userStr) {
-      try { setCurrentUser(JSON.parse(userStr)); } catch { /* */ }
-    }
-    fetchFeed();
-    fetchStories();
-    fetchSuggested();
+    let mounted = true;
+
+    const bootstrap = async () => {
+      const user = await fetchCurrentUser();
+      if (!mounted) return;
+
+      setCurrentUser(user);
+      fetchFeed(1, false);
+      fetchStories();
+      fetchSuggested();
+    };
+
+    bootstrap();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const handleLike = async (postId: string) => {
@@ -158,6 +200,27 @@ export default function PersonalDashboard() {
         liked_by_me: data.liked
       } : p));
     } catch (err) { console.error(err); }
+  };
+
+  const handleSave = async (post: Post) => {
+    if (!currentUser) return;
+
+    try {
+      const res = await fetch(`/api/gigs/${post.id}/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+
+      setPosts(prev => prev.map(p => p.id === post.id ? { ...p, saved_by_me: data.saved } : p));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const loadMoreFeed = async () => {
+    if (loadingMoreFeed || !hasMoreFeed) return;
+    await fetchFeed(feedPage + 1, true);
   };
 
   const fetchComments = async (post: Post) => {
@@ -202,7 +265,7 @@ export default function PersonalDashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: currentUser.id, other_user_id: otherUserId })
       });
-      const conv = await res.json();
+      await res.json();
       router.push('/dashboard/messages');
     } catch (err) { console.error(err); }
   };
@@ -266,7 +329,7 @@ export default function PersonalDashboard() {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
                         <span className="text-[13px] font-black text-zinc-950 dark:text-white">{c.username}</span>
-                        <span className="text-[9px] font-bold text-zinc-400">1h ago</span>
+                        <span className="text-[9px] font-bold text-zinc-400">{timeAgo(c.created_at)}</span>
                       </div>
                       <p className="text-[13px] text-zinc-600 dark:text-zinc-300 font-medium leading-relaxed">{c.text}</p>
                     </div>
@@ -321,14 +384,37 @@ export default function PersonalDashboard() {
           </div>
 
           <div className="space-y-12 lg:space-y-16">
-            {posts.length > 0 ? posts.map((post, i) => (
+            {loading ? (
+              <div className="space-y-10">
+                {[1, 2].map((item) => (
+                  <div key={item} className="space-y-4">
+                    <div className="flex items-center justify-between pb-4">
+                      <div className="flex items-center gap-3.5">
+                        <div className="h-10 w-10 rounded-full bg-zinc-100 dark:bg-zinc-900 animate-pulse" />
+                        <div className="space-y-2">
+                          <div className="h-4 w-28 bg-zinc-100 dark:bg-zinc-900 rounded-full animate-pulse" />
+                          <div className="h-3 w-16 bg-zinc-100 dark:bg-zinc-900 rounded-full animate-pulse" />
+                        </div>
+                      </div>
+                      <div className="h-8 w-8 bg-zinc-100 dark:bg-zinc-900 rounded-full animate-pulse" />
+                    </div>
+                    <div className="aspect-[4/5] sm:aspect-square bg-zinc-100 dark:bg-zinc-900 rounded-2xl sm:rounded-3xl animate-pulse" />
+                    <div className="space-y-3">
+                      <div className="h-5 w-32 bg-zinc-100 dark:bg-zinc-900 rounded-full animate-pulse" />
+                      <div className="h-4 w-full bg-zinc-100 dark:bg-zinc-900 rounded-full animate-pulse" />
+                      <div className="h-4 w-3/4 bg-zinc-100 dark:bg-zinc-900 rounded-full animate-pulse" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : posts.length > 0 ? posts.map((post, i) => (
               <article key={i} className="bg-white dark:bg-[#0A0E17]">
                 <div className="flex items-center justify-between pb-4">
                   <div className="flex items-center gap-3.5">
-                    <div className="h-10 w-10 rounded-full bg-zinc-50 dark:bg-zinc-900 text-zinc-950 dark:text-white flex items-center justify-center text-xs font-black shadow-sm cursor-pointer" onClick={() => startConversation(post.worker_id)}>{post.user_name.charAt(0)}</div>
+                    <div className="h-10 w-10 rounded-full bg-zinc-50 dark:bg-zinc-900 text-zinc-950 dark:text-white flex items-center justify-center text-xs font-black shadow-sm cursor-pointer" onClick={() => startConversation(post.user_id || post.worker_id)}>{post.user_name.charAt(0)}</div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="text-[14px] font-black text-zinc-900 dark:text-white cursor-pointer" onClick={() => startConversation(post.worker_id)}>{post.user_name}</p>
+                        <p className="text-[14px] font-black text-zinc-900 dark:text-white cursor-pointer" onClick={() => startConversation(post.user_id || post.worker_id)}>{post.user_name}</p>
                         {post.verified && <SealCheck size={16} weight="fill" className="text-[#0066FF]" />}
                       </div>
                       <p className="text-[10px] text-[#0066FF] font-black uppercase tracking-[0.2em]">{post.trade}</p>
@@ -340,7 +426,7 @@ export default function PersonalDashboard() {
                 <div className="aspect-[4/5] sm:aspect-square bg-zinc-100 dark:bg-zinc-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
                   <VideoPlayer 
                     src={post.video_url} 
-                    poster={post.thumbnail_url || 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=800'} 
+                    poster={post.thumbnail_url || APP_CONFIG.defaults.thumbnail} 
                     className="w-full h-full" 
                   />
                 </div>
@@ -352,7 +438,12 @@ export default function PersonalDashboard() {
                       <ChatCircleDots size={28} className="hover:text-[#0066FF] cursor-pointer" onClick={() => fetchComments(post)} />
                       <ShareFat size={28} className="hover:text-[#0066FF] cursor-pointer" onClick={() => handleShare(post)} />
                     </div>
-                    <BookmarkSimple size={28} className="hover:text-[#0066FF] cursor-pointer text-zinc-950 dark:text-white" />
+                    <BookmarkSimple 
+                      size={28} 
+                      weight={post.saved_by_me ? "fill" : "regular"} 
+                      className={`${post.saved_by_me ? 'text-[#0066FF]' : 'hover:text-[#0066FF] text-zinc-950 dark:text-white'} cursor-pointer`} 
+                      onClick={() => handleSave(post)} 
+                    />
                   </div>
                   <div className="space-y-1.5">
                     <p className="text-[14px] font-black text-zinc-900 dark:text-white">{post.likes_count.toLocaleString()} likes</p>
@@ -378,6 +469,17 @@ export default function PersonalDashboard() {
                 <Link href="/dashboard/create" className="px-8 h-12 bg-[#0066FF] text-white rounded-full font-black text-[13px] uppercase tracking-widest shadow-xl shadow-blue-500/20 hover:scale-105 transition-all flex items-center justify-center">
                   Create First Post
                 </Link>
+              </div>
+            )}
+            {posts.length > 0 && hasMoreFeed && (
+              <div className="flex justify-center pt-4">
+                <button
+                  onClick={loadMoreFeed}
+                  disabled={loadingMoreFeed}
+                  className="h-12 px-6 rounded-full bg-zinc-950 dark:bg-white text-white dark:text-zinc-950 text-[12px] font-black uppercase tracking-[0.2em] shadow-lg shadow-black/10 disabled:opacity-50"
+                >
+                  {loadingMoreFeed ? 'Loading more' : 'Load more posts'}
+                </button>
               </div>
             )}
           </div>
@@ -421,7 +523,7 @@ export default function PersonalDashboard() {
                       </div>
                     </div>
                   </div>
-                  <button className="text-[#0066FF] text-[13px] font-black" onClick={() => startConversation(pro.id)}>Connect</button>
+                  <button className="text-[#0066FF] text-[13px] font-black" onClick={() => startConversation(pro.user_id || pro.id)}>Connect</button>
                 </div>
               ))}
             </div>

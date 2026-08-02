@@ -2,18 +2,35 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { fetchCurrentUser } from '@/lib/session';
 
 export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Check stored role and redirect accordingly
-    const role = localStorage.getItem('workora_role') || 'pro';
-    if (role === 'client') {
-      router.replace('/dashboard/feed');
-    } else {
-      router.replace('/dashboard/pro');
-    }
+    let mounted = true;
+
+    const bootstrap = async () => {
+      const user = await fetchCurrentUser();
+      if (!mounted) return;
+
+      if (!user) {
+        router.replace('/login');
+        return;
+      }
+
+      if (user.role === 'hirer') {
+        router.replace('/dashboard/feed');
+      } else {
+        router.replace('/dashboard/pro');
+      }
+    };
+
+    bootstrap();
+
+    return () => {
+      mounted = false;
+    };
   }, [router]);
 
   return (

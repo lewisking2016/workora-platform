@@ -11,33 +11,49 @@ export async function proxyRequest(targetPath: string, request: Request) {
 
     const url = `${backendUrl}${targetPath}`;
     const method = request.method;
-    
-    let body = undefined;
-    let parsedBody: any = {};
+
+    let body: BodyInit | undefined = undefined;
+    let parsedBody: unknown = {};
+
+
+    const contentType = request.headers.get('content-type') || '';
+    const isJson = contentType.includes('application/json');
+
     if (method !== 'GET' && method !== 'HEAD') {
-      try {
-        parsedBody = await request.json();
+      if (isJson) {
+        // Only JSON-parse when it's actually JSON
+        parsedBody = await request.json().catch(() => ({}));
         body = JSON.stringify(parsedBody);
-      } catch {
-        // Body might not be JSON or empty
+      } else {
+        // Forward non-JSON bodies (multipart, form-data, etc.) as-is
+        body = await request.arrayBuffer();
       }
     }
 
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json'
-    };
+    const headers = new Headers(request.headers);
+
+    // Replace content-type if we successfully parsed JSON.
+    // Otherwise keep original content-type (important for uploads).
+    if (isJson) {
+      headers.set('content-type', 'application/json');
+    } else {
+      headers.delete('content-type');
+    }
 
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      headers.set('authorization', `Bearer ${token}`);
     }
 
     const response = await fetch(url, {
       method,
       headers,
-      body
+      body,
     });
 
-    const data = await response.json().catch(() => null);
+    const responseContentType = response.headers.get('content-type') || '';
+    const isResponseJson = responseContentType.includes('application/json');
+
+    const data = isResponseJson ? await response.json().catch(() => null) : null;
 
     if (!response.ok) {
       return NextResponse.json(
@@ -46,13 +62,18 @@ export async function proxyRequest(targetPath: string, request: Request) {
       );
     }
 
-    const nextResponse = NextResponse.json(data);
-
     // If login or register was successful, capture token and set cookie
-    if (response.ok && data?.token && (targetPath === '/auth/login' || targetPath === '/auth/register')) {
-      const rememberMe = parsedBody?.rememberMe === true;
-      const maxAge = rememberMe ? 60 * 60 * 24 * 30 : 60 * 60; // 30 days or 1 hour
+    // (Backend returns { token, user: ... } for those endpoints)
+    if (
+      response.ok &&
+      data?.token &&
+      (targetPath === '/auth/login' || targetPath === '/auth/register')
+    ) {
+      const rememberMe = (parsedBody as { rememberMe?: unknown } | null)?.rememberMe === true;
 
+      const maxAge = rememberMe ? 60 * 60 * 24 * 30 : 60 * 60;
+
+      const nextResponse = NextResponse.json(data);
       nextResponse.cookies.set({
         name: 'token',
         value: data.token,
@@ -62,11 +83,20 @@ export async function proxyRequest(targetPath: string, request: Request) {
         maxAge: maxAge,
         path: '/',
       });
+
+      return nextResponse;
     }
 
-    return nextResponse;
+    if (isResponseJson) {
+      return NextResponse.json(data);
+    }
+
+    // Non-JSON response: return raw body
+    const raw = await response.arrayBuffer();
+    return new NextResponse(raw, { status: response.status });
   } catch (error) {
     console.error(`Proxy Error [${targetPath}]:`, error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+

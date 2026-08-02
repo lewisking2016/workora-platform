@@ -120,6 +120,15 @@ CREATE TABLE IF NOT EXISTS gig_comments (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- 10b. Saved Gigs
+CREATE TABLE IF NOT EXISTS saved_gigs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    gig_id UUID REFERENCES gigs(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(gig_id, user_id)
+);
+
 -- 11. Ratings & Reviews
 CREATE TABLE IF NOT EXISTS ratings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -141,6 +150,7 @@ DO $$ BEGIN
     ALTER TABLE worker_profiles ADD COLUMN IF NOT EXISTS title TEXT;
     ALTER TABLE gigs ADD COLUMN IF NOT EXISTS description TEXT;
     ALTER TABLE gigs ADD COLUMN IF NOT EXISTS category TEXT;
+    ALTER TABLE gigs ADD COLUMN IF NOT EXISTS price DECIMAL(10, 2) DEFAULT 0.0;
 EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 
@@ -165,6 +175,18 @@ CREATE TABLE IF NOT EXISTS messages (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- 14. System Settings
+CREATE TABLE IF NOT EXISTS system_settings (
+    key TEXT PRIMARY KEY,
+    value JSONB NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Seed initial pricing
+INSERT INTO system_settings (key, value) 
+VALUES ('pro_plus_price', '{"amount": 300, "currency": "Ksh", "interval": "month"}')
+ON CONFLICT (key) DO NOTHING;
+
 -- Indexing for search performance
 CREATE INDEX IF NOT EXISTS idx_worker_trade ON worker_profiles(trade);
 CREATE INDEX IF NOT EXISTS idx_gig_worker ON gigs(worker_id);
@@ -173,3 +195,4 @@ CREATE INDEX IF NOT EXISTS idx_worker_skills ON worker_skills(profile_id);
 CREATE INDEX IF NOT EXISTS idx_worker_lang ON worker_languages(profile_id);
 CREATE INDEX IF NOT EXISTS idx_messages_conv ON messages(conversation_id);
 CREATE INDEX IF NOT EXISTS idx_conv_participants ON conversations(participant_1, participant_2);
+CREATE INDEX IF NOT EXISTS idx_saved_gigs_user ON saved_gigs(user_id);
