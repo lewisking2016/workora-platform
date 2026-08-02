@@ -44,7 +44,7 @@ const LAST_NAMES = [
   'Adhiambo', 'Kimani', 'Wambui', 'Omondi', 'Atieno', 'Gitau', 'Wangari',
   'Kipchoge', 'Chepkoech', 'Koech', 'Chebet', 'Kiplagat', 'Jepkosgei',
   'Mutua', 'Muthoni', 'Kibet', 'Jepkemoi', 'Wafula', 'Nekesa', 'Onyango',
-  'Auma', 'Kariuki', 'Wangui', 'Ng'ang'a', 'Wairimu', 'Musyoka', 'Nduku',
+  'Auma', 'Kariuki', 'Wangui', 'Nganga', 'Wairimu', 'Musyoka', 'Nduku',
   'Omolo', 'Apiyo', 'Macharia', 'Nyambura', 'Kimutai', 'Jelimo'
 ];
 
