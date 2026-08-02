@@ -444,7 +444,10 @@ export default function PersonalDashboard() {
                   </div>
 
                   {/* Post Video/Image */}
-                  <div className="aspect-square bg-black w-full">
+                  <div 
+                    className="aspect-square bg-black w-full cursor-pointer" 
+                    onClick={() => router.push(`/dashboard/post/${post.id}`)}
+                  >
                     <VideoPlayer 
                       src={post.video_url} 
                       poster={post.thumbnail_url || APP_CONFIG.defaults.thumbnail} 
@@ -466,7 +469,7 @@ export default function PersonalDashboard() {
                           size={26} 
                           weight="regular"
                           className="text-zinc-950 dark:text-white cursor-pointer active:scale-90 transition-transform" 
-                          onClick={() => fetchComments(post)} 
+                          onClick={() => router.push(`/dashboard/post/${post.id}`)} 
                         />
                         <ShareFat 
                           size={26}
@@ -498,7 +501,7 @@ export default function PersonalDashboard() {
                     {post.comments_count > 0 && (
                       <button 
                         className="text-zinc-500 dark:text-zinc-400 text-[13px] font-normal" 
-                        onClick={() => fetchComments(post)}
+                        onClick={() => router.push(`/dashboard/post/${post.id}`)}
                       >
                         View all {post.comments_count} comments
                       </button>

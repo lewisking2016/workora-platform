@@ -80,7 +80,7 @@ export default function SavedPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: i * 0.02 }}
                   className="group relative aspect-square bg-black cursor-pointer overflow-hidden"
-                  onClick={() => router.push('/dashboard/feed')}
+                  onClick={() => router.push(`/dashboard/post/${gig.id}`)}
                 >
                   <img 
                     src={gig.thumbnail_url || APP_CONFIG.defaults.thumbnail}

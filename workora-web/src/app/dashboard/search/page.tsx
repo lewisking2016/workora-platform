@@ -188,7 +188,7 @@ export default function SearchPage() {
                   animate={{ opacity: 1 }}
                   transition={{ delay: i * 0.02 }}
                   className="aspect-square bg-black relative group cursor-pointer overflow-hidden"
-                  onClick={() => router.push(`/dashboard/feed`)}
+                  onClick={() => router.push(`/dashboard/post/${gig.id}`)}
                 >
                   <img 
                     src={gig.thumbnail_url || APP_CONFIG.defaults.thumbnail}
