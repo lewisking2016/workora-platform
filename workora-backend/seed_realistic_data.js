@@ -1,8 +1,12 @@
+require('dotenv').config();
 const { Client } = require('pg');
 const bcrypt = require('bcrypt');
 
 // Use DATABASE_URL from environment or construct from individual vars
 const connectionString = process.env.DATABASE_URL || `postgresql://${process.env.DB_USER || 'postgres'}:${process.env.DB_PASSWORD || 'your_password'}@${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || 5432}/${process.env.DB_NAME || 'workora'}`;
+
+console.log('🔗 Connecting to database...');
+console.log('Using connection string:', connectionString.replace(/:[^:@]+@/, ':***@')); // Hide password
 
 // Database connection
 const client = new Client({
