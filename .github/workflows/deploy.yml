@@ -15,7 +15,7 @@ jobs:
           username: azureuser
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
-            cd ~/workora-platform
+            cd /home/lewis/workora-platform
             git config pull.rebase false
-            git pull origin main
-            echo "${{ secrets.VPS_PASSWORD }}" | sudo -S docker-compose up -d --build
+            sudo git pull origin main
+            sudo docker-compose up -d --build
