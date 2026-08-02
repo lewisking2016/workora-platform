@@ -1,71 +1,62 @@
 const { z } = require('zod');
 const { parsePagination } = require('../lib/pagination');
-const { getCachedFeed, invalidateCache, cachePost, getCachedPost } = require('../lib/cache');
+// const { getCachedFeed, invalidateCache, cachePost, getCachedPost } = require('../lib/cache');
 
 async function gigRoutes(fastify) {
   const { pool } = fastify;
   const resolveActorId = (request) => request.user?.id;
 
-  // 1. GET FEED (Home Screen Algorithm) - WITH CACHING
+  // 1. GET FEED (Home Screen Algorithm) - DIRECT QUERY (CACHE DISABLED)
   fastify.get('/feed', async (request, reply) => {
     const { limit, offset } = parsePagination(request.query, { defaultLimit: 20, maxLimit: 50 });
-    const userId = resolveActorId(request) || 'guest';
-    const cacheKey = `feed:${userId}:${limit}:${offset}`;
     
-    const data = await getCachedFeed(cacheKey, async () => {
-      const res = await pool.query(`
-        SELECT 
-          g.*, 
-          COALESCE(p.full_name, u.username) as user_name, 
-          u.username as handle, 
-          COALESCE(p.trade, 'Member') as trade, 
-          COALESCE(p.is_verified, false) as verified,
-          p.avatar_url,
-          CASE
-            WHEN $1::uuid IS NULL THEN false
-            ELSE EXISTS (
-              SELECT 1 FROM saved_gigs sg
-              WHERE sg.gig_id = g.id AND sg.user_id = $1
-            )
-          END as saved_by_me,
-          (SELECT COUNT(*) FROM gig_likes WHERE gig_id = g.id) as real_likes,
-          (SELECT COUNT(*) FROM gig_comments WHERE gig_id = g.id) as real_comments
-        FROM gigs g
-        JOIN users u ON g.user_id = u.id
-        LEFT JOIN worker_profiles p ON u.id = p.user_id
-        ORDER BY g.created_at DESC
-        LIMIT $2 OFFSET $3
-      `, [resolveActorId(request) || null, limit, offset]);
-      return res.rows;
-    }, 180); // Cache for 3 minutes
+    const res = await pool.query(`
+      SELECT 
+        g.*, 
+        COALESCE(p.full_name, u.username) as user_name, 
+        u.username as handle, 
+        COALESCE(p.trade, 'Member') as trade, 
+        COALESCE(p.is_verified, false) as verified,
+        p.avatar_url,
+        CASE
+          WHEN $1::uuid IS NULL THEN false
+          ELSE EXISTS (
+            SELECT 1 FROM saved_gigs sg
+            WHERE sg.gig_id = g.id AND sg.user_id = $1
+          )
+        END as saved_by_me,
+        (SELECT COUNT(*) FROM gig_likes WHERE gig_id = g.id) as real_likes,
+        (SELECT COUNT(*) FROM gig_comments WHERE gig_id = g.id) as real_comments
+      FROM gigs g
+      JOIN users u ON g.user_id = u.id
+      LEFT JOIN worker_profiles p ON u.id = p.user_id
+      ORDER BY g.created_at DESC
+      LIMIT $2 OFFSET $3
+    `, [resolveActorId(request) || null, limit, offset]);
     
-    return data;
+    return res.rows;
   });
 
-  // 2. GET EXPLORE (Trending/Discovery) - WITH CACHING
+  // 2. GET EXPLORE (Trending/Discovery) - DIRECT QUERY (CACHE DISABLED)
   fastify.get('/explore', async (request, reply) => {
     const { limit, offset } = parsePagination(request.query, { defaultLimit: 30, maxLimit: 60 });
-    const cacheKey = `explore:${limit}:${offset}`;
     
-    const data = await getCachedFeed(cacheKey, async () => {
-      const res = await pool.query(`
-        SELECT g.*, 
-          COALESCE(p.full_name, u.username) as user_name,
-          u.username as handle,
-          COALESCE(p.trade, 'Member') as trade,
-          COALESCE(p.is_verified, false) as verified,
-          (SELECT COUNT(*) FROM gig_likes WHERE gig_id = g.id) as real_likes,
-          (SELECT COUNT(*) FROM gig_comments WHERE gig_id = g.id) as real_comments
-        FROM gigs g
-        JOIN users u ON g.user_id = u.id
-        LEFT JOIN worker_profiles p ON u.id = p.user_id
-        ORDER BY g.view_count DESC
-        LIMIT $1 OFFSET $2
-      `, [limit, offset]);
-      return res.rows;
-    }, 300); // Cache for 5 minutes
+    const res = await pool.query(`
+      SELECT g.*, 
+        COALESCE(p.full_name, u.username) as user_name,
+        u.username as handle,
+        COALESCE(p.trade, 'Member') as trade,
+        COALESCE(p.is_verified, false) as verified,
+        (SELECT COUNT(*) FROM gig_likes WHERE gig_id = g.id) as real_likes,
+        (SELECT COUNT(*) FROM gig_comments WHERE gig_id = g.id) as real_comments
+      FROM gigs g
+      JOIN users u ON g.user_id = u.id
+      LEFT JOIN worker_profiles p ON u.id = p.user_id
+      ORDER BY g.view_count DESC
+      LIMIT $1 OFFSET $2
+    `, [limit, offset]);
     
-    return data;
+    return res.rows;
   });
 
   // 3. CREATE GIG
@@ -81,7 +72,7 @@ async function gigRoutes(fastify) {
     return res.rows[0];
   });
 
-  // 4. LIKE/UNLIKE GIG - INVALIDATE CACHE
+  // 4. LIKE/UNLIKE GIG
   fastify.post('/:id/like', { preHandler: fastify.authenticate }, async (request, reply) => {
     const { id } = request.params;
     const user_id = resolveActorId(request);
@@ -90,15 +81,9 @@ async function gigRoutes(fastify) {
       const existing = await pool.query('SELECT * FROM gig_likes WHERE gig_id = $1 AND user_id = $2', [id, user_id]);
       if (existing.rows.length > 0) {
         await pool.query('DELETE FROM gig_likes WHERE gig_id = $1 AND user_id = $2', [id, user_id]);
-        // Invalidate cache
-        await invalidateCache('feed:*');
-        await invalidateCache('explore:*');
         return { liked: false };
       } else {
         await pool.query('INSERT INTO gig_likes (gig_id, user_id) VALUES ($1, $2)', [id, user_id]);
-        // Invalidate cache
-        await invalidateCache('feed:*');
-        await invalidateCache('explore:*');
         return { liked: true };
       }
     } catch (err) {
