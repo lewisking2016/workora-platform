@@ -22,6 +22,7 @@ export default function LoginPage() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [loadingStartTime, setLoadingStartTime] = useState<number>(0);
   const [authError, setAuthError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -30,6 +31,7 @@ export default function LoginPage() {
     if (!formData.phone || !formData.password) return;
     
     setLoading(true);
+    setLoadingStartTime(Date.now());
     setAuthError(null);
     try {
       const response = await fetch('/api/auth/login', {
@@ -67,7 +69,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-white dark:bg-[#0A0E17] flex flex-col lg:flex-row font-display relative overflow-hidden">
       
       {/* 0. Fullscreen Loader overlay */}
-      {loading && <WorkoraLoader fullScreen />}
+      {loading && <WorkoraLoader fullScreen startTime={loadingStartTime} />}
       
       {/* 1. Cinematic Left Side (1:1 Image Strategy) */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-zinc-950 items-center justify-center p-12">

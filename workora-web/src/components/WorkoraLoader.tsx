@@ -13,16 +13,51 @@ const ZipperIcon = ({ size = 24, className = "" }) => (
   </svg>
 );
 
-export default function WorkoraLoader({ fullScreen = false }: { fullScreen?: boolean }) {
-  const [phase, setPhase] = useState(0);
+interface WorkoraLoaderProps {
+  fullScreen?: boolean;
+  /** Optional: Provide loading start time to auto-calculate duration */
+  startTime?: number;
+}
 
-  // Cycle through phases every 1.3 seconds
+export default function WorkoraLoader({ fullScreen = false, startTime }: WorkoraLoaderProps) {
+  const [phase, setPhase] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [cycleSpeed, setCycleSpeed] = useState(1300);
+
+  // Track elapsed time if startTime is provided
+  useEffect(() => {
+    if (!startTime) return;
+    
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      setElapsedTime(elapsed);
+      
+      // Adjust cycle speed based on loading time
+      // Fast loading (< 2s): 900ms cycles
+      // Normal loading (2-5s): 1300ms cycles  
+      // Slow loading (> 5s): 1800ms cycles
+      if (elapsed < 2000) {
+        setCycleSpeed(900);
+      } else if (elapsed < 5000) {
+        setCycleSpeed(1300);
+      } else {
+        setCycleSpeed(1800);
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [startTime]);
+
+  // Cycle through phases dynamically based on speed
   useEffect(() => {
     const interval = setInterval(() => {
       setPhase((prev) => (prev + 1) % 3);
-    }, 1300);
+    }, cycleSpeed);
     return () => clearInterval(interval);
-  }, []);
+  }, [cycleSpeed]);
+
+  // Calculate animation duration based on cycle speed
+  const animDuration = cycleSpeed / 1000;
 
   // Phase configurations
   const phases = [
@@ -30,27 +65,29 @@ export default function WorkoraLoader({ fullScreen = false }: { fullScreen?: boo
       id: 'cut',
       icon: <Scissors size={28} weight="fill" className="text-zinc-950 dark:text-white -rotate-90" />,
       trackStyle: 'border-b-2 border-dashed border-zinc-950 dark:border-white',
-      gap: 6, // Separates
-      iconAnim: { rotate: [-90, -45, -90, -45, -90, -45, -90], transition: { duration: 1.3 } }
+      gap: 6,
+      iconAnim: { rotate: [-90, -45, -90, -45, -90, -45, -90], transition: { duration: animDuration } }
     },
     {
       id: 'build',
       icon: <Hammer size={28} weight="fill" className="text-[#0066FF]" />,
-      // Track style looking like nails/dots
       trackStyle: 'bg-[radial-gradient(circle,currentColor_2px,transparent_2px)] bg-[length:12px_12px] h-[4px] text-zinc-950 dark:text-white',
-      gap: 0, // Closes tight
-      iconAnim: { rotate: [0, -45, 0, -45, 0, -45, 0], transition: { duration: 1.3 } }
+      gap: 0,
+      iconAnim: { rotate: [0, -45, 0, -45, 0, -45, 0], transition: { duration: animDuration } }
     },
     {
       id: 'zip',
       icon: <ZipperIcon size={28} className="text-[#7000FF] rotate-90" />,
       trackStyle: 'border-b-4 border-double border-zinc-400',
-      gap: 8, // Unzips wide
-      iconAnim: { scale: [1, 1.1, 1], transition: { duration: 1.3 } }
+      gap: 8,
+      iconAnim: { scale: [1, 1.1, 1], transition: { duration: animDuration } }
     }
   ];
 
   const currentPhase = phases[phase];
+
+  // Dynamic easing based on loading time
+  const easeType = elapsedTime > 5000 ? "easeOut" : elapsedTime > 2000 ? "easeInOut" : "linear";
 
   const loaderContent = (
     <div className="relative flex flex-col items-center justify-center w-[90vw] max-w-[300px]">
@@ -61,7 +98,7 @@ export default function WorkoraLoader({ fullScreen = false }: { fullScreen?: boo
         {/* Top Half of Text */}
         <motion.div 
           animate={{ y: -currentPhase.gap / 2 }}
-          transition={{ duration: 1, ease: "easeInOut" }}
+          transition={{ duration: animDuration * 0.77, ease: easeType }}
           className="absolute inset-0 flex items-center justify-center overflow-hidden"
           style={{ clipPath: 'inset(0 0 50% 0)' }}
         >
@@ -71,7 +108,7 @@ export default function WorkoraLoader({ fullScreen = false }: { fullScreen?: boo
         {/* Bottom Half of Text */}
         <motion.div 
           animate={{ y: currentPhase.gap / 2 }}
-          transition={{ duration: 1, ease: "easeInOut" }}
+          transition={{ duration: animDuration * 0.77, ease: easeType }}
           className="absolute inset-0 flex items-center justify-center overflow-hidden"
           style={{ clipPath: 'inset(50% 0 0 0)' }}
         >
@@ -84,7 +121,7 @@ export default function WorkoraLoader({ fullScreen = false }: { fullScreen?: boo
              key={`track-${phase}`}
              initial={{ width: '0%' }}
              animate={{ width: '100%' }}
-             transition={{ duration: 1.3, ease: "linear" }}
+             transition={{ duration: animDuration, ease: "linear" }}
              className={`h-full w-full ${currentPhase.trackStyle}`}
            />
         </div>
@@ -95,7 +132,7 @@ export default function WorkoraLoader({ fullScreen = false }: { fullScreen?: boo
             key={`icon-container-${phase}`}
             initial={{ left: '0%' }}
             animate={{ left: '100%' }}
-            transition={{ duration: 1.3, ease: "linear" }}
+            transition={{ duration: animDuration, ease: "linear" }}
             className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center justify-center bg-white dark:bg-[#0A0E17] rounded-full p-1 shadow-sm border border-zinc-100 dark:border-zinc-800"
           >
             <motion.div animate={currentPhase.iconAnim.rotate || currentPhase.iconAnim.scale ? currentPhase.iconAnim : {}}>
@@ -105,13 +142,13 @@ export default function WorkoraLoader({ fullScreen = false }: { fullScreen?: boo
         </div>
       </div>
       
-      {/* Tagline */}
+      {/* Tagline with elapsed time indicator */}
       <motion.div 
         animate={{ opacity: [0.5, 1, 0.5] }}
         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         className="mt-2 text-zinc-400 font-bold text-[10px] uppercase tracking-[0.3em]"
       >
-        Processing...
+        {elapsedTime > 5000 ? 'Almost there...' : elapsedTime > 2000 ? 'Loading...' : 'Processing...'}
       </motion.div>
     </div>
   );

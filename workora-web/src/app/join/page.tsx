@@ -68,6 +68,7 @@ export default function JoinPage() {
   const [rememberMe, setRememberMe] = useState(false);
 
   const [loading, setLoading] = useState(false);
+  const [loadingStartTime, setLoadingStartTime] = useState<number>(0);
 
   // Validation Logic
   const isFullNameValid = formData.fullName.trim().split(' ').length >= 2;
@@ -80,6 +81,7 @@ export default function JoinPage() {
   const handleRegister = async () => {
     setError(null);
     setLoading(true);
+    setLoadingStartTime(Date.now());
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -125,7 +127,7 @@ export default function JoinPage() {
     <div className="min-h-screen bg-white dark:bg-[#0A0E17] text-zinc-950 dark:text-zinc-50 flex flex-col items-center pt-20 px-[5%] overflow-x-hidden font-display relative pb-32">
       
       {/* Fullscreen Loader overlay */}
-      {loading && <WorkoraLoader fullScreen />}
+      {loading && <WorkoraLoader fullScreen startTime={loadingStartTime} />}
       
       {/* Header Logo */}
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
