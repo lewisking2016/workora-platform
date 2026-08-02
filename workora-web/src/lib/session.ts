@@ -24,10 +24,24 @@ function readLegacyUser(): CurrentUser | null {
   }
 }
 
+export function clearLegacySession() {
+  if (typeof window === 'undefined') return;
+  window.localStorage.removeItem('workora_user');
+  window.localStorage.removeItem('workora_username');
+  window.localStorage.removeItem('workora_role');
+}
+
 export async function fetchCurrentUser(): Promise<CurrentUser | null> {
   try {
     const res = await fetch('/api/auth/me');
-    if (!res.ok) return readLegacyUser();
+    if (!res.ok) {
+      if (res.status === 401) {
+        clearLegacySession();
+        return null;
+      }
+
+      return readLegacyUser();
+    }
 
     const data = await res.json();
     const user = data?.user;

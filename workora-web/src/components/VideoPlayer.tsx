@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { Play, Pause, SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react';
+import { FALLBACK_MEDIA_DATA_URI, resolveMediaUrl } from '@/lib/media';
 
 interface VideoPlayerProps {
   src: string;
@@ -19,6 +20,8 @@ export function VideoPlayer({ src, poster, className = "", autoPlay = false, loo
   const [showControls, setShowControls] = useState(false);
   const [hasVideoLoaded, setHasVideoLoaded] = useState(false);
   const [hasVideoError, setHasVideoError] = useState(false);
+  const resolvedSrc = resolveMediaUrl(src);
+  const resolvedPoster = resolveMediaUrl(poster) || FALLBACK_MEDIA_DATA_URI;
 
   useEffect(() => {
     if (videoRef.current && autoPlay) {
@@ -56,7 +59,7 @@ export function VideoPlayer({ src, poster, className = "", autoPlay = false, loo
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={poster || 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=800'}
+        src={resolvedPoster}
         className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
           src && !hasVideoError && hasVideoLoaded ? 'opacity-0' : 'opacity-100'
         }`}
@@ -66,8 +69,8 @@ export function VideoPlayer({ src, poster, className = "", autoPlay = false, loo
       {src && !hasVideoError && (
         <video
           ref={videoRef}
-          src={src}
-          poster={poster}
+          src={resolvedSrc}
+          poster={resolvedPoster}
           className={`relative z-10 w-full h-full object-cover transition-opacity duration-300 ${
             hasVideoLoaded ? 'opacity-100' : 'opacity-0'
           }`}
