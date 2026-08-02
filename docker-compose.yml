@@ -5,11 +5,18 @@ services:
     build: ./workora-backend
     ports:
       - "3001:3001"
-    env_file:
-      - ./workora-backend/.env
     environment:
       - PORT=3001
+      - DATABASE_URL=postgresql://neondb_owner:npg_cOgvDbm42AXF@ep-nameless-thunder-al8gsrup-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+      - JWT_SECRET=juakazi-2026-secret
+      - R2_ACCOUNT_ID=23ae408e06f8b2cd6c4188d0b985b03b
+      - R2_ACCESS_KEY_ID=205da145e53a96e70b8e6554fc60950d
+      - R2_SECRET_ACCESS_KEY=7eeaf8bbe44c09dee4b69e617b3871cc52ca88afb19e70cd224bc9d3fc935e21
+      - R2_ENDPOINT=https://23ae408e06f8b2cd6c4188d0b985b03b.r2.cloudflarestorage.com
+      - REDIS_URL=redis://redis:6379
     restart: always
+    depends_on:
+      - redis
 
   redis:
     image: redis:alpine
