@@ -1,54 +1,91 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   Heart,
   ChatCircleDots,
   BookmarkSimple,
   SealCheck,
-  MusicNotes,
-  UserCirclePlus
+  ShareFat,
+  DotsThree,
+  PaperPlaneTilt
 } from '@phosphor-icons/react';
 import { fetchCurrentUser } from '@/lib/session';
+import { VideoPlayer } from '@/components/VideoPlayer';
+import { APP_CONFIG } from '@/lib/config';
+import { useRouter } from 'next/navigation';
 
 interface Work {
   id: string;
   user_id: string;
+  worker_id: string;
   user_name: string;
+  handle: string;
   trade: string;
   verified: boolean;
   description: string;
   likes_count: number;
   comments_count: number;
+  video_url: string;
+  thumbnail_url: string;
   saved_by_me?: boolean;
+  liked_by_me?: boolean;
+  real_likes?: number;
+  real_comments?: number;
+}
+
+interface User {
+  id: string;
+  username: string;
+  role: string;
 }
 
 export default function WorksPage() {
   const [works, setWorks] = useState<Work[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState<{ id: string; username: string; role: string } | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const fetchWorks = async () => {
     try {
-      const res = await fetch('/api/gigs/feed');
+      const res = await fetch('/api/gigs/feed?page=1&limit=50');
       const data = await res.json();
       if (Array.isArray(data)) {
         setWorks(data);
       } else {
-        console.warn('Works data is not an array:', data);
         setWorks([]);
       }
-    } catch {
-      console.error('Works fetch failed');
+    } catch (err) {
+      console.error('Works fetch failed:', err);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleLike = async (work: Work) => {
+    if (!currentUser) return;
+    try {
+      const res = await fetch(`/api/gigs/${work.id}/like`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: currentUser.id })
+      });
+      const data = await res.json();
+      setWorks(prev => prev.map(item => item.id === work.id ? {
+        ...item,
+        likes_count: data.liked ? item.likes_count + 1 : item.likes_count - 1,
+        liked_by_me: data.liked
+      } : item));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleSave = async (work: Work) => {
     if (!currentUser) return;
-
     try {
       const res = await fetch(`/api/gigs/${work.id}/save`, {
         method: 'POST',
@@ -61,107 +98,178 @@ export default function WorksPage() {
     }
   };
 
+  const startConversation = async (otherUserId: string) => {
+    if (!currentUser) {
+      router.push('/login');
+      return;
+    }
+    try {
+      const res = await fetch('/api/messages/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: currentUser.id, other_user_id: otherUserId })
+      });
+      await res.json();
+      router.push('/dashboard/messages');
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     let mounted = true;
-
     const bootstrap = async () => {
       const user = await fetchCurrentUser();
       if (!mounted) return;
       setCurrentUser(user);
       fetchWorks();
     };
-
-    const timer = setTimeout(() => {
-      bootstrap();
-    }, 0);
-
-    return () => {
-      mounted = false;
-      clearTimeout(timer);
-    };
+    bootstrap();
+    return () => { mounted = false; };
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!containerRef.current) return;
+      const scrollTop = containerRef.current.scrollTop;
+      const windowHeight = window.innerHeight;
+      const newIndex = Math.round(scrollTop / windowHeight);
+      setCurrentIndex(newIndex);
+    };
+
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="h-full w-full bg-black flex items-center justify-center">
+        <div className="h-10 w-10 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (works.length === 0) {
+    return (
+      <div className="h-full w-full bg-black flex flex-col items-center justify-center text-white gap-4 px-8">
+        <Heart size={48} weight="duotone" className="text-white/20" />
+        <p className="text-sm font-medium text-center text-white/60">
+          No videos available yet. Check back soon!
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-full w-full bg-zinc-950 text-white overflow-y-auto snap-y snap-mandatory">
-      {loading ? (
-        <div className="h-full w-full flex items-center justify-center">
-           <div className="h-10 w-10 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-        </div>
-      ) : works.length > 0 ? (
-        works.map((work) => (
-          <section key={work.id} className="h-screen w-full snap-start relative flex items-center justify-center overflow-hidden">
-             {/* Background Video Placeholder */}
-             <div className="absolute inset-0 bg-zinc-900 flex flex-col items-center justify-center gap-4">
-                <div className="h-20 w-20 rounded-full border-2 border-white/10 flex items-center justify-center opacity-40">
-                   <Heart size={40} weight="fill" />
-                </div>
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-30">Proof of Work Active</p>
-             </div>
+    <div 
+      ref={containerRef}
+      className="h-full w-full bg-black overflow-y-scroll snap-y snap-mandatory scrollbar-hide"
+    >
+      {works.map((work, idx) => (
+        <section 
+          key={work.id} 
+          className="h-screen w-full snap-start relative flex items-center justify-center overflow-hidden"
+        >
+          {/* Video Background */}
+          <div className="absolute inset-0">
+            <VideoPlayer 
+              src={work.video_url}
+              poster={work.thumbnail_url || APP_CONFIG.defaults.thumbnail}
+              className="w-full h-full object-cover"
+              autoPlay={idx === currentIndex}
+              loop
+              muted
+            />
+          </div>
 
-             {/* UI Overlays */}
-             <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80 pointer-events-none" />
+          {/* Gradient Overlays */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80 pointer-events-none" />
 
-             {/* Right Side Actions */}
-             <div className="absolute right-6 bottom-32 flex flex-col items-center gap-8 pointer-events-auto">
-                <div className="relative group">
-                  <div className="h-12 w-12 rounded-full border-2 border-white overflow-hidden bg-zinc-800">
-                     <span className="h-full w-full flex items-center justify-center text-xs font-black">{work.user_name.charAt(0)}</span>
-                  </div>
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-[#FF0069] h-5 w-5 rounded-full flex items-center justify-center text-white">
-                     <UserCirclePlus size={14} weight="bold" />
-                  </div>
+          {/* Top Header */}
+          <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-auto z-10">
+            <div className="flex items-center gap-2">
+              <div className="h-10 w-10 rounded-full bg-zinc-900/60 backdrop-blur-sm flex items-center justify-center text-sm font-bold text-white">
+                {work.user_name?.charAt(0) || '?'}
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-white font-semibold text-sm">{work.user_name}</span>
+                  {work.verified && <SealCheck size={14} weight="fill" className="text-[#0066FF]" />}
                 </div>
+                <p className="text-white/70 text-xs">{work.trade}</p>
+              </div>
+            </div>
+            <DotsThree size={24} weight="bold" className="text-white" />
+          </div>
 
-                <div className="flex flex-col items-center gap-1">
-                  <Heart size={34} weight="fill" className="text-white hover:text-red-500 transition-colors cursor-pointer" />
-                  <span className="text-[11px] font-black">{work.likes_count}</span>
-                </div>
+          {/* Right Side Actions */}
+          <div className="absolute right-4 bottom-32 flex flex-col items-center gap-6 pointer-events-auto z-10">
+            {/* Profile */}
+            <button 
+              onClick={() => startConversation(work.user_id || work.worker_id)}
+              className="relative group"
+            >
+              <div className="h-12 w-12 rounded-full border-2 border-white bg-zinc-800 flex items-center justify-center text-xs font-bold text-white">
+                {work.user_name?.charAt(0) || '?'}
+              </div>
+              <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 h-6 w-6 rounded-full bg-[#FF0050] flex items-center justify-center">
+                <PaperPlaneTilt size={12} weight="fill" className="text-white" />
+              </div>
+            </button>
 
-                <div className="flex flex-col items-center gap-1">
-                  <ChatCircleDots size={34} weight="fill" className="text-white hover:text-[#0066FF] transition-colors cursor-pointer" />
-                  <span className="text-[11px] font-black">{work.comments_count}</span>
-                </div>
+            {/* Like */}
+            <button onClick={() => handleLike(work)} className="flex flex-col items-center gap-1">
+              <Heart 
+                size={32} 
+                weight={work.liked_by_me ? "fill" : "regular"} 
+                className={`${work.liked_by_me ? 'text-red-500' : 'text-white'} transition-colors`} 
+              />
+              <span className="text-white text-xs font-semibold">
+                {(work.real_likes || work.likes_count || 0).toLocaleString()}
+              </span>
+            </button>
 
-                <BookmarkSimple
-                  size={34}
-                  weight={work.saved_by_me ? "fill" : "regular"}
-                  className={`${work.saved_by_me ? 'text-[#0066FF]' : 'text-white hover:text-yellow-500'} transition-colors cursor-pointer`}
-                  onClick={() => handleSave(work)}
-                />
-                
-                <motion.div 
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                  className="h-12 w-12 rounded-full border-2 border-white/20 p-1 mt-4"
-                >
-                  <div className="h-full w-full rounded-full bg-gradient-to-tr from-[#FFD600] to-[#FF0069] flex items-center justify-center">
-                     <MusicNotes size={20} weight="fill" />
-                  </div>
-                </motion.div>
-             </div>
+            {/* Comment */}
+            <button className="flex flex-col items-center gap-1">
+              <ChatCircleDots size={32} weight="regular" className="text-white" />
+              <span className="text-white text-xs font-semibold">
+                {(work.real_comments || work.comments_count || 0).toLocaleString()}
+              </span>
+            </button>
 
-             {/* Bottom Content */}
-             <div className="absolute left-6 bottom-10 right-24 pointer-events-none">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-base font-black tracking-tight">{work.user_name}</span>
-                  {work.verified && <SealCheck size={18} weight="fill" className="text-[#0066FF]" />}
-                  <span className="text-white/40 font-bold text-xs">&bull; {work.trade}</span>
-                </div>
-                <p className="text-[14px] font-medium leading-relaxed text-white/80 line-clamp-2">
-                  {work.description}
-                </p>
-                <div className="flex items-center gap-2 mt-4 text-[11px] font-black text-white/40 uppercase tracking-widest">
-                   <MusicNotes size={16} weight="fill" />
-                   <span>Original Audio • Workora Trust Network</span>
-                </div>
-             </div>
-          </section>
-        ))
-      ) : (
-        <div className="h-full w-full flex items-center justify-center text-zinc-500 font-black uppercase tracking-widest text-xs">
-          No proof-of-work reels available.
-        </div>
-      )}
+            {/* Save */}
+            <button onClick={() => handleSave(work)} className="flex flex-col items-center gap-1">
+              <BookmarkSimple
+                size={32}
+                weight={work.saved_by_me ? "fill" : "regular"}
+                className={`${work.saved_by_me ? 'text-yellow-400' : 'text-white'} transition-colors`}
+              />
+            </button>
+
+            {/* Share */}
+            <button className="flex flex-col items-center gap-1">
+              <ShareFat size={32} weight="regular" className="text-white" />
+            </button>
+          </div>
+
+          {/* Bottom Content */}
+          <div className="absolute left-4 bottom-10 right-20 pointer-events-none z-10">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-white font-semibold text-base">{work.handle || work.user_name}</span>
+              {work.verified && <SealCheck size={16} weight="fill" className="text-[#0066FF]" />}
+            </div>
+            <p className="text-white text-sm font-normal leading-relaxed line-clamp-2">
+              {work.description || 'Check out this amazing work!'}
+            </p>
+            <div className="mt-3 text-white/60 text-xs">
+              #{work.trade.toLowerCase().replace(' ', '')} #workora #professional
+            </div>
+          </div>
+        </section>
+      ))}
     </div>
   );
 }

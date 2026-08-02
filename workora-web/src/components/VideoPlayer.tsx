@@ -7,13 +7,23 @@ interface VideoPlayerProps {
   src: string;
   poster?: string;
   className?: string;
+  autoPlay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
 }
 
-export function VideoPlayer({ src, poster, className = "" }: VideoPlayerProps) {
+export function VideoPlayer({ src, poster, className = "", autoPlay = false, loop = true, muted = true }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(autoPlay);
+  const [isMuted, setIsMuted] = useState(muted);
   const [showControls, setShowControls] = useState(false);
+
+  useEffect(() => {
+    if (videoRef.current && autoPlay) {
+      videoRef.current.play().catch(err => console.log('Auto-play prevented:', err));
+      setIsPlaying(true);
+    }
+  }, [autoPlay, src]);
 
   const togglePlay = (e: React.MouseEvent) => {
     e.stopPropagation();
