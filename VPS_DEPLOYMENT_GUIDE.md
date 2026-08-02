@@ -9,6 +9,10 @@
 - **SSH User:** azureuser
 - **Project Owner:** lewis
 
+**Live URLs:**
+- **Frontend:** https://workora.imeantech.com/
+- **Backend API:** http://4.221.170.153:3001
+
 ## SSH Access
 
 ```bash
@@ -259,6 +263,8 @@ sudo docker-compose ps
 3. Make sure the `VPS_PASSWORD` secret is set in GitHub repository settings
 4. Backend runs on port 3001
 5. Redis runs on port 6379
+6. **Frontend is deployed separately at:** https://workora.imeantech.com/
+7. **Backend API is at:** http://4.221.170.153:3001
 
 ## Support
 
