@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Play, Heart, ChatCircleDots, SealCheck } from '@phosphor-icons/react';
 import { useRouter } from 'next/navigation';
 import { APP_CONFIG } from '@/lib/config';
+import { SafeMediaThumb } from '@/components/SafeMediaThumb';
 
 interface Gig {
   id: string;
@@ -61,7 +62,11 @@ export default function ExplorePage() {
   };
 
   useEffect(() => {
-    fetchExplore(1, false);
+    const timer = window.setTimeout(() => {
+      void fetchExplore(1, false);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   const loadMore = async () => {
@@ -98,7 +103,7 @@ export default function ExplorePage() {
                     className="group relative aspect-square bg-black cursor-pointer overflow-hidden"
                     onClick={() => router.push(`/dashboard/post/${gig.id}`)}
                   >
-                    <img 
+                    <SafeMediaThumb
                       src={gig.thumbnail_url || APP_CONFIG.defaults.thumbnail}
                       alt={gig.description || gig.title}
                       className="w-full h-full object-cover"

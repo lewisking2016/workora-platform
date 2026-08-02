@@ -17,6 +17,8 @@ export function VideoPlayer({ src, poster, className = "", autoPlay = false, loo
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [isMuted, setIsMuted] = useState(muted);
   const [showControls, setShowControls] = useState(false);
+  const [hasVideoLoaded, setHasVideoLoaded] = useState(false);
+  const [hasVideoError, setHasVideoError] = useState(false);
 
   useEffect(() => {
     if (videoRef.current && autoPlay) {
@@ -52,21 +54,33 @@ export function VideoPlayer({ src, poster, className = "", autoPlay = false, loo
       onMouseLeave={() => setShowControls(false)}
       onClick={togglePlay}
     >
-      {src ? (
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={poster || 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=800'}
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
+          src && !hasVideoError && hasVideoLoaded ? 'opacity-0' : 'opacity-100'
+        }`}
+        alt="Video poster"
+      />
+
+      {src && !hasVideoError && (
         <video
           ref={videoRef}
           src={src}
           poster={poster}
-          className="w-full h-full object-cover"
-          loop
+          className={`relative z-10 w-full h-full object-cover transition-opacity duration-300 ${
+            hasVideoLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+          loop={loop}
           muted={isMuted}
           playsInline
-        />
-      ) : (
-        <img 
-          src={poster || 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=800'} 
-          className="w-full h-full object-cover opacity-50 grayscale"
-          alt="Video fallback"
+          preload="metadata"
+          onLoadedData={() => setHasVideoLoaded(true)}
+          onCanPlay={() => setHasVideoLoaded(true)}
+          onError={() => {
+            setHasVideoError(true);
+            setHasVideoLoaded(false);
+          }}
         />
       )}
 

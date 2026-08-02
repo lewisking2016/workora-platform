@@ -6,13 +6,11 @@ import {
   MagnifyingGlass, 
   SealCheck, 
   Star, 
-  MapPin, 
-  CaretRight,
-  FadersHorizontal,
   Play
 } from '@phosphor-icons/react';
 import { useRouter } from 'next/navigation';
 import { APP_CONFIG } from '@/lib/config';
+import { SafeMediaThumb } from '@/components/SafeMediaThumb';
 
 interface Gig {
   id: string;
@@ -47,6 +45,22 @@ export default function SearchPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const router = useRouter();
 
+  async function fetchGigs() {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/gigs/feed?page=1&limit=100');
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        const shuffled = data.sort(() => Math.random() - 0.5);
+        setGigs(shuffled);
+      }
+    } catch (err) {
+      console.error('Failed to fetch gigs:', err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
     async function fetchTrades() {
       try {
@@ -62,28 +76,20 @@ export default function SearchPage() {
       }
     }
     fetchTrades();
-    fetchGigs();
+
+    const timer = window.setTimeout(() => {
+      void fetchGigs();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
-  const fetchGigs = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch('/api/gigs/feed?page=1&limit=100');
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        // Shuffle for algorithmic feel
-        const shuffled = data.sort(() => Math.random() - 0.5);
-        setGigs(shuffled);
-      }
-    } catch (err) {
-      console.error('Failed to fetch gigs:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchGigs();
+    const timer = window.setTimeout(() => {
+      void fetchGigs();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, [selectedCategory]);
 
   const handleSearch = React.useCallback(async () => {
@@ -190,7 +196,7 @@ export default function SearchPage() {
                   className="aspect-square bg-black relative group cursor-pointer overflow-hidden"
                   onClick={() => router.push(`/dashboard/post/${gig.id}`)}
                 >
-                  <img 
+                  <SafeMediaThumb
                     src={gig.thumbnail_url || APP_CONFIG.defaults.thumbnail}
                     alt={gig.description}
                     className="w-full h-full object-cover"
