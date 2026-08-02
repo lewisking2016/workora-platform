@@ -37,10 +37,8 @@ export async function fetchCurrentUser(): Promise<CurrentUser | null> {
     if (!res.ok) {
       if (res.status === 401) {
         clearLegacySession();
-        return null;
       }
-
-      return readLegacyUser();
+      return null;
     }
 
     const data = await res.json();

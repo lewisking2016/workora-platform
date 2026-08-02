@@ -16,20 +16,58 @@ import { fetchCurrentUser } from '@/lib/session';
 
 type Tab = 'overview' | 'profile' | 'portfolio' | 'analytics';
 
+interface ProfileSummary {
+  id: string;
+  bio?: string;
+  trade?: string;
+  location?: string;
+  full_name?: string;
+  title?: string;
+  total_gigs?: number;
+  trust_score?: number | string;
+  total_earnings?: number;
+}
+
+type FormState = {
+  bio: string;
+  trade: string;
+  location: string;
+  full_name: string;
+  title: string;
+};
+
 export default function BusinessDashboard() {
   const [isDark, setIsDark] = useState(false);
   const [tab, setTab] = useState<Tab>('overview');
   const [username, setUsername] = useState('Professional');
   const [userId, setUserId] = useState('');
-  const [profile, setProfile] = useState<any>(null);
-  const [skills, setSkills] = useState<any[]>([]);
-  const [experience, setExperience] = useState<any[]>([]);
-  const [education, setEducation] = useState<any[]>([]);
-  const [certs, setCerts] = useState<any[]>([]);
-  const [gigs, setGigs] = useState<any[]>([]);
+  const [profile, setProfile] = useState<ProfileSummary | null>(null);
+  const [skills, setSkills] = useState<Array<Record<string, unknown>>>([]);
+  const [experience, setExperience] = useState<Array<Record<string, unknown>>>([]);
+  const [education, setEducation] = useState<Array<Record<string, unknown>>>([]);
+  const [certs, setCerts] = useState<Array<Record<string, unknown>>>([]);
+  const [gigs, setGigs] = useState<Array<Record<string, unknown>>>([]);
   const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({ bio: '', trade: '', location: '', full_name: '', title: '' });
+  const [form, setForm] = useState<FormState>({ bio: '', trade: '', location: '', full_name: '', title: '' });
   const [newSkill, setNewSkill] = useState('');
+
+  async function fetchAll() {
+    try {
+      const res = await fetch('/api/profile/me');
+      const data = await res.json();
+      if (data.profile) {
+        setProfile(data.profile);
+        setForm({ bio: data.profile.bio || '', trade: data.profile.trade || '', location: data.profile.location || '', full_name: data.profile.full_name || '', title: data.profile.title || '' });
+        setSkills(data.skills || []);
+        setExperience(data.experience || []);
+        setEducation(data.education || []);
+        setCerts(data.certifications || []);
+        const gRes = await fetch(`/api/gigs/worker/${data.profile.id}`);
+        const gData = await gRes.json();
+        setGigs(Array.isArray(gData) ? gData : []);
+      }
+    } catch (e) { console.error(e); }
+  }
 
   useEffect(() => {
     let mounted = true;
@@ -45,7 +83,7 @@ export default function BusinessDashboard() {
 
       setUsername(user.username);
       setUserId(user.id);
-      fetchAll(user.id);
+      fetchAll();
     };
 
     bootstrap();
@@ -55,31 +93,13 @@ export default function BusinessDashboard() {
     };
   }, []);
 
-  const fetchAll = async (uid: string) => {
-    try {
-      const res = await fetch(`/api/profile/me/${uid}`);
-      const data = await res.json();
-      if (data.profile) {
-        setProfile(data.profile);
-        setForm({ bio: data.profile.bio || '', trade: data.profile.trade || '', location: data.profile.location || '', full_name: data.profile.full_name || '', title: data.profile.title || '' });
-        setSkills(data.skills || []);
-        setExperience(data.experience || []);
-        setEducation(data.education || []);
-        setCerts(data.certifications || []);
-        const gRes = await fetch(`/api/gigs/worker/${data.profile.id}`);
-        const gData = await gRes.json();
-        setGigs(Array.isArray(gData) ? gData : []);
-      }
-    } catch (e) { console.error(e); }
-  };
-
   const saveProfile = async () => {
     await fetch(`/api/profile/update/${userId}`, {
       method: 'PATCH', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ bio: form.bio, title: form.title, display_name: form.full_name, location: form.location }),
     });
     setEditing(false);
-    fetchAll(userId);
+    fetchAll();
   };
 
   const addSkill = async () => {
@@ -89,19 +109,19 @@ export default function BusinessDashboard() {
       body: JSON.stringify({ profile_id: profile.id, skill_name: newSkill, skill_level: 'intermediate' }),
     });
     setNewSkill('');
-    fetchAll(userId);
+    fetchAll();
   };
 
   const deleteSkill = async (id: string) => {
     await fetch(`/api/profile/skills/${id}`, { method: 'DELETE' });
-    fetchAll(userId);
+    fetchAll();
   };
 
   const bg = isDark ? 'bg-zinc-950 text-white' : 'bg-zinc-100 text-zinc-950';
   const card = isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-100';
   const muted = isDark ? 'text-zinc-400' : 'text-zinc-500';
 
-  const TABS: { key: Tab; label: string; icon: any }[] = [
+  const TABS: { key: Tab; label: string; icon: React.ElementType }[] = [
     { key: 'overview', label: 'Overview', icon: House },
     { key: 'profile', label: 'Profile', icon: User },
     { key: 'portfolio', label: 'Portfolio', icon: VideoCamera },
@@ -241,9 +261,9 @@ export default function BusinessDashboard() {
                 ].map(f => (
                   <div key={f.key}>
                     <label className={`text-[10px] font-black uppercase tracking-wider ${muted}`}>{f.label}</label>
-                    {editing ? <input value={(form as any)[f.key] || ''} onChange={e => setForm({ ...form, [f.key]: e.target.value })}
+                    {editing ? <input value={form[f.key as keyof FormState] || ''} onChange={e => setForm({ ...form, [f.key]: e.target.value })}
                       className={`mt-1 h-10 w-full rounded-xl border px-4 text-sm font-bold outline-none ${isDark ? 'bg-zinc-800 border-zinc-700 text-white' : 'bg-zinc-50 border-zinc-200'}`} />
-                      : <p className="text-sm font-bold mt-1">{(form as any)[f.key] || '-'}</p>}
+                      : <p className="text-sm font-bold mt-1">{form[f.key as keyof FormState] || '-'}</p>}
                   </div>
                 ))}
                 <div className="md:col-span-2">

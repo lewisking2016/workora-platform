@@ -5,6 +5,10 @@ const ALLOWED_MEDIA_HOSTS = new Set([
   'source.unsplash.com',
   'cdn.pixabay.com',
   'images.pexels.com',
+  'filesamples.com',
+  'www.w3schools.com',
+  'media.w3.org',
+  'interactive-examples.mdn.mozilla.net',
 ]);
 
 export function resolveMediaUrl(src?: string | null): string {

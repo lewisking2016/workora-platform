@@ -24,6 +24,18 @@ import {
 } from '@phosphor-icons/react';
 import { fetchCurrentUser } from '@/lib/session';
 
+interface CurrentUser {
+  id: string;
+  username: string;
+  role: string;
+}
+
+interface GigSummary {
+  view_count?: number;
+  likes_count?: number;
+  comments_count?: number;
+}
+
 interface Stats {
   totalViews: number;
   viewGrowth: number;
@@ -87,29 +99,26 @@ export default function AnalyticsPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState<any>(null);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
 
   useEffect(() => {
     async function loadAnalytics() {
-      const user = await fetchCurrentUser();
+      const user: CurrentUser | null = await fetchCurrentUser();
       if (!user) {
         window.location.href = '/login';
         return;
       }
-      setCurrentUser(user);
 
       try {
-        const profileRes = await fetch(`/api/profile/me/${user.id}`);
+        const profileRes = await fetch('/api/profile/me');
         const profileData = await profileRes.json();
 
         const gigsRes = await fetch(`/api/gigs/worker/${profileData.profile?.id}`);
-        const gigsData = await gigsRes.json();
-
-        const totalGigs = Array.isArray(gigsData) ? gigsData.length : 0;
-        const totalViews = gigsData.reduce((sum: number, gig: any) => sum + (gig.view_count || 0), 0);
-        const totalLikes = gigsData.reduce((sum: number, gig: any) => sum + (gig.likes_count || 0), 0);
-        const totalComments = gigsData.reduce((sum: number, gig: any) => sum + (gig.comments_count || 0), 0);
+        const gigsJson = await gigsRes.json();
+        const gigsData: GigSummary[] = Array.isArray(gigsJson) ? gigsJson : [];
+        const totalViews = gigsData.reduce((sum, gig) => sum + (gig.view_count || 0), 0);
+        const totalLikes = gigsData.reduce((sum, gig) => sum + (gig.likes_count || 0), 0);
+        const totalComments = gigsData.reduce((sum, gig) => sum + (gig.comments_count || 0), 0);
         const totalEngagement = totalLikes + totalComments;
 
         setStats({

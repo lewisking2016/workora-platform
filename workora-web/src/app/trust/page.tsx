@@ -42,7 +42,7 @@ export default function TrustPassportPage() {
       const user = await fetchCurrentUser();
       if (user) {
         try {
-          const res = await fetch(`/api/profile/me/${user.id}`);
+          const res = await fetch('/api/profile/me');
           const data = await res.json();
           if (data.profile) {
             

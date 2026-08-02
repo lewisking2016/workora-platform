@@ -90,7 +90,7 @@ export default function DashboardProfile() {
 
   const fetchData = async (userId: string) => {
     try {
-      const profileRes = await fetch(`/api/profile/me/${userId}`);
+      const profileRes = await fetch('/api/profile/me');
       const profileData = await profileRes.json();
       setProfile(profileData);
 
@@ -159,7 +159,7 @@ export default function DashboardProfile() {
             <button className="h-12 px-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl flex items-center gap-2 font-black text-sm text-zinc-950 dark:text-white hover:shadow-lg transition-all">
               <Share size={20} weight="bold" /> Share
             </button>
-            <Link href="/dashboard/profile/edit" className="h-12 px-6 bg-[#0066FF] text-white rounded-2xl flex items-center gap-2 font-black text-sm hover:brightness-110 transition-all shadow-lg">
+            <Link href="/profile/edit" className="h-12 px-6 bg-[#0066FF] text-white rounded-2xl flex items-center gap-2 font-black text-sm hover:brightness-110 transition-all shadow-lg">
               <PencilSimple size={20} weight="bold" /> Edit Profile
             </Link>
           </div>
@@ -206,7 +206,7 @@ export default function DashboardProfile() {
             <div className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[32px] p-8 space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight">About Me</h2>
-                <Link href="/dashboard/profile/edit" className="text-[#0066FF] text-sm font-black hover:underline">
+                <Link href="/profile/edit" className="text-[#0066FF] text-sm font-black hover:underline">
                   Edit
                 </Link>
               </div>

@@ -251,41 +251,41 @@ async function createGigs(profiles) {
   console.log('\n📸 Creating gigs (proof of work)...');
   const gigs = [];
 
-  // High-quality work videos - curated collection
+  // High-quality public MP4s that load reliably in browsers
   const workVideosByCategory = {
     'Plumber': [
-      'https://videos.pexels.com/video-files/5637991/5637991-uhd_2560_1440_30fps.mp4',
-      'https://videos.pexels.com/video-files/8460283/8460283-uhd_2560_1440_25fps.mp4',
+      'https://filesamples.com/samples/video/mp4/sample_640x360.mp4',
+      'https://www.w3schools.com/html/mov_bbb.mp4',
     ],
     'Electrician': [
-      'https://videos.pexels.com/video-files/5473845/5473845-hd_1920_1080_30fps.mp4',
-      'https://videos.pexels.com/video-files/7235804/7235804-hd_1920_1080_25fps.mp4',
+      'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+      'https://filesamples.com/samples/video/mp4/sample_640x360.mp4',
     ],
     'Carpenter': [
-      'https://videos.pexels.com/video-files/6195275/6195275-hd_1920_1080_30fps.mp4',
-      'https://videos.pexels.com/video-files/7414197/7414197-hd_1920_1080_25fps.mp4',
+      'https://www.w3schools.com/html/mov_bbb.mp4',
+      'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
     ],
     'Mason': [
-      'https://videos.pexels.com/video-files/4624136/4624136-hd_1920_1080_30fps.mp4',
-      'https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4',
+      'https://filesamples.com/samples/video/mp4/sample_640x360.mp4',
+      'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
     ],
     'Painter': [
-      'https://videos.pexels.com/video-files/4629630/4629630-hd_1920_1080_25fps.mp4',
-      'https://videos.pexels.com/video-files/7191156/7191156-hd_1920_1080_25fps.mp4',
+      'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+      'https://www.w3schools.com/html/mov_bbb.mp4',
     ],
     'Mechanic': [
-      'https://videos.pexels.com/video-files/4489702/4489702-hd_1920_1080_25fps.mp4',
-      'https://videos.pexels.com/video-files/8962588/8962588-hd_1920_1080_30fps.mp4',
+      'https://filesamples.com/samples/video/mp4/sample_640x360.mp4',
+      'https://www.w3schools.com/html/mov_bbb.mp4',
     ],
     'Welder': [
-      'https://videos.pexels.com/video-files/3629537/3629537-hd_1920_1080_25fps.mp4',
-      'https://videos.pexels.com/video-files/5474254/5474254-hd_1920_1080_30fps.mp4',
+      'https://www.w3schools.com/html/mov_bbb.mp4',
+      'https://filesamples.com/samples/video/mp4/sample_640x360.mp4',
     ],
     'default': [
-      'https://videos.pexels.com/video-files/3196036/3196036-hd_1920_1080_25fps.mp4',
-      'https://videos.pexels.com/video-files/4629618/4629618-hd_1920_1080_25fps.mp4',
-      'https://videos.pexels.com/video-files/5473845/5473845-hd_1920_1080_30fps.mp4',
-      'https://videos.pexels.com/video-files/7191156/7191156-hd_1920_1080_25fps.mp4',
+      'https://filesamples.com/samples/video/mp4/sample_640x360.mp4',
+      'https://www.w3schools.com/html/mov_bbb.mp4',
+      'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+      'https://filesamples.com/samples/video/mp4/sample_640x360.mp4',
     ]
   };
 
