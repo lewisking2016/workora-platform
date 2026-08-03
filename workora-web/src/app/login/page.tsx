@@ -75,22 +75,23 @@ export default function LoginPage() {
       
       {/* 1. Cinematic Left Side (1:1 Image Strategy) */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-zinc-950 items-center justify-center p-12">
-        <div className="relative aspect-square w-full max-w-2xl overflow-hidden rounded-[48px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] border-4 border-white/5">
-          <Image 
-            src="/login images/workora login.png"
-            alt="Workora Cinematic"
-            fill
-            sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-cover"
-            priority
-          />
-          {/* Deep Cinematic Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent" />
-          
+        <div className="relative aspect-square w-full max-w-2xl overflow-hidden rounded-[48px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] border border-white/10 bg-[radial-gradient(circle_at_top_left,_rgba(0,102,255,0.35),_transparent_38%),radial-gradient(circle_at_80%_20%,_rgba(112,0,255,0.3),_transparent_30%),linear-gradient(145deg,_#050816,_#0b1020_45%,_#111827)]">
+          <div className="absolute inset-0 opacity-70 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.08),_transparent_55%)]" />
+          <div className="absolute -left-10 top-10 h-56 w-56 rounded-full bg-[#0066FF]/20 blur-3xl" />
+          <div className="absolute -right-8 bottom-12 h-64 w-64 rounded-full bg-[#7000FF]/20 blur-3xl" />
+
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="relative h-[28rem] w-[28rem] rounded-full border border-white/10 bg-white/5 backdrop-blur-sm">
+              <div className="absolute inset-10 rounded-full border border-white/10 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.12),_transparent_62%)]" />
+              <div className="absolute inset-24 rounded-full border border-white/10 bg-[linear-gradient(145deg,_rgba(0,102,255,0.16),_rgba(112,0,255,0.18))]" />
+              <div className="absolute inset-36 rounded-full bg-gradient-to-br from-[#0066FF] via-[#4F46E5] to-[#7000FF] opacity-35 blur-2xl" />
+            </div>
+          </div>
+
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="absolute bottom-12 left-12 z-10"
+            className="absolute bottom-12 left-12 z-10 max-w-[24rem]"
           >
             <h1 className="text-5xl font-black tracking-tighter text-white leading-none">
               See everyday moments <br />
