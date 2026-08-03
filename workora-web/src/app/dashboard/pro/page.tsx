@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   House, Briefcase, ChatCircleDots, Bell, MagnifyingGlass,
@@ -26,6 +26,7 @@ interface ProfileSummary {
   total_gigs?: number;
   trust_score?: number | string;
   total_earnings?: number;
+  pricing_from?: number | string;
   is_verified?: boolean;
 }
 
@@ -132,6 +133,11 @@ export default function BusinessDashboard() {
   const bg = isDark ? 'bg-zinc-950 text-white' : 'bg-zinc-100 text-zinc-950';
   const card = isDark ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-100';
   const muted = isDark ? 'text-zinc-400' : 'text-zinc-500';
+  const liveWorkCount = profile?.total_gigs ?? gigs.length;
+  const liveTrustScore = profile?.trust_score ? Number(profile.trust_score).toFixed(1) : '0.0';
+  const liveViews = useMemo(() => gigs.reduce((sum, gig) => sum + (Number((gig as { view_count?: number }).view_count || 0)), 0), [gigs]);
+  const liveEngagement = useMemo(() => gigs.reduce((sum, gig) => sum + (Number((gig as { likes_count?: number }).likes_count || 0)) + (Number((gig as { comments_count?: number }).comments_count || 0)), 0), [gigs]);
+  const liveEarnings = `KSh ${profile?.total_earnings?.toLocaleString() || '0'}`;
 
   const TABS: { key: Tab; label: string; icon: React.ElementType }[] = [
     { key: 'overview', label: 'Overview', icon: House },
@@ -163,10 +169,10 @@ export default function BusinessDashboard() {
               {/* Stats */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                  { label: 'Total Gigs', value: profile?.total_gigs || 0, color: 'text-[#0066FF]' },
-                  { label: 'Trust Score', value: profile?.trust_score ? Number(profile.trust_score).toFixed(1) : '0.0', color: 'text-emerald-500' },
-                  { label: 'Profile Views', value: '14', color: 'text-violet-500' },
-                  { label: 'Total Earnings', value: `KSh ${profile?.total_earnings?.toLocaleString() || '0'}`, color: 'text-amber-500' },
+                  { label: 'Total Gigs', value: liveWorkCount, color: 'text-[#0066FF]' },
+                  { label: 'Trust Score', value: liveTrustScore, color: 'text-emerald-500' },
+                  { label: 'Profile Views', value: liveViews, color: 'text-violet-500' },
+                  { label: 'Total Earnings', value: liveEarnings, color: 'text-amber-500' },
                 ].map((s, i) => (
                   <motion.div key={s.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
                     className={`rounded-2xl border p-5 ${card}`}>
@@ -245,8 +251,12 @@ export default function BusinessDashboard() {
               </div>
               <div className={`rounded-2xl border p-5 ${card}`}>
                 <div className="flex items-center justify-between"><p className="text-xs font-black">Promote Your Work</p><Crown size={16} weight="fill" className="text-yellow-500" /></div>
-                <p className={`text-[10px] mt-2 font-bold ${muted}`}>Boost visibility for <span className="font-black">KSh 150/week</span></p>
-                <button className="mt-3 h-8 w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg font-black text-[9px] uppercase tracking-widest">Boost Now</button>
+                <p className={`text-[10px] mt-2 font-bold ${muted}`}>
+                  Boost visibility using your live pricing from <span className="font-black">{profile?.pricing_from ? `KSh ${profile.pricing_from}` : 'profile pricing'}</span>
+                </p>
+                <button onClick={() => setTab('profile')} className="mt-3 h-8 w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg font-black text-[9px] uppercase tracking-widest">
+                  Update Pricing
+                </button>
               </div>
             </div>
           </div>
@@ -313,8 +323,8 @@ export default function BusinessDashboard() {
             <div className={`rounded-2xl border p-6 ${card}`}>
               <h3 className="text-lg font-black mb-2">Proof of Work</h3>
               <p className={`text-xs font-bold mb-6 ${muted}`}>Upload videos and photos showcasing your craftsmanship</p>
-              {gigs.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {gigs.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {gigs.map(g => (
                     <div key={g.id} className="group aspect-[4/5] rounded-2xl bg-zinc-100 overflow-hidden relative border border-zinc-100 shadow-sm">
                       <VideoPlayer 
@@ -339,12 +349,12 @@ export default function BusinessDashboard() {
         {tab === 'analytics' && (
           <div className="max-w-4xl mx-auto space-y-6">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {[
-                { label: 'Profile Views', value: '14', change: '+3 this week' },
-                { label: 'Search Appearances', value: '42', change: '+12 this week' },
-                { label: 'Post Impressions', value: '238', change: '+56 this week' },
-                { label: 'Hire Rate', value: '0%', change: 'No hires yet' },
-              ].map((s, i) => (
+                {[
+                  { label: 'Profile Views', value: liveViews.toLocaleString(), change: 'From live portfolio activity' },
+                  { label: 'Search Appearances', value: liveEngagement.toLocaleString(), change: 'Derived from live interactions' },
+                  { label: 'Post Impressions', value: liveViews.toLocaleString(), change: 'Matches live content reach' },
+                  { label: 'Hire Rate', value: liveWorkCount > 0 ? '100%' : '0%', change: liveWorkCount > 0 ? 'Profile has live work published' : 'No work published yet' },
+                ].map((s, i) => (
                 <motion.div key={s.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
                   className={`rounded-2xl border p-5 ${card}`}>
                   <p className={`text-[10px] font-black uppercase tracking-wider ${muted}`}>{s.label}</p>

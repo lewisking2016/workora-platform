@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import {
   X,
   ArrowLeft,
@@ -37,15 +38,21 @@ const FILTERS: Filter[] = [
 
 export default function NewPostPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const mode = useMemo(() => {
+    const value = searchParams.get('type') || 'post';
+    return ['post', 'reel', 'story', 'gig', 'proof', 'media'].includes(value) ? value : 'post';
+  }, [searchParams]);
   const [step, setStep] = useState<'upload' | 'filter' | 'details'>('upload');
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mediaPreview, setMediaPreview] = useState<string>('');
   const [mediaType, setMediaType] = useState<'image' | 'video'>('image');
   const [selectedFilter, setSelectedFilter] = useState(0);
   const [caption, setCaption] = useState('');
-  const [location, setLocation] = useState('');
+  const [location] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [trade, setTrade] = useState('');
+  const [fileError, setFileError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -58,8 +65,21 @@ export default function NewPostPage() {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setFileError('');
 
     const isVideo = file.type.startsWith('video/');
+    const isImage = file.type.startsWith('image/');
+    if (!isVideo && !isImage) {
+      setFileError('Only image and video files are supported.');
+      return;
+    }
+
+    const maxSize = 250 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setFileError('That file is too large for the live upload limit.');
+      return;
+    }
+
     setMediaType(isVideo ? 'video' : 'image');
     setMediaFile(file);
 
@@ -109,9 +129,9 @@ export default function NewPostPage() {
 
       if (!postRes.ok) throw new Error('Failed to create post');
 
-      router.push('/dashboard/feed');
-    } catch (err: any) {
-      alert(err.message || 'Something went wrong');
+      router.push('/dashboard/create/published-success');
+    } catch (err: unknown) {
+      setFileError(err instanceof Error ? err.message : 'Something went wrong');
       setIsUploading(false);
     }
   };
@@ -137,11 +157,14 @@ export default function NewPostPage() {
           )}
         </button>
         <h1 className="text-base font-semibold text-zinc-950 dark:text-white">
-          {step === 'upload' ? 'New post' : step === 'filter' ? 'Filters' : 'New post'}
+          {mode === 'post' ? 'New post' : mode === 'reel' ? 'New reel' : mode === 'story' ? 'New story' : mode === 'gig' ? 'New gig' : 'New proof'}
         </h1>
         <button 
           onClick={() => {
-            if (step === 'upload') return;
+            if (step === 'upload') {
+              router.push('/dashboard/create');
+              return;
+            }
             if (step === 'filter') setStep('details');
             else handlePost();
           }}
@@ -170,14 +193,16 @@ export default function NewPostPage() {
                   <Sparkle size={48} weight="duotone" className="text-zinc-400" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-zinc-950 dark:text-white mb-2">Create new post</h2>
-                  <p className="text-zinc-500 dark:text-zinc-400 text-sm">Share your work with the Workora community</p>
+                  <h2 className="text-xl font-bold text-zinc-950 dark:text-white mb-2">
+                    {mode === 'post' ? 'Create new post' : mode === 'reel' ? 'Create new reel' : mode === 'story' ? 'Create new story' : mode === 'gig' ? 'Create new gig' : 'Upload proof of work'}
+                  </h2>
+                  <p className="text-zinc-500 dark:text-zinc-400 text-sm">Share live work with the Workora community.</p>
                 </div>
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   className="h-12 px-6 bg-[#0066FF] text-white rounded-xl font-semibold"
                 >
-                  Select from device
+                  {mode === 'story' ? 'Capture or upload' : 'Select from device'}
                 </button>
               </div>
             ) : (
@@ -191,6 +216,12 @@ export default function NewPostPage() {
             )}
           </div>
         )}
+
+        {fileError ? (
+          <div className="mx-4 mt-4 rounded-[16px] border border-rose-200 bg-rose-50 p-4 text-sm font-medium text-rose-700 dark:border-rose-400/20 dark:bg-rose-400/10 dark:text-rose-200">
+            {fileError}
+          </div>
+        ) : null}
 
         {/* FILTER STEP */}
         {step === 'filter' && (
