@@ -26,6 +26,18 @@ interface ProfileSummary {
   total_gigs?: number;
   trust_score?: number | string;
   total_earnings?: number;
+  is_verified?: boolean;
+}
+
+interface SkillItem {
+  id: string;
+  skill_name: string;
+}
+
+interface GigItem {
+  id: string;
+  video_url: string;
+  thumbnail_url?: string;
 }
 
 type FormState = {
@@ -42,11 +54,11 @@ export default function BusinessDashboard() {
   const [username, setUsername] = useState('Professional');
   const [userId, setUserId] = useState('');
   const [profile, setProfile] = useState<ProfileSummary | null>(null);
-  const [skills, setSkills] = useState<Array<Record<string, unknown>>>([]);
+  const [skills, setSkills] = useState<SkillItem[]>([]);
   const [experience, setExperience] = useState<Array<Record<string, unknown>>>([]);
   const [education, setEducation] = useState<Array<Record<string, unknown>>>([]);
   const [certs, setCerts] = useState<Array<Record<string, unknown>>>([]);
-  const [gigs, setGigs] = useState<Array<Record<string, unknown>>>([]);
+  const [gigs, setGigs] = useState<GigItem[]>([]);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<FormState>({ bio: '', trade: '', location: '', full_name: '', title: '' });
   const [newSkill, setNewSkill] = useState('');
