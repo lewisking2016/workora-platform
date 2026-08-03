@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Hammer, 
@@ -26,8 +26,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { BirthdayPicker } from '@/components/BirthdayPicker';
 import WorkoraLoader from '@/components/WorkoraLoader';
-import { persistLegacySession } from '@/lib/session';
+import { fetchCurrentUser, persistLegacySession } from '@/lib/session';
 import { APP_CONFIG } from '@/lib/config';
+import { useRouter } from 'next/navigation';
 
 const TRADES = [
   { name: 'Construction', sub: 'Masons, Roofers', icon: Hammer, color: 'text-[#0066FF]' },
@@ -41,10 +42,10 @@ const TRADES = [
 ];
 
 const COUNTRIES = [
-  { name: 'Kenya', code: '+254', flag: '🇰🇪' },
-  { name: 'Uganda', code: '+256', flag: '🇺🇬' },
-  { name: 'Tanzania', code: '+255', flag: '🇹🇿' },
-  { name: 'Rwanda', code: '+250', flag: '🇷🇼' },
+  { name: 'Kenya', code: '+254', badge: 'KE' },
+  { name: 'Uganda', code: '+256', badge: 'UG' },
+  { name: 'Tanzania', code: '+255', badge: 'TZ' },
+  { name: 'Rwanda', code: '+250', badge: 'RW' },
 ];
 
 export default function JoinPage() {
@@ -69,6 +70,24 @@ export default function JoinPage() {
 
   const [loading, setLoading] = useState(false);
   const [loadingStartTime, setLoadingStartTime] = useState<number>(0);
+  const router = useRouter();
+
+  useEffect(() => {
+    let mounted = true;
+
+    const bootstrap = async () => {
+      const user = await fetchCurrentUser();
+      if (!mounted || !user) return;
+
+      window.location.href = user.role === 'hirer' ? '/dashboard/feed' : '/dashboard/pro';
+    };
+
+    void bootstrap();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Validation Logic
   const isFullNameValid = formData.fullName.trim().split(' ').length >= 2;
@@ -101,7 +120,9 @@ export default function JoinPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Registration failed');
+        const errorCode = String(data?.code || 'account_already_exists');
+        router.push(`/auth/error/${errorCode}`);
+        return;
       }
 
       persistLegacySession({
@@ -112,9 +133,7 @@ export default function JoinPage() {
 
       setStep(3); 
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Registration failed';
-      setError(errorMessage);
-      console.error('Registration failed:', err);
+      router.push('/auth/error/network_error');
     } finally {
       setLoading(false);
     }
@@ -194,7 +213,7 @@ export default function JoinPage() {
           {/* Step 2: Registration Form */}
           {step === 2 && (
             <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col gap-8 w-full">
-               <button onClick={() => { formData.role === 'client' ? setStep(0) : setStep(1); }} className="flex items-center gap-2 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors font-black text-[10px] uppercase tracking-widest">
+               <button onClick={() => { if (formData.role === 'client') setStep(0); else setStep(1); }} className="flex items-center gap-2 text-zinc-400 hover:text-zinc-950 dark:hover:text-white transition-colors font-black text-[10px] uppercase tracking-widest">
                 <CaretLeft size={14} weight="bold" /> Back
               </button>
               <div className="text-center">
@@ -211,7 +230,7 @@ export default function JoinPage() {
                         onClick={() => setShowCountryPicker(!showCountryPicker)}
                         className="h-12 px-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center gap-2 hover:bg-white dark:hover:bg-zinc-800 transition-all shadow-sm"
                       >
-                         <span className="text-lg">{selectedCountry.flag}</span>
+                         <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-white px-2 text-[10px] font-black text-zinc-950 dark:bg-zinc-800 dark:text-white">{selectedCountry.badge}</span>
                          <span className="text-[10px] font-black">{selectedCountry.code}</span>
                          <CaretDown size={10} weight="bold" />
                       </button>
@@ -224,7 +243,7 @@ export default function JoinPage() {
                             >
                                {COUNTRIES.map(c => (
                                   <button key={c.code} onClick={() => { setSelectedCountry(c); setShowCountryPicker(false); }} className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
-                                     <span>{c.flag}</span>
+                                     <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-zinc-100 px-2 text-[10px] font-black text-zinc-950 dark:bg-zinc-800 dark:text-white">{c.badge}</span>
                                      <span className="text-[10px] font-black text-zinc-950 dark:text-white">{c.name}</span>
                                      <span className="ml-auto text-[9px] font-bold text-zinc-400">{c.code}</span>
                                   </button>

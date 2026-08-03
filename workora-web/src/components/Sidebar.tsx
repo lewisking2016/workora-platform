@@ -35,7 +35,10 @@ export function Sidebar() {
   ];
 
   return (
-    <aside className="hidden lg:flex flex-col justify-between w-[240px] h-full flex-shrink-0 bg-white dark:bg-zinc-950 z-50 pt-8 border-r border-zinc-50 dark:border-zinc-900">
+    <aside
+      data-analytics-section="sidebar_navigation"
+      className="hidden lg:flex flex-col justify-between w-[240px] h-full flex-shrink-0 bg-white dark:bg-zinc-950 z-50 pt-8 border-r border-zinc-50 dark:border-zinc-900"
+    >
       <div className="flex flex-col h-full">
         <Link href="/" className="flex items-center justify-center mb-10 px-6 group">
           <div className="relative h-14 w-14 transform group-hover:scale-110 transition-transform">
@@ -48,7 +51,11 @@ export function Sidebar() {
             const isActive = pathname === item.href;
             return (
               <Link key={item.label} href={item.href}>
-                <button className={`flex items-center gap-4 w-full p-3 rounded-xl transition-all text-[15px] ${isActive ? 'text-[#0066FF] dark:text-[#00D1FF]' : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-zinc-100'}`}>
+                <button
+                  data-analytics-label={item.label}
+                  data-analytics-event="sidebar_nav_clicked"
+                  className={`flex items-center gap-4 w-full p-3 rounded-xl transition-all text-[15px] ${isActive ? 'text-[#0066FF] dark:text-[#00D1FF]' : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-zinc-100'}`}
+                >
                   <item.icon size={26} weight={isActive ? 'fill' : 'regular'} />
                   <span className={isActive ? 'font-black' : 'font-semibold'}>{item.label}</span>
                 </button>
@@ -58,7 +65,11 @@ export function Sidebar() {
         </nav>
 
         <div className="p-3">
-          <button className="flex items-center gap-4 w-full p-3 rounded-xl text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all text-[15px] font-bold">
+          <button
+            data-analytics-label="More"
+            data-analytics-event="sidebar_more_clicked"
+            className="flex items-center gap-4 w-full p-3 rounded-xl text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all text-[15px] font-bold"
+          >
             <List size={26} /> More
           </button>
         </div>

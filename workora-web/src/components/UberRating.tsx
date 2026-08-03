@@ -19,22 +19,22 @@ export function UberRating({ average, totalReviews, breakdown }: UberRatingProps
   const totalCount = totalReviews || 1;
 
   return (
-    <div className="flex flex-col gap-8 p-8 bg-zinc-50 border border-zinc-100 rounded-[40px] shadow-sm">
+    <div className="flex flex-col gap-6 rounded-xl bg-zinc-50 p-6 shadow-sm dark:bg-zinc-900">
       <div className="flex items-start justify-between">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-3">
-            <span className="text-5xl font-black tracking-tighter text-zinc-950">{average}</span>
+            <span className="text-5xl font-black tracking-tighter text-zinc-950 dark:text-white">{average}</span>
             <div className="flex flex-col">
               <div className="flex text-yellow-500">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <Star key={i} size={16} weight="fill" />
                 ))}
               </div>
-              <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">{totalReviews} Ratings</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">{totalReviews} ratings</span>
             </div>
           </div>
         </div>
-        <div className="h-12 w-12 rounded-full bg-white border border-zinc-100 flex items-center justify-center text-[#0066FF] shadow-sm">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-[#0066FF] shadow-sm dark:bg-zinc-950">
            <ShieldCheck size={28} weight="fill" />
         </div>
       </div>
@@ -62,11 +62,11 @@ export function UberRating({ average, totalReviews, breakdown }: UberRatingProps
         })}
       </div>
 
-      <div className="pt-6 border-t border-zinc-200 flex items-start gap-3">
-        <div className="mt-0.5 text-zinc-400">
-          <Info size={18} weight="bold" />
-        </div>
-        <p className="text-[11px] font-medium text-zinc-500 leading-relaxed">
+        <div className="flex items-start gap-3 border-t border-zinc-200 pt-5 dark:border-zinc-800">
+          <div className="mt-0.5 text-zinc-400">
+            <Info size={18} weight="bold" />
+          </div>
+          <p className="text-[11px] font-medium text-zinc-500 leading-relaxed">
           Your rating is a weighted average of your most recent trips. We use a moving average to ensure your profile reflects your current quality of service.
         </p>
       </div>

@@ -25,6 +25,15 @@ CREATE TABLE IF NOT EXISTS worker_profiles (
     trade TEXT NOT NULL,
     bio TEXT,
     location TEXT DEFAULT 'Kenya',
+    profile_visibility TEXT DEFAULT 'public',
+    account_status TEXT DEFAULT 'active',
+    verification_status TEXT DEFAULT 'pending',
+    availability_status TEXT DEFAULT 'available',
+    service_areas TEXT,
+    cover_url TEXT,
+    pricing_from DECIMAL(10, 2) DEFAULT 0.0,
+    identity_status TEXT DEFAULT 'unverified',
+    identity_document_url TEXT,
     avatar_url TEXT,
     voice_intro_url TEXT,
     trust_score DECIMAL(3, 2) DEFAULT 0.0,
@@ -129,6 +138,91 @@ CREATE TABLE IF NOT EXISTS saved_gigs (
     UNIQUE(gig_id, user_id)
 );
 
+-- 10c. Social Graph
+CREATE TABLE IF NOT EXISTS user_follows (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    follower_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    following_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(follower_id, following_user_id)
+);
+
+CREATE TABLE IF NOT EXISTS user_mutes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    muted_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, muted_user_id)
+);
+
+CREATE TABLE IF NOT EXISTS user_blocks (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    blocker_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    blocked_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(blocker_id, blocked_user_id)
+);
+
+CREATE TABLE IF NOT EXISTS gig_hides (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    gig_id UUID REFERENCES gigs(id) ON DELETE CASCADE,
+    reason TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, gig_id)
+);
+
+CREATE TABLE IF NOT EXISTS gig_reports (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    gig_id UUID REFERENCES gigs(id) ON DELETE CASCADE,
+    reason TEXT NOT NULL,
+    details TEXT,
+    status TEXT DEFAULT 'open',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 10d. Collections
+CREATE TABLE IF NOT EXISTS collections (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    owner_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    description TEXT,
+    kind TEXT DEFAULT 'custom',
+    is_public BOOLEAN DEFAULT TRUE,
+    cover_url TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS collection_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    collection_id UUID REFERENCES collections(id) ON DELETE CASCADE,
+    item_type TEXT NOT NULL CHECK (item_type IN ('gig', 'profile')),
+    gig_id UUID REFERENCES gigs(id) ON DELETE CASCADE,
+    profile_id UUID REFERENCES worker_profiles(id) ON DELETE CASCADE,
+    position INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS collection_saves (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    collection_id UUID REFERENCES collections(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(collection_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS profile_reports (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    reporter_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    reported_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    reason TEXT NOT NULL,
+    details TEXT,
+    status TEXT DEFAULT 'open',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- 11. Ratings & Reviews
 CREATE TABLE IF NOT EXISTS ratings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -138,6 +232,16 @@ CREATE TABLE IF NOT EXISTS ratings (
     score INTEGER CHECK (score >= 1 AND score <= 5),
     comment TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 11b. Auth login attempts
+CREATE TABLE IF NOT EXISTS auth_login_attempts (
+    identifier TEXT PRIMARY KEY,
+    failed_count INTEGER DEFAULT 0,
+    locked_until TIMESTAMP WITH TIME ZONE,
+    last_failed_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Safe column additions (won't error if they already exist)
@@ -151,6 +255,19 @@ DO $$ BEGIN
     ALTER TABLE gigs ADD COLUMN IF NOT EXISTS description TEXT;
     ALTER TABLE gigs ADD COLUMN IF NOT EXISTS category TEXT;
     ALTER TABLE gigs ADD COLUMN IF NOT EXISTS price DECIMAL(10, 2) DEFAULT 0.0;
+    ALTER TABLE worker_profiles ADD COLUMN IF NOT EXISTS profile_visibility TEXT DEFAULT 'public';
+    ALTER TABLE worker_profiles ADD COLUMN IF NOT EXISTS account_status TEXT DEFAULT 'active';
+    ALTER TABLE worker_profiles ADD COLUMN IF NOT EXISTS verification_status TEXT DEFAULT 'pending';
+    ALTER TABLE worker_profiles ADD COLUMN IF NOT EXISTS availability_status TEXT DEFAULT 'available';
+    ALTER TABLE worker_profiles ADD COLUMN IF NOT EXISTS service_areas TEXT;
+    ALTER TABLE worker_profiles ADD COLUMN IF NOT EXISTS cover_url TEXT;
+    ALTER TABLE worker_profiles ADD COLUMN IF NOT EXISTS pricing_from DECIMAL(10, 2) DEFAULT 0.0;
+    ALTER TABLE worker_profiles ADD COLUMN IF NOT EXISTS identity_status TEXT DEFAULT 'unverified';
+    ALTER TABLE worker_profiles ADD COLUMN IF NOT EXISTS identity_document_url TEXT;
+    ALTER TABLE auth_login_attempts ADD COLUMN IF NOT EXISTS failed_count INTEGER DEFAULT 0;
+    ALTER TABLE auth_login_attempts ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP WITH TIME ZONE;
+    ALTER TABLE auth_login_attempts ADD COLUMN IF NOT EXISTS last_failed_at TIMESTAMP WITH TIME ZONE;
+    ALTER TABLE auth_login_attempts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
 EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 
@@ -175,7 +292,22 @@ CREATE TABLE IF NOT EXISTS messages (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- 14. System Settings
+-- 14. Analytics Events
+CREATE TABLE IF NOT EXISTS analytics_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    session_id TEXT NOT NULL,
+    event_name TEXT NOT NULL,
+    page_path TEXT NOT NULL,
+    screen_name TEXT,
+    section TEXT,
+    element TEXT,
+    referrer TEXT,
+    properties JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 15. System Settings
 CREATE TABLE IF NOT EXISTS system_settings (
     key TEXT PRIMARY KEY,
     value JSONB NOT NULL,
@@ -196,3 +328,19 @@ CREATE INDEX IF NOT EXISTS idx_worker_lang ON worker_languages(profile_id);
 CREATE INDEX IF NOT EXISTS idx_messages_conv ON messages(conversation_id);
 CREATE INDEX IF NOT EXISTS idx_conv_participants ON conversations(participant_1, participant_2);
 CREATE INDEX IF NOT EXISTS idx_saved_gigs_user ON saved_gigs(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_follows_follower ON user_follows(follower_id);
+CREATE INDEX IF NOT EXISTS idx_user_follows_following ON user_follows(following_user_id);
+CREATE INDEX IF NOT EXISTS idx_user_mutes_user ON user_mutes(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_blocks_blocker ON user_blocks(blocker_id);
+CREATE INDEX IF NOT EXISTS idx_gig_hides_user ON gig_hides(user_id);
+CREATE INDEX IF NOT EXISTS idx_gig_reports_gig ON gig_reports(gig_id);
+CREATE INDEX IF NOT EXISTS idx_collections_owner ON collections(owner_user_id);
+CREATE INDEX IF NOT EXISTS idx_collections_kind ON collections(kind);
+CREATE INDEX IF NOT EXISTS idx_collection_items_collection ON collection_items(collection_id);
+CREATE INDEX IF NOT EXISTS idx_collection_saves_user ON collection_saves(user_id);
+CREATE INDEX IF NOT EXISTS idx_profile_reports_reported ON profile_reports(reported_user_id);
+CREATE INDEX IF NOT EXISTS idx_analytics_event_name ON analytics_events(event_name);
+CREATE INDEX IF NOT EXISTS idx_analytics_page_path ON analytics_events(page_path);
+CREATE INDEX IF NOT EXISTS idx_analytics_user_id ON analytics_events(user_id);
+CREATE INDEX IF NOT EXISTS idx_analytics_session_id ON analytics_events(session_id);
+CREATE INDEX IF NOT EXISTS idx_analytics_created_at ON analytics_events(created_at);

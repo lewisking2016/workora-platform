@@ -12,6 +12,13 @@ const registerSchema = z.object({
   role: z.enum(['worker', 'hirer']).default('worker'),
 });
 
+const LOGIN_LOCK_THRESHOLD = 5;
+const LOGIN_LOCK_MINUTES = 15;
+
+function buildAuthError(code, message, extras = {}) {
+  return { code, message, ...extras };
+}
+
 async function authRoutes(fastify) {
   const { pool } = fastify;
 
@@ -64,14 +71,16 @@ async function authRoutes(fastify) {
       console.error('[Register] CRITICAL ERROR:', err);
       await client.query('ROLLBACK');
       if (err.code === '23505') {
-        // Determine which field caused the duplicate
-        if (err.detail && err.detail.includes('phone_number')) {
-          return reply.status(400).send({ message: 'Phone number already registered' });
+        if (err.constraint === 'users_phone_number_key' || err.detail?.includes('phone_number')) {
+          return reply.status(400).send(buildAuthError('phone_already_used', 'Phone number already registered'));
         }
-        if (err.detail && err.detail.includes('username')) {
-          return reply.status(400).send({ message: 'Username already taken' });
+        if (err.constraint === 'users_email_key' || err.detail?.includes('email')) {
+          return reply.status(400).send(buildAuthError('email_already_used', 'Email already registered'));
         }
-        return reply.status(400).send({ message: 'Account already exists' });
+        if (err.constraint === 'users_username_key' || err.detail?.includes('username')) {
+          return reply.status(400).send(buildAuthError('username_already_used', 'Username already taken'));
+        }
+        return reply.status(400).send(buildAuthError('account_already_exists', 'Account already exists'));
       }
       throw err;
     } finally {
@@ -85,7 +94,26 @@ async function authRoutes(fastify) {
     const password = request.body?.password;
 
     if (!identifier || !password) {
-      return reply.status(400).send({ message: 'Missing login credentials' });
+      return reply.status(400).send(buildAuthError('missing_credentials', 'Missing login credentials'));
+    }
+
+    const normalizedIdentifier = identifier.toLowerCase();
+    const attemptsRes = await pool.query(
+      'SELECT failed_count, locked_until FROM auth_login_attempts WHERE identifier = $1 LIMIT 1',
+      [normalizedIdentifier]
+    );
+    const attempt = attemptsRes.rows[0];
+
+    if (attempt?.locked_until && new Date(attempt.locked_until) > new Date()) {
+      const minutesRemaining = Math.max(
+        1,
+        Math.ceil((new Date(attempt.locked_until).getTime() - Date.now()) / 60000)
+      );
+      return reply.status(429).send(
+        buildAuthError('too_many_attempts', 'Too many attempts. Try again later.', {
+          retry_after_minutes: minutesRemaining,
+        })
+      );
     }
 
     const res = await pool.query(
@@ -102,8 +130,42 @@ async function authRoutes(fastify) {
     const user = res.rows[0];
 
     if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-      return reply.status(401).send({ message: 'Invalid credentials' });
+      const nextFailedCount = (attempt?.failed_count || 0) + 1;
+      const shouldLock = nextFailedCount >= LOGIN_LOCK_THRESHOLD;
+
+      await pool.query(
+        `
+          INSERT INTO auth_login_attempts (identifier, failed_count, locked_until, last_failed_at, updated_at)
+          VALUES (
+            $1,
+            $2,
+            CASE WHEN $3::boolean THEN NOW() + INTERVAL '${LOGIN_LOCK_MINUTES} minutes' ELSE NULL END,
+            NOW(),
+            NOW()
+          )
+          ON CONFLICT (identifier)
+          DO UPDATE SET
+            failed_count = CASE
+              WHEN auth_login_attempts.locked_until IS NOT NULL AND auth_login_attempts.locked_until > NOW()
+                THEN auth_login_attempts.failed_count
+              ELSE auth_login_attempts.failed_count + 1
+            END,
+            locked_until = CASE
+              WHEN auth_login_attempts.locked_until IS NOT NULL AND auth_login_attempts.locked_until > NOW()
+                THEN auth_login_attempts.locked_until
+              WHEN EXCLUDED.failed_count >= $2 THEN NOW() + INTERVAL '${LOGIN_LOCK_MINUTES} minutes'
+              ELSE NULL
+            END,
+            last_failed_at = NOW(),
+            updated_at = NOW()
+        `,
+        [normalizedIdentifier, LOGIN_LOCK_THRESHOLD, shouldLock]
+      );
+
+      return reply.status(401).send(buildAuthError('invalid_credentials', 'Invalid credentials'));
     }
+
+    await pool.query('DELETE FROM auth_login_attempts WHERE identifier = $1', [normalizedIdentifier]);
 
     const token = fastify.jwt.sign({ id: user.id, role: user.role });
     return { token, user: { id: user.id, username: user.username, role: user.role } };
@@ -153,6 +215,36 @@ async function authRoutes(fastify) {
     const { userId, subscription } = request.body;
     await pool.query('UPDATE users SET subscription = $1 WHERE id = $2', [subscription, userId]);
     return { success: true };
+  });
+
+  // 6. PASSWORD RECOVERY REQUEST
+  fastify.post('/forgot', async (request, reply) => {
+    const identifier = String(request.body?.identifier || '').trim();
+
+    if (!identifier) {
+      return reply.status(400).send({ message: 'Missing account identifier' });
+    }
+
+    const result = await pool.query(
+      `
+        SELECT id
+        FROM users
+        WHERE phone_number = $1
+           OR LOWER(username) = LOWER($1)
+           OR LOWER(email) = LOWER($1)
+        LIMIT 1
+      `,
+      [identifier]
+    );
+
+    if (result.rows[0]) {
+      request.log.info({ userId: result.rows[0].id }, 'Password recovery requested');
+    }
+
+    return {
+      ok: true,
+      message: 'If an account exists, recovery instructions have been queued.',
+    };
   });
 }
 

@@ -36,8 +36,6 @@ export async function proxyRequest(targetPath: string, request: Request) {
     // Otherwise keep original content-type (important for uploads).
     if (isJson) {
       headers.set('content-type', 'application/json');
-    } else {
-      headers.delete('content-type');
     }
 
     if (token) {
@@ -99,4 +97,3 @@ export async function proxyRequest(targetPath: string, request: Request) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
-

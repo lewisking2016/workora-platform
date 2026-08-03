@@ -23,7 +23,10 @@ export function BottomNav() {
 
   return (
     <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md z-50">
-      <nav className="bg-white/90 dark:bg-[#0A0E17]/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden">
+      <nav
+        data-analytics-section="bottom_navigation"
+        className="bg-white/90 dark:bg-[#0A0E17]/90 backdrop-blur-2xl rounded-3xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] border border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden"
+      >
         <div className="flex h-[72px] items-center justify-around px-2">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
@@ -33,6 +36,8 @@ export function BottomNav() {
               <Link
                 key={item.label}
                 href={item.href}
+                data-analytics-label={item.label}
+                data-analytics-event="bottom_nav_clicked"
                 className="relative flex flex-col items-center justify-center w-full h-full gap-1 group"
               >
                 {isActive && (

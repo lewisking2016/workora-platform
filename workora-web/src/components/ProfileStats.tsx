@@ -10,7 +10,7 @@ interface StatItemProps {
 
 const StatItem = ({ icon: Icon, label, value, color }: StatItemProps) => (
   <div className="flex flex-col items-center gap-2 px-4">
-    <div className="h-11 w-11 rounded-xl bg-zinc-100 dark:bg-zinc-800 shadow-[0_12px_28px_-16px_rgba(15,23,42,0.25)] flex items-center justify-center">
+    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-800">
       <Icon size={18} weight="regular" className={color} />
     </div>
     <div className="text-center">
@@ -29,7 +29,7 @@ interface ProfileStatsProps {
 
 export function ProfileStats({ income = "KSh 0", jobs = 0, trust = "0%", rating = "0.0" }: ProfileStatsProps) {
   return (
-    <div className="w-full bg-zinc-50 border border-zinc-100 rounded-[24px] py-8 grid grid-cols-4 divide-x divide-zinc-200 shadow-sm dark:bg-zinc-900 dark:border-zinc-800 dark:divide-zinc-800">
+    <div className="grid w-full grid-cols-4 divide-x divide-zinc-200 rounded-xl bg-zinc-50 py-6 shadow-sm dark:divide-zinc-800 dark:bg-zinc-900">
       <StatItem icon={CurrencyCircleDollar} label="Income" value={income} color="text-green-500" />
       <StatItem icon={Briefcase} label="Jobs" value={jobs.toString()} color="text-[#0066FF]" />
       <StatItem icon={Clock} label="Trust" value={trust} color="text-[#7000FF]" />

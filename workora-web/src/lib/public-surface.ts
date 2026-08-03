@@ -1,0 +1,93 @@
+import { APP_CONFIG } from './config';
+
+export interface PublicTrade {
+  id?: string;
+  trade?: string | null;
+}
+
+export interface PublicGig {
+  id: string;
+  title?: string | null;
+  description?: string | null;
+  category?: string | null;
+  video_url?: string | null;
+  thumbnail_url?: string | null;
+  user_name?: string | null;
+  handle?: string | null;
+  trade?: string | null;
+  verified?: boolean | null;
+  likes_count?: number | null;
+  comments_count?: number | null;
+  view_count?: number | null;
+}
+
+export interface PublicSurfaceData {
+  trades: string[];
+  feed: PublicGig[];
+  explore: PublicGig[];
+  stats: {
+    tradeCount: number;
+    feedCount: number;
+    exploreCount: number;
+    verifiedCount: number;
+  };
+}
+
+const FALLBACK_BASE_URL = 'http://localhost:3001';
+
+function getBackendBaseUrl() {
+  const value = process.env.NEXT_PUBLIC_API_URL || FALLBACK_BASE_URL;
+  return value === 'base' ? 'http://4.221.170.153:3001' : value;
+}
+
+async function fetchJson<T>(path: string): Promise<T | null> {
+  try {
+    const response = await fetch(`${getBackendBaseUrl()}${path}`, {
+      cache: 'no-store',
+      headers: { accept: 'application/json' },
+    });
+
+    if (!response.ok) return null;
+    return (await response.json()) as T;
+  } catch {
+    return null;
+  }
+}
+
+export async function loadPublicSurfaceData(): Promise<PublicSurfaceData> {
+  const [trades, feed, explore] = await Promise.all([
+    fetchJson<string[]>('/profile/trades'),
+    fetchJson<PublicGig[]>('/gigs/feed?limit=8'),
+    fetchJson<PublicGig[]>('/gigs/explore?limit=8'),
+  ]);
+
+  const safeTrades = Array.isArray(trades) ? trades.filter(Boolean) : [];
+  const safeFeed = Array.isArray(feed) ? feed : [];
+  const safeExplore = Array.isArray(explore) ? explore : [];
+
+  return {
+    trades: safeTrades,
+    feed: safeFeed,
+    explore: safeExplore,
+    stats: {
+      tradeCount: safeTrades.length,
+      feedCount: safeFeed.length,
+      exploreCount: safeExplore.length,
+      verifiedCount: safeFeed.filter((item) => item.verified).length,
+    },
+  };
+}
+
+export const publicSurfaceTheme = {
+  accent: '#0066FF',
+  accentAlt: '#7000FF',
+  surface: 'bg-white dark:bg-[#0A0E17]',
+  panel: 'bg-zinc-50 dark:bg-zinc-900',
+  border: 'border-zinc-200 dark:border-zinc-800',
+  text: 'text-zinc-950 dark:text-white',
+  muted: 'text-zinc-600 dark:text-zinc-400',
+  soft: 'text-zinc-500 dark:text-zinc-500',
+  chip: 'bg-white dark:bg-zinc-900',
+} as const;
+
+export const APP_DEFAULTS = APP_CONFIG.defaults;

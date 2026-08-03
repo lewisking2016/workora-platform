@@ -88,7 +88,7 @@ export default function NotificationsPage() {
           </div>
           <p className="text-zinc-400 text-sm font-medium mt-1">Stay updated with Workora</p>
         </div>
-        <button className="h-11 w-11 rounded-2xl bg-zinc-100 flex items-center justify-center hover:bg-zinc-200 transition-colors relative">
+        <button className="h-11 w-11 rounded-lg bg-zinc-100 flex items-center justify-center hover:bg-zinc-200 transition-colors relative">
           <Bell className="h-4 w-4 text-zinc-600" />
           {newCount > 0 && (
             <div className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-[#0066FF] border-2 border-white" />
@@ -106,9 +106,9 @@ export default function NotificationsPage() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.08, duration: 0.4 }}
-              className="group relative flex gap-4 p-4 rounded-2xl bg-white border border-zinc-100 hover:border-zinc-200 hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)] transition-all cursor-pointer"
+              className="group relative flex gap-4 p-4 rounded-lg bg-white border border-zinc-100 hover:border-zinc-200 hover:shadow-[0_4px_20px_rgba(0,0,0,0.04)] transition-all cursor-pointer"
             >
-              <div className={`h-11 w-11 rounded-xl flex items-center justify-center shrink-0 ${note.color}`}>
+              <div className={`h-11 w-11 rounded-lg flex items-center justify-center shrink-0 ${note.color}`}>
                 <Icon className="h-5 w-5" />
               </div>
               
@@ -139,9 +139,9 @@ export default function NotificationsPage() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="mt-2 p-5 rounded-2xl bg-gradient-to-br from-zinc-950 to-zinc-800 flex items-start gap-4"
+        className="mt-2 p-5 rounded-lg bg-gradient-to-br from-zinc-950 to-zinc-800 flex items-start gap-4"
       >
-        <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+        <div className="h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
           <Sparkles className="h-5 w-5 text-white" />
         </div>
         <div className="flex flex-col gap-1">

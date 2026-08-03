@@ -6,12 +6,12 @@ import {
   ArrowLeft,
   Heart,
   ChatCircleDots,
-  PaperPlaneTilt,
   BookmarkSimple,
   ShareFat,
   DotsThree,
   SealCheck,
-  Smiley
+  Smiley,
+  WarningCircle
 } from '@phosphor-icons/react';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { fetchCurrentUser } from '@/lib/session';
@@ -63,24 +63,44 @@ export default function PostDetailPage() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(true);
+  const [loadState, setLoadState] = useState<'loading' | 'ready' | 'missing' | 'restricted' | 'error'>('loading');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const commentInputRef = useRef<HTMLInputElement>(null);
   const commentsEndRef = useRef<HTMLDivElement>(null);
 
-  const fetchPost = async () => {
+  const fetchPost = async (): Promise<'ready' | 'missing' | 'restricted' | 'error'> => {
     try {
-      // Fetch from feed and find the post
-      const res = await fetch('/api/gigs/feed?page=1&limit=100');
+      const res = await fetch(`/api/gigs/${postId}`);
+      if (res.status === 404) {
+        setLoadState('missing');
+        setPost(null);
+        return 'missing';
+      }
+      if (res.status === 403) {
+        setLoadState('restricted');
+        setPost(null);
+        return 'restricted';
+      }
+      if (!res.ok) {
+        setLoadState('error');
+        setPost(null);
+        return 'error';
+      }
+
       const data = await res.json();
-      if (Array.isArray(data)) {
-        const foundPost = data.find((p: Post) => p.id === postId);
-        if (foundPost) {
-          setPost(foundPost);
-        }
+      if (data && !data.message) {
+        setPost(data);
+        setLoadState('ready');
+        return 'ready';
+      } else {
+        setLoadState('missing');
+        return 'missing';
       }
     } catch (err) {
       console.error('Post fetch failed:', err);
+      setLoadState('error');
+      return 'error';
     }
   };
 
@@ -108,11 +128,16 @@ export default function PostDetailPage() {
         return;
       }
       setCurrentUser(user);
-      await fetchPost();
-      await fetchComments();
+      const state = await fetchPost();
+      if (state === 'ready') {
+        await fetchComments();
+      } else {
+        setLoading(false);
+      }
     };
     bootstrap();
     return () => { mounted = false; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [postId, router]);
 
   const handleLike = async () => {
@@ -194,10 +219,54 @@ export default function PostDetailPage() {
     return new Date(d).toLocaleDateString();
   };
 
-  if (loading || !post) {
+  if (loading || loadState === 'loading') {
     return (
       <div className="h-full w-full bg-white dark:bg-black flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-zinc-200 dark:border-zinc-800 border-t-[#0066FF] rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (loadState === 'missing' || loadState === 'restricted' || loadState === 'error' || !post) {
+    const effectiveState = loadState;
+    const stateCopy = {
+      missing: {
+        title: 'Content removed',
+        body: 'This post is no longer available on the platform.',
+      },
+      restricted: {
+        title: 'Content restricted',
+        body: 'You do not have permission to view this post.',
+      },
+      error: {
+        title: 'Unable to load post',
+        body: 'We could not load this post right now.',
+      },
+    }[effectiveState as 'missing' | 'restricted' | 'error'];
+
+    return (
+      <div className="min-h-full w-full bg-white dark:bg-black flex items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-3xl bg-zinc-50 p-8 text-center dark:bg-zinc-950">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-900">
+            <WarningCircle size={28} weight="fill" className="text-[#4F46E5]" />
+          </div>
+          <h1 className="text-2xl font-black text-zinc-950 dark:text-white">{stateCopy.title}</h1>
+          <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">{stateCopy.body}</p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <button
+              onClick={() => router.back()}
+              className="flex-1 rounded-xl bg-zinc-950 px-4 py-3 text-sm font-semibold text-white dark:bg-white dark:text-zinc-950"
+            >
+              Go back
+            </button>
+            <button
+              onClick={() => router.push('/dashboard/feed')}
+              className="flex-1 rounded-xl bg-zinc-100 px-4 py-3 text-sm font-semibold text-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
+            >
+              Open feed
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -223,10 +292,10 @@ export default function PostDetailPage() {
             <p className="text-xs text-zinc-500">{post.trade}</p>
           </div>
         </div>
-        <button>
-          <DotsThree size={24} weight="bold" className="text-zinc-950 dark:text-white" />
-        </button>
-      </div>
+          <button>
+            <DotsThree size={24} weight="bold" className="text-zinc-950 dark:text-white" />
+          </button>
+        </div>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto">
@@ -246,12 +315,12 @@ export default function PostDetailPage() {
         <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-900">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-4">
-              <button onClick={handleLike}>
-                <Heart 
-                  size={28} 
-                  weight={post.liked_by_me ? "fill" : "regular"}
-                  className={`${post.liked_by_me ? 'text-red-500' : 'text-zinc-950 dark:text-white'} transition-colors`}
-                />
+            <button onClick={handleLike}>
+            <Heart
+                size={28}
+                weight={post.liked_by_me ? "fill" : "regular"}
+                className={`${post.liked_by_me ? 'text-red-500' : 'text-zinc-950 dark:text-white'} transition-colors`}
+              />
               </button>
               <button onClick={() => commentInputRef.current?.focus()}>
                 <ChatCircleDots size={28} weight="regular" className="text-zinc-950 dark:text-white" />

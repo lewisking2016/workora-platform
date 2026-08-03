@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Suspense } from 'react';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/Providers';
@@ -53,14 +54,16 @@ export default function RootLayout({
         <div className="fixed top-0 left-0 right-0 h-[3px] z-[9999] overflow-hidden">
           <div className="w-full h-full bg-gradient-to-r from-[#0066FF] via-[#7000FF] to-[#0066FF] shadow-[0_0_15px_rgba(0,102,255,0.8)] animate-pulse" />
         </div>
-        <Providers>
-          <TopNav />
-          <main>
-            {children}
-          </main>
-          <Footer />
-          <BottomNav />
-        </Providers>
+        <Suspense fallback={null}>
+          <Providers>
+            <TopNav />
+            <main>
+              {children}
+            </main>
+            <Footer />
+            <BottomNav />
+          </Providers>
+        </Suspense>
 
         <div id="google_translate_element" style={{ display: 'none' }}></div>
         <Script

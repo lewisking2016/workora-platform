@@ -28,51 +28,15 @@ interface Notification {
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState<{ id: string; username: string } | null>(null);
   const router = useRouter();
 
-  const fetchNotifications = async (userId: string) => {
+  const fetchNotifications = async () => {
     try {
-      // For now, we'll generate notifications from recent activity
-      // In production, you'd have a dedicated notifications table
-      const gigsRes = await fetch('/api/gigs/feed?page=1&limit=20');
-      const gigsData = await gigsRes.json();
-      
-      if (Array.isArray(gigsData)) {
-        const fakeNotifications: Notification[] = gigsData.slice(0, 10).map((gig, idx) => {
-          const types = ['like', 'comment', 'follow', 'rating'];
-          const type = types[idx % 4];
-          let text = '';
-          
-          switch (type) {
-            case 'like':
-              text = 'liked your post';
-              break;
-            case 'comment':
-              text = `commented: "${gig.description?.substring(0, 30)}..."`;
-              break;
-            case 'follow':
-              text = 'started following you';
-              break;
-            case 'rating':
-              text = 'gave you a 5-star rating';
-              break;
-          }
-          
-          return {
-            id: `notif-${idx}`,
-            type,
-            actor_id: gig.user_id || gig.worker_id,
-            actor_name: gig.user_name,
-            actor_trade: gig.trade,
-            actor_verified: gig.verified,
-            gig_id: gig.id,
-            text,
-            created_at: gig.created_at
-          };
-        });
-        
-        setNotifications(fakeNotifications);
+      const res = await fetch('/api/notifications');
+      const data = await res.json();
+
+      if (Array.isArray(data)) {
+        setNotifications(data);
       }
     } catch (err) {
       console.error('Notifications fetch failed:', err);
@@ -90,8 +54,7 @@ export default function NotificationsPage() {
         router.push('/login');
         return;
       }
-      setCurrentUser(user);
-      fetchNotifications(user.id);
+      fetchNotifications();
     };
     bootstrap();
     return () => { mounted = false; };

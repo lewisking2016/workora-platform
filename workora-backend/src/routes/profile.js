@@ -5,42 +5,156 @@ async function profileRoutes(fastify) {
     return profileRes.rows[0]?.id || null;
   };
 
-  // 1. GET PROFILE
-  fastify.get('/me/:userId', async (request, reply) => {
-    const { userId } = request.params;
+  const resolveActorId = (request) => request.user?.id;
+  const loadProfileBundle = async (userId) => {
     const userRes = await pool.query('SELECT * FROM users WHERE id = $1', [userId]);
-    if (!userRes.rows[0]) return reply.status(404).send({ message: 'User not found' });
-
     const profileRes = await pool.query('SELECT * FROM worker_profiles WHERE user_id = $1', [userId]);
-    const skillsRes = await pool.query(
-      'SELECT * FROM worker_skills WHERE profile_id = $1', [profileRes.rows[0]?.id]
-    );
-    const langsRes = await pool.query(
-      'SELECT * FROM worker_languages WHERE profile_id = $1', [profileRes.rows[0]?.id]
-    );
-    const expRes = await pool.query(
-      'SELECT * FROM worker_experience WHERE profile_id = $1 ORDER BY start_date DESC', [profileRes.rows[0]?.id]
-    );
-    const eduRes = await pool.query(
-      'SELECT * FROM worker_education WHERE profile_id = $1 ORDER BY end_year DESC', [profileRes.rows[0]?.id]
-    );
-    const certRes = await pool.query(
-      'SELECT * FROM worker_certifications WHERE profile_id = $1', [profileRes.rows[0]?.id]
-    );
+    const profile = profileRes.rows[0] || null;
+    const profileId = profile?.id || null;
+    const accountStatus = String(profile?.account_status || 'active');
+    const profileVisibility = String(profile?.profile_visibility || 'public');
+    const verificationStatus = String(profile?.verification_status || profile?.identity_status || 'pending');
+    const isEmptyProfile =
+      profile &&
+      !profile.bio &&
+      !profile.avatar_url &&
+      !profile.cover_url &&
+      !profile.pricing_from &&
+      !profile.service_areas;
+    const profileState = !userRes.rows[0]
+      ? 'not_found'
+      : accountStatus === 'suspended'
+        ? 'suspended'
+        : profileVisibility === 'restricted'
+          ? 'restricted'
+          : profileVisibility === 'private'
+            ? 'private'
+            : verificationStatus === 'pending'
+              ? 'verification_pending'
+              : isEmptyProfile
+                ? 'empty'
+                : 'ready';
 
-    const earningsRes = await pool.query(
-      'SELECT COALESCE(SUM(price), 0) as total_earnings FROM gigs WHERE worker_id = $1', [profileRes.rows[0]?.id]
-    );
+    const emptyLists = {
+      skills: [],
+      languages: [],
+      experience: [],
+      education: [],
+      certifications: [],
+      portfolio: [],
+      ratings: [],
+      ratingBreakdown: [],
+      trustAverage: 0,
+      totalEarnings: 0,
+    };
+
+    if (!profileId) {
+      return {
+        user: userRes.rows[0] || null,
+        profile: null,
+        profile_state: 'not_found',
+        ...emptyLists,
+      };
+    }
+
+    const [
+      skillsRes,
+      langsRes,
+      expRes,
+      eduRes,
+      certRes,
+      portfolioRes,
+      ratingsRes,
+      breakdownRes,
+      avgRes,
+      earningsRes,
+    ] = await Promise.all([
+      pool.query('SELECT * FROM worker_skills WHERE profile_id = $1 ORDER BY created_at DESC', [profileId]),
+      pool.query('SELECT * FROM worker_languages WHERE profile_id = $1 ORDER BY created_at DESC', [profileId]),
+      pool.query('SELECT * FROM worker_experience WHERE profile_id = $1 ORDER BY start_date DESC NULLS LAST, created_at DESC', [profileId]),
+      pool.query('SELECT * FROM worker_education WHERE profile_id = $1 ORDER BY end_year DESC NULLS LAST, created_at DESC', [profileId]),
+      pool.query('SELECT * FROM worker_certifications WHERE profile_id = $1 ORDER BY created_at DESC', [profileId]),
+      pool.query(
+        `SELECT
+          g.*,
+          COALESCE(g.thumbnail_url, g.video_url) AS preview_url
+         FROM gigs g
+         WHERE g.worker_id = $1
+         ORDER BY g.created_at DESC
+         LIMIT 12`,
+        [profileId]
+      ),
+      pool.query(
+        `SELECT
+          r.*,
+          u.username AS reviewer_username
+         FROM ratings r
+         LEFT JOIN users u ON u.id = r.from_user_id
+         WHERE r.to_worker_id = $1
+         ORDER BY r.created_at DESC
+         LIMIT 24`,
+        [profileId]
+      ),
+      pool.query(
+        `SELECT score, COUNT(*)::int AS count
+         FROM ratings
+         WHERE to_worker_id = $1
+         GROUP BY score`,
+        [profileId]
+      ),
+      pool.query(
+        `SELECT COALESCE(AVG(score), 0) AS average
+         FROM ratings
+         WHERE to_worker_id = $1`,
+        [profileId]
+      ),
+      pool.query(
+        'SELECT COALESCE(SUM(price), 0) AS total_earnings FROM gigs WHERE worker_id = $1',
+        [profileId]
+      ),
+    ]);
 
     return {
-      user: userRes.rows[0],
-      profile: profileRes.rows[0] ? { ...profileRes.rows[0], total_earnings: parseFloat(earningsRes.rows[0].total_earnings) } : null,
+      user: userRes.rows[0] || null,
+      profile: profile
+        ? {
+            ...profile,
+            total_earnings: Number(earningsRes.rows[0]?.total_earnings || 0),
+          }
+        : null,
+      profile_state: profileState,
       skills: skillsRes.rows,
       languages: langsRes.rows,
       experience: expRes.rows,
       education: eduRes.rows,
       certifications: certRes.rows,
+      portfolio: portfolioRes.rows,
+      ratings: ratingsRes.rows,
+      ratingBreakdown: breakdownRes.rows,
+      trustAverage: Number(avgRes.rows[0]?.average || 0),
+      totalEarnings: Number(earningsRes.rows[0]?.total_earnings || 0),
     };
+  };
+
+  // 1. GET PROFILE
+  fastify.get('/me', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const userId = resolveActorId(request);
+    if (!userId) return reply.status(401).send({ message: 'Unauthorized' });
+    return loadProfileBundle(userId);
+  });
+
+  fastify.get('/me/:userId', async (request, reply) => {
+    const { userId } = request.params;
+    const bundle = await loadProfileBundle(userId);
+    if (!bundle.user) return reply.status(404).send({ message: 'User not found' });
+    return bundle;
+  });
+
+  fastify.get('/public/:userId', async (request, reply) => {
+    const { userId } = request.params;
+    const bundle = await loadProfileBundle(userId);
+    if (!bundle.user) return reply.status(404).send({ message: 'User not found' });
+    return bundle;
   });
 
   // 2. UPDATE PROFILE (bio, title, display_name, location)
@@ -49,7 +163,18 @@ async function profileRoutes(fastify) {
     if (request.user?.id && request.user.id !== userId) {
       return reply.status(403).send({ message: 'Forbidden' });
     }
-    const { bio, title, display_name, location } = request.body;
+    const {
+      bio,
+      title,
+      display_name,
+      location,
+      availability_status,
+      service_areas,
+      pricing_from,
+      cover_url,
+      identity_status,
+      identity_document_url,
+    } = request.body;
 
     await pool.query(
       `UPDATE worker_profiles SET 
@@ -57,9 +182,27 @@ async function profileRoutes(fastify) {
         title = COALESCE($2, title), 
         display_name = COALESCE($3, display_name), 
         location = COALESCE($4, location),
+        availability_status = COALESCE($5, availability_status),
+        service_areas = COALESCE($6, service_areas),
+        pricing_from = COALESCE($7, pricing_from),
+        cover_url = COALESCE($8, cover_url),
+        identity_status = COALESCE($9, identity_status),
+        identity_document_url = COALESCE($10, identity_document_url),
         updated_at = CURRENT_TIMESTAMP
-       WHERE user_id = $5`,
-      [bio, title, display_name, location, userId]
+       WHERE user_id = $11`,
+      [
+        bio,
+        title,
+        display_name,
+        location,
+        availability_status,
+        service_areas,
+        pricing_from,
+        cover_url,
+        identity_status,
+        identity_document_url,
+        userId,
+      ]
     );
     return { success: true };
   });
@@ -208,7 +351,7 @@ async function profileRoutes(fastify) {
 
     // Update worker_profiles trust_score (Weighted Moving Average logic can be complex, for now simple avg)
     await pool.query(`
-      UPDATE worker_profiles 
+      UPDATE worker_profiles
       SET trust_score = (SELECT AVG(score) FROM ratings WHERE to_worker_id = $1)
       WHERE id = $1
     `, [to_worker_id]);
@@ -216,14 +359,69 @@ async function profileRoutes(fastify) {
     return res.rows[0];
   });
 
+  // 14b. UPDATE RATING
+  fastify.put('/ratings/:id', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const { id } = request.params;
+    const { score, comment } = request.body;
+    const from_user_id = request.user.id;
+
+    const existing = await pool.query('SELECT id, from_user_id, to_worker_id FROM ratings WHERE id = $1', [id]);
+    const rating = existing.rows[0];
+    if (!rating) return reply.status(404).send({ message: 'Review not found' });
+    if (rating.from_user_id !== from_user_id) return reply.status(403).send({ message: 'Forbidden' });
+
+    const res = await pool.query(
+      'UPDATE ratings SET score = COALESCE($1, score), comment = COALESCE($2, comment) WHERE id = $3 RETURNING *',
+      [score, comment, id]
+    );
+
+    await pool.query(`
+      UPDATE worker_profiles
+      SET trust_score = (SELECT COALESCE(AVG(score), 0) FROM ratings WHERE to_worker_id = $1)
+      WHERE id = $1
+    `, [rating.to_worker_id]);
+
+    return res.rows[0];
+  });
+
+  // 14c. DELETE RATING
+  fastify.delete('/ratings/:id', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const { id } = request.params;
+    const from_user_id = request.user.id;
+
+    const existing = await pool.query('SELECT id, from_user_id, to_worker_id FROM ratings WHERE id = $1', [id]);
+    const rating = existing.rows[0];
+    if (!rating) return reply.status(404).send({ message: 'Review not found' });
+    if (rating.from_user_id !== from_user_id) return reply.status(403).send({ message: 'Forbidden' });
+
+    await pool.query('DELETE FROM ratings WHERE id = $1', [id]);
+
+    await pool.query(`
+      UPDATE worker_profiles
+      SET trust_score = (SELECT COALESCE(AVG(score), 0) FROM ratings WHERE to_worker_id = $1)
+      WHERE id = $1
+    `, [rating.to_worker_id]);
+
+    return { deleted: true };
+  });
+
   // 15. SEARCH PROS
   fastify.get('/search', async (request, reply) => {
-    const { q, category } = request.query;
+    const {
+      q,
+      category,
+      location,
+      availability,
+      sort,
+      min_trust,
+    } = request.query;
     let sql = `
       SELECT 
         p.*,
         u.id as user_id,
-        COALESCE(p.full_name, u.username) as user_name
+        COALESCE(p.full_name, u.username) as user_name,
+        COALESCE(p.location, 'Kenya') as location,
+        COALESCE(p.availability_status, 'available') as availability_status
       FROM worker_profiles p
       JOIN users u ON u.id = p.user_id
       WHERE 1=1
@@ -240,7 +438,29 @@ async function profileRoutes(fastify) {
       sql += ` AND trade = $${params.length}`;
     }
 
-    sql += ' ORDER BY trust_score DESC LIMIT 20';
+    if (location && location !== 'All' && location !== '') {
+      params.push(`%${location}%`);
+      sql += ` AND COALESCE(location, 'Kenya') ILIKE $${params.length}`;
+    }
+
+    if (availability && availability !== 'All' && availability !== '') {
+      params.push(availability);
+      sql += ` AND COALESCE(availability_status, 'available') = $${params.length}`;
+    }
+
+    if (min_trust && !Number.isNaN(Number(min_trust))) {
+      params.push(Number(min_trust));
+      sql += ` AND COALESCE(trust_score, 0) >= $${params.length}`;
+    }
+
+    const orderBy = {
+      trust: 'COALESCE(trust_score, 0) DESC, updated_at DESC',
+      location: 'COALESCE(location, \'Kenya\') ASC, COALESCE(trust_score, 0) DESC',
+      recent: 'updated_at DESC',
+      availability: 'COALESCE(availability_status, \'available\') ASC, COALESCE(trust_score, 0) DESC',
+    }[String(sort || 'trust')];
+
+    sql += ` ORDER BY ${orderBy} LIMIT 20`;
     
     try {
       const res = await pool.query(sql, params);
@@ -260,6 +480,256 @@ async function profileRoutes(fastify) {
       console.error('Trades query failed:', err);
       return reply.status(500).send({ error: 'Failed to fetch trades' });
     }
+  });
+
+  // 17. TOGGLE FOLLOW
+  fastify.post('/follow/:targetUserId', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const followerId = resolveActorId(request);
+    const { targetUserId } = request.params;
+
+    if (!followerId || followerId === targetUserId) {
+      return reply.status(400).send({ message: 'Invalid follow target' });
+    }
+
+    const existing = await pool.query(
+      'SELECT id FROM user_follows WHERE follower_id = $1 AND following_user_id = $2',
+      [followerId, targetUserId]
+    );
+
+    if (existing.rows.length > 0) {
+      await pool.query('DELETE FROM user_follows WHERE follower_id = $1 AND following_user_id = $2', [followerId, targetUserId]);
+      return { following: false };
+    }
+
+    await pool.query(
+      'INSERT INTO user_follows (follower_id, following_user_id) VALUES ($1, $2)',
+      [followerId, targetUserId]
+    );
+    return { following: true };
+  });
+
+  // 18. TOGGLE MUTE CREATOR
+  fastify.post('/mute/:targetUserId', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const userId = resolveActorId(request);
+    const { targetUserId } = request.params;
+
+    if (!userId || userId === targetUserId) {
+      return reply.status(400).send({ message: 'Invalid mute target' });
+    }
+
+    const existing = await pool.query(
+      'SELECT id FROM user_mutes WHERE user_id = $1 AND muted_user_id = $2',
+      [userId, targetUserId]
+    );
+
+    if (existing.rows.length > 0) {
+      await pool.query('DELETE FROM user_mutes WHERE user_id = $1 AND muted_user_id = $2', [userId, targetUserId]);
+      return { muted: false };
+    }
+
+    await pool.query(
+      'INSERT INTO user_mutes (user_id, muted_user_id) VALUES ($1, $2)',
+      [userId, targetUserId]
+    );
+    return { muted: true };
+  });
+
+  // 19. TOGGLE BLOCK CREATOR
+  fastify.post('/block/:targetUserId', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const blockerId = resolveActorId(request);
+    const { targetUserId } = request.params;
+
+    if (!blockerId || blockerId === targetUserId) {
+      return reply.status(400).send({ message: 'Invalid block target' });
+    }
+
+    const existing = await pool.query(
+      'SELECT id FROM user_blocks WHERE blocker_id = $1 AND blocked_user_id = $2',
+      [blockerId, targetUserId]
+    );
+
+    if (existing.rows.length > 0) {
+      await pool.query('DELETE FROM user_blocks WHERE blocker_id = $1 AND blocked_user_id = $2', [blockerId, targetUserId]);
+      return { blocked: false };
+    }
+
+    await pool.query(
+      'INSERT INTO user_blocks (blocker_id, blocked_user_id) VALUES ($1, $2)',
+      [blockerId, targetUserId]
+    );
+    return { blocked: true };
+  });
+
+  // 20. REPORT PROFILE
+  fastify.post('/report/:targetUserId', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const reporterUserId = resolveActorId(request);
+    const { targetUserId } = request.params;
+    const reason = String(request.body?.reason || 'other');
+    const details = String(request.body?.details || '');
+
+    const res = await pool.query(
+      'INSERT INTO profile_reports (reporter_user_id, reported_user_id, reason, details) VALUES ($1, $2, $3, $4) RETURNING id',
+      [reporterUserId, targetUserId, reason, details || null]
+    );
+
+    return { reported: true, report_id: res.rows[0]?.id };
+  });
+
+  // 21. FEATURED BUSINESSES
+  fastify.get('/businesses', async (request, reply) => {
+    const res = await pool.query(`
+      SELECT
+        u.id as user_id,
+        COALESCE(wp.display_name, wp.full_name, u.username, 'Business') as business_name,
+        COALESCE(wp.trade, u.role, 'Business') as category,
+        COALESCE(wp.location, 'Kenya') as location,
+        COALESCE(wp.trust_score, 0) as trust_score,
+        COALESCE(wp.is_verified, false) as verified,
+        COALESCE(wp.avatar_url, '') as avatar_url,
+        COALESCE(wp.cover_url, '') as cover_url,
+        COALESCE(wp.bio, '') as bio,
+        COALESCE(wp.pricing_from, 0) as pricing_from,
+        COUNT(g.id)::int as gig_count
+      FROM users u
+      LEFT JOIN worker_profiles wp ON wp.user_id = u.id
+      LEFT JOIN gigs g ON g.worker_id = wp.id
+      WHERE u.role = 'hirer'
+         OR COALESCE(u.team_type, 'solo') = 'team'
+         OR COALESCE(u.subscription, 'free') = 'elite'
+      GROUP BY u.id, wp.display_name, wp.full_name, u.username, wp.trade, u.role, wp.location, wp.trust_score, wp.is_verified, wp.avatar_url, wp.cover_url, wp.bio, wp.pricing_from
+      ORDER BY COALESCE(wp.trust_score, 0) DESC, gig_count DESC, business_name ASC
+      LIMIT 24
+    `);
+
+    return res.rows;
+  });
+
+  // 22. COLLECTIONS
+  fastify.get('/collections', async (request, reply) => {
+    const ownerId = request.user?.id || null;
+    const kind = String(request.query?.kind || '').trim().toLowerCase();
+    if (kind === 'saved') {
+      const savedRes = await pool.query(`
+        SELECT
+          c.*,
+          COUNT(ci.id)::int AS item_count,
+          COUNT(cs.id)::int AS save_count
+        FROM collections c
+        INNER JOIN collection_saves s ON s.collection_id = c.id
+        LEFT JOIN collection_items ci ON ci.collection_id = c.id
+        LEFT JOIN collection_saves cs ON cs.collection_id = c.id
+        WHERE s.user_id = $1
+        GROUP BY c.id
+        ORDER BY s.created_at DESC
+      `, [ownerId]);
+      return savedRes.rows;
+    }
+
+    const res = await pool.query(`
+      SELECT
+        c.*,
+        COUNT(ci.id)::int AS item_count,
+        COUNT(cs.id)::int AS save_count
+      FROM collections c
+      LEFT JOIN collection_items ci ON ci.collection_id = c.id
+      LEFT JOIN collection_saves cs ON cs.collection_id = c.id
+      WHERE c.is_public = TRUE OR c.owner_user_id = $1
+      GROUP BY c.id
+      ORDER BY c.created_at DESC
+    `, [ownerId]);
+    return res.rows;
+  });
+
+  fastify.get('/collections/:collectionId', async (request, reply) => {
+    const { collectionId } = request.params;
+    const res = await pool.query(`
+      SELECT
+        c.*,
+        json_agg(
+          json_build_object(
+            'id', ci.id,
+            'item_type', ci.item_type,
+            'gig_id', ci.gig_id,
+            'profile_id', ci.profile_id,
+            'position', ci.position
+          ) ORDER BY ci.position ASC, ci.created_at ASC
+        ) FILTER (WHERE ci.id IS NOT NULL) AS items
+      FROM collections c
+      LEFT JOIN collection_items ci ON ci.collection_id = c.id
+      WHERE c.id = $1
+      GROUP BY c.id
+      LIMIT 1
+    `, [collectionId]);
+
+    if (!res.rows[0]) return reply.status(404).send({ message: 'Collection not found' });
+    return res.rows[0];
+  });
+
+  fastify.post('/collections', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const ownerId = resolveActorId(request);
+    const title = String(request.body?.title || '').trim();
+    const description = String(request.body?.description || '').trim();
+    const kind = String(request.body?.kind || 'custom').trim();
+    const isPublic = request.body?.is_public !== false;
+    const coverUrl = String(request.body?.cover_url || '').trim() || null;
+
+    if (!title) return reply.status(400).send({ message: 'Title is required' });
+
+    const res = await pool.query(
+      'INSERT INTO collections (owner_user_id, title, description, kind, is_public, cover_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [ownerId, title, description || null, kind, isPublic, coverUrl]
+    );
+
+    return res.rows[0];
+  });
+
+  fastify.post('/collections/:collectionId/items', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const { collectionId } = request.params;
+    const { item_type, gig_id, profile_id, position } = request.body || {};
+    const ownerId = resolveActorId(request);
+
+    const collectionRes = await pool.query('SELECT owner_user_id FROM collections WHERE id = $1', [collectionId]);
+    const collection = collectionRes.rows[0];
+    if (!collection) return reply.status(404).send({ message: 'Collection not found' });
+    if (collection.owner_user_id !== ownerId) return reply.status(403).send({ message: 'Forbidden' });
+
+    const res = await pool.query(
+      'INSERT INTO collection_items (collection_id, item_type, gig_id, profile_id, position) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [collectionId, item_type, gig_id || null, profile_id || null, Number(position || 0)]
+    );
+
+    return res.rows[0];
+  });
+
+  fastify.delete('/collections/:collectionId/items/:itemId', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const { collectionId, itemId } = request.params;
+    const ownerId = resolveActorId(request);
+
+    const collectionRes = await pool.query('SELECT owner_user_id FROM collections WHERE id = $1', [collectionId]);
+    const collection = collectionRes.rows[0];
+    if (!collection) return reply.status(404).send({ message: 'Collection not found' });
+    if (collection.owner_user_id !== ownerId) return reply.status(403).send({ message: 'Forbidden' });
+
+    await pool.query('DELETE FROM collection_items WHERE id = $1 AND collection_id = $2', [itemId, collectionId]);
+    return { deleted: true };
+  });
+
+  fastify.post('/collections/:collectionId/save', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const { collectionId } = request.params;
+    const userId = resolveActorId(request);
+
+    await pool.query(
+      'INSERT INTO collection_saves (collection_id, user_id) VALUES ($1, $2) ON CONFLICT (collection_id, user_id) DO NOTHING',
+      [collectionId, userId]
+    );
+    return { saved: true };
+  });
+
+  fastify.delete('/collections/:collectionId/save', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const { collectionId } = request.params;
+    const userId = resolveActorId(request);
+    await pool.query('DELETE FROM collection_saves WHERE collection_id = $1 AND user_id = $2', [collectionId, userId]);
+    return { saved: false };
   });
 }
 

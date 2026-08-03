@@ -1,115 +1,101 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { 
-  CaretLeft,
-  UserCircle
-} from '@phosphor-icons/react';
-import LinkNext from 'next/link';
+import { useState } from 'react';
+import Link from 'next/link';
+import { ArrowLeft, CheckCircle, UserCircle } from '@phosphor-icons/react';
 
 export default function ForgotPage() {
   const [identifier, setIdentifier] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
   const handleFindAccount = async () => {
+    if (!identifier.trim()) return;
+
     setLoading(true);
-    // Simulate real backend check
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setSuccess(true);
-    setLoading(false);
+    setMessage(null);
+
+    try {
+      const response = await fetch('/api/auth/forgot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier }),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(data?.message || 'We could not start account recovery.');
+      }
+
+      setSuccess(true);
+      setMessage(data?.message || 'Recovery instructions have been queued.');
+    } catch (error) {
+      setSuccess(false);
+      setMessage(error instanceof Error ? error.message : 'We could not start account recovery.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-white text-zinc-950 flex flex-col items-center pt-20 px-[5%] overflow-x-hidden font-display relative pb-32">
-      
-      {/* Header Logo */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-12"
-      >
-        <LinkNext href="/login" className="relative h-12 w-12 bg-zinc-200/50 backdrop-blur-xl border border-white/50 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110 mx-auto">
-          <CaretLeft size={24} weight="bold" className="text-zinc-950" />
-        </LinkNext>
-      </motion.div>
+    <div className="min-h-screen bg-white px-[5%] py-20 font-display text-zinc-950 dark:bg-[#0A0E17] dark:text-zinc-50">
+      <div className="mx-auto flex max-w-[560px] flex-col items-center">
+        <Link href="/login" className="mb-10 inline-flex h-12 w-12 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-950 transition-transform hover:scale-110 dark:border-zinc-800 dark:bg-zinc-950 dark:text-white">
+          <ArrowLeft size={20} weight="bold" />
+        </Link>
 
-      <div className="w-full max-w-[400px] flex flex-col items-center">
-        
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full flex flex-col gap-8"
-        >
-          <div className="flex flex-col gap-2">
-            <h1 className="text-2xl font-black tracking-tight text-zinc-950">Find your account</h1>
-            <p className="text-zinc-500 font-bold text-sm">
-              Enter your mobile number, username or email. <LinkNext href="#" className="text-[#0066FF]">Can&apos;t reset your password?</LinkNext>
-            </p>
+        <div className="w-full rounded-[28px] border border-zinc-200 bg-zinc-50 p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 md:p-10">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#0066FF]/10 text-[#0066FF]">
+              <UserCircle size={24} weight="bold" />
+            </div>
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-[0.24em] text-[#0066FF]">Account recovery</p>
+              <h1 className="mt-1 text-2xl font-black tracking-tight">Find your account</h1>
+            </div>
           </div>
 
-          {!success ? (
-            <div className="flex flex-col gap-6">
-              <div className="flex flex-col gap-4">
-                <input 
-                  type="text" 
-                  placeholder="Mobile number, username or email"
-                  className="h-12 w-full rounded-xl bg-zinc-50 border border-zinc-200 px-4 outline-none focus:bg-white focus:border-[#0066FF] transition-all font-medium text-sm text-zinc-950"
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
-                />
-                <p className="text-[10px] text-zinc-400 font-bold leading-relaxed px-2">
-                  You may receive WhatsApp and SMS notifications from us for security and login purposes.
-                </p>
-              </div>
+          <p className="mt-4 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+            Enter a phone number, username, or email address. If the account exists, we will queue recovery instructions without exposing whether it is registered.
+          </p>
 
-              <button 
-                disabled={!identifier || loading}
-                onClick={handleFindAccount}
-                className="h-12 w-full bg-[#0066FF] text-white rounded-full font-black text-sm flex items-center justify-center gap-4 disabled:opacity-50 transition-all shadow-lg shadow-[#0066FF]/20"
-              >
-                {loading ? (
-                  <motion.div 
-                    animate={{ rotate: 360 }} 
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full"
-                  />
-                ) : (
-                  "Continue"
-                )}
-              </button>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-6 text-center py-8">
-               <div className="h-20 w-20 bg-zinc-50 rounded-full flex items-center justify-center mx-auto border border-zinc-100">
-                  <UserCircle size={48} weight="duotone" className="text-[#0066FF]" />
-               </div>
-               <div className="flex flex-col gap-2">
-                  <h2 className="text-lg font-black tracking-tight">Check your device</h2>
-                  <p className="text-sm text-zinc-500 font-bold">We&apos;ve sent a security link to the mobile number associated with {identifier}.</p>
-               </div>
-               <LinkNext href="/login" className="text-sm font-black text-[#0066FF] hover:underline">
-                  Back to Log In
-               </LinkNext>
+          <div className="mt-8 space-y-4">
+            <input
+              type="text"
+              placeholder="Phone number, username, or email"
+              className="h-12 w-full rounded-xl border border-zinc-200 bg-white px-4 text-sm font-medium outline-none transition-colors placeholder:text-zinc-400 focus:border-[#0066FF] dark:border-zinc-800 dark:bg-zinc-950 dark:text-white"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+            />
+
+            <button
+              disabled={!identifier.trim() || loading}
+              onClick={handleFindAccount}
+              className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-[#0066FF] px-5 text-sm font-black text-white transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {loading ? 'Checking account' : 'Continue'}
+            </button>
+          </div>
+
+          {message && (
+            <div className={`mt-6 rounded-2xl border p-4 text-sm ${success ? 'border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-200' : 'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200'}`}>
+              <div className="flex items-start gap-3">
+                <CheckCircle size={18} weight="bold" className={success ? 'text-emerald-600' : 'text-amber-600'} />
+                <p className="leading-6">{message}</p>
+              </div>
             </div>
           )}
-        </motion.div>
 
-        {/* Footer Meta Style Links */}
-        <div className="mt-40 flex flex-wrap justify-center gap-x-4 gap-y-2 text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-           <LinkNext href="#">ImeanTech</LinkNext>
-           <LinkNext href="#">About</LinkNext>
-           <LinkNext href="#">Blog</LinkNext>
-           <LinkNext href="#">Jobs</LinkNext>
-           <LinkNext href="#">Help</LinkNext>
-           <LinkNext href="#">API</LinkNext>
-           <LinkNext href="#">Privacy</LinkNext>
-           <LinkNext href="#">Terms</LinkNext>
-           <LinkNext href="#">Locations</LinkNext>
-        </div>
-        <div className="mt-8 text-[10px] font-black text-zinc-300 uppercase tracking-[0.4em] text-center">
-           © 2026 Workora Platform from ImeanTech
+          <div className="mt-8 flex items-center justify-between text-sm">
+            <Link href="/login" className="font-black text-[#0066FF] hover:underline">
+              Back to log in
+            </Link>
+            <Link href="/help" className="font-black text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white">
+              Need help?
+            </Link>
+          </div>
         </div>
       </div>
     </div>

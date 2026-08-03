@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   House,
@@ -13,7 +13,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { EliteErrorCard } from '@/components/EliteErrorCard';
 import WorkoraLoader from '@/components/WorkoraLoader';
-import { persistLegacySession } from '@/lib/session';
+import { fetchCurrentUser, persistLegacySession } from '@/lib/session';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -26,6 +27,24 @@ export default function LoginPage() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    let mounted = true;
+
+    const bootstrap = async () => {
+      const user = await fetchCurrentUser();
+      if (!mounted || !user) return;
+
+      window.location.href = user.role === 'hirer' ? '/dashboard/feed' : '/dashboard/pro';
+    };
+
+    void bootstrap();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const handleLogin = async () => {
     const identifier = formData.identifier.trim();
@@ -49,7 +68,9 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error('The credentials provided do not match our records. Please verify your phone number or password.');
+        const errorCode = String(data?.code || 'invalid_credentials');
+        router.push(`/auth/error/${errorCode}`);
+        return;
       }
 
       persistLegacySession({
@@ -61,7 +82,7 @@ export default function LoginPage() {
       // Redirect to Dashboard
       window.location.href = '/dashboard/feed';
     } catch (err: unknown) {
-      setAuthError(err instanceof Error ? err.message : 'The credentials provided do not match our records. Please verify your phone number or password.');
+      router.push('/auth/error/network_error');
     } finally {
       setLoading(false);
     }

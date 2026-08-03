@@ -12,11 +12,10 @@ import { usePathname } from 'next/navigation';
 export function TopNav() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
-  const [isSwahili, setIsSwahili] = useState(false);
+  const [isSwahili] = useState(() => typeof document !== 'undefined' && document.cookie.includes('googtrans=/en/sw'));
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    setIsSwahili(document.cookie.includes('googtrans=/en/sw'));
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
@@ -27,7 +26,10 @@ export function TopNav() {
   if (['/login', '/join', '/forgot'].includes(pathname) || pathname.startsWith('/dashboard')) return null;
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ease-out ${scrolled ? 'bg-white/40 dark:bg-[#0A0E17]/40 backdrop-blur-2xl saturate-150 py-3' : 'bg-transparent py-6'}`}>
+    <nav
+      data-analytics-section="top_navigation"
+      className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ease-out ${scrolled ? 'bg-white/40 dark:bg-[#0A0E17]/40 backdrop-blur-2xl saturate-150 py-3' : 'bg-transparent py-6'}`}
+    >
       <div className="mx-auto max-w-screen-2xl px-6 md:px-12 flex items-center justify-between">
         
         {/* Left Side: Logo & Links */}
@@ -54,6 +56,8 @@ export function TopNav() {
               <Link
                 key={tab.name}
                 href={tab.href}
+                data-analytics-label={tab.name}
+                data-analytics-event="topnav_link_clicked"
                 className="relative group py-2"
               >
                 <span className={`text-sm font-black tracking-wide drop-shadow-sm transition-colors duration-300 ${
@@ -79,7 +83,9 @@ export function TopNav() {
               Insights
             </Link>
             <ThemeToggle />
-            <button 
+            <button
+              data-analytics-label="Language toggle"
+              data-analytics-event="topnav_language_toggle"
               onClick={() => {
                 const newValue = isSwahili ? '/en/en' : '/en/sw';
                 document.cookie = `googtrans=${newValue}; path=/`;
@@ -94,19 +100,25 @@ export function TopNav() {
           <div className="flex items-center gap-3">
             <Link 
               href="/login" 
+              data-analytics-label="Sign in"
+              data-analytics-event="topnav_sign_in"
               className="hidden sm:flex h-10 px-6 items-center justify-center text-sm font-black text-zinc-900 drop-shadow-sm dark:text-white hover:opacity-70 transition-opacity"
             >
               Sign in
             </Link>
             <Link 
               href="/join" 
+              data-analytics-label="Get Started"
+              data-analytics-event="topnav_get_started"
               className="group relative h-10 px-6 bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-lg font-black text-sm flex items-center justify-center transition-all hover:scale-105 active:scale-95 shadow-md shadow-blue-500/20"
             >
               <span className="relative z-10">Get Started</span>
             </Link>
             
             {/* Mobile Menu Toggle */}
-            <button 
+            <button
+              data-analytics-label="Open mobile menu"
+              data-analytics-event="topnav_mobile_menu_open"
               onClick={() => setMobileMenuOpen(true)}
               className="lg:hidden ml-2 h-10 w-10 flex items-center justify-center rounded-lg bg-zinc-50 dark:bg-zinc-800 text-zinc-950 dark:text-white border border-zinc-100 dark:border-zinc-700"
             >
@@ -129,10 +141,12 @@ export function TopNav() {
               <div className="relative h-12 w-36">
                 <Image src="/logo/workora_logo.png" alt="Workora Logo" fill className="object-contain dark:brightness-0 dark:invert" priority />
               </div>
-              <button 
-                onClick={() => setMobileMenuOpen(false)}
-                className="h-10 w-10 flex items-center justify-center rounded-lg bg-zinc-50 dark:bg-zinc-800 text-zinc-950 dark:text-white border border-zinc-100 dark:border-zinc-700"
-              >
+            <button
+              data-analytics-label="Close mobile menu"
+              data-analytics-event="topnav_mobile_menu_close"
+              onClick={() => setMobileMenuOpen(false)}
+              className="h-10 w-10 flex items-center justify-center rounded-lg bg-zinc-50 dark:bg-zinc-800 text-zinc-950 dark:text-white border border-zinc-100 dark:border-zinc-700"
+            >
                 <X size={24} weight="bold" />
               </button>
             </div>
@@ -147,6 +161,8 @@ export function TopNav() {
                 <Link 
                   key={tab.name} 
                   href={tab.href} 
+                  data-analytics-label={tab.name}
+                  data-analytics-event="mobile_nav_link_clicked"
                   onClick={() => setMobileMenuOpen(false)}
                   className="text-zinc-950 dark:text-white hover:text-[#0066FF] dark:hover:text-[#00D1FF] transition-colors"
                 >
@@ -158,12 +174,14 @@ export function TopNav() {
             <div className="mt-12 flex flex-col gap-6">
               <div className="flex items-center gap-6">
                 <ThemeToggle />
-                <button 
-                  onClick={() => {
-                    const newValue = isSwahili ? '/en/en' : '/en/sw';
-                    document.cookie = `googtrans=${newValue}; path=/`;
-                    window.location.reload();
-                  }}
+              <button
+                data-analytics-label="Language toggle"
+                data-analytics-event="mobile_language_toggle"
+                onClick={() => {
+                  const newValue = isSwahili ? '/en/en' : '/en/sw';
+                  document.cookie = `googtrans=${newValue}; path=/`;
+                  window.location.reload();
+                }}
                   className="flex items-center gap-2 text-lg font-black tracking-wide text-zinc-950 dark:text-white"
                 >
                   <Globe size={24} /> {isSwahili ? 'Swahili' : 'English'}
@@ -172,6 +190,8 @@ export function TopNav() {
               <hr className="border-zinc-100 dark:border-zinc-800" />
               <Link 
                 href="/login" 
+                data-analytics-label="Sign in"
+                data-analytics-event="mobile_sign_in"
                 onClick={() => setMobileMenuOpen(false)}
                 className="h-14 flex items-center justify-center text-lg font-black text-zinc-950 dark:text-white bg-zinc-50 dark:bg-zinc-900 rounded-xl"
               >

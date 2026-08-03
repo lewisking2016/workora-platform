@@ -26,20 +26,20 @@ export function ProfileHero({
   const avatarColor = getAvatarColor(name);
   
   return (
-    <div className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[24px] p-8">
-      <div className="flex items-start gap-6">
+    <div className="rounded-xl bg-white p-6 shadow-sm shadow-black/5 dark:bg-zinc-900">
+      <div className="flex items-start gap-5">
         <div className="relative">
-          <div className="p-1 rounded-full bg-gradient-to-tr from-[#0066FF] via-[#4F46E5] to-[#7000FF] shadow-[0_20px_40px_-20px_rgba(79,70,229,0.6)]">
+          <div className="rounded-xl bg-gradient-to-tr from-[#0066FF] via-[#4F46E5] to-[#7000FF] p-1.5 shadow-[0_16px_30px_-18px_rgba(79,70,229,0.55)]">
             {showImage ? (
               <Image
                 src={imageUrl}
                 alt={name}
                 width={128}
                 height={128}
-                className="w-32 h-32 rounded-full object-cover border-4 border-white dark:border-zinc-900"
+                className="h-28 w-28 rounded-xl object-cover"
               />
             ) : (
-              <div className={`w-32 h-32 rounded-full ${avatarColor} flex items-center justify-center border-4 border-white dark:border-zinc-900`}>
+              <div className={`flex h-28 w-28 items-center justify-center rounded-xl ${avatarColor}`}>
                 <span className="text-white text-5xl font-black">
                   {initials}
                 </span>
@@ -48,7 +48,7 @@ export function ProfileHero({
           </div>
           
           {isVerified && (
-            <div className="absolute -bottom-1 -right-1 rounded-full bg-gradient-to-br from-[#0066FF] via-[#4F46E5] to-[#7000FF] p-1.5 shadow-lg">
+            <div className="absolute -bottom-1 -right-1 rounded-xl bg-gradient-to-br from-[#0066FF] via-[#4F46E5] to-[#7000FF] p-1.5 shadow-lg">
                 <SealCheck size={18} weight="regular" className="text-white" />
             </div>
           )}
@@ -56,9 +56,9 @@ export function ProfileHero({
 
         {/* Profile info */}
         <div className="flex-1">
-          <div className="flex items-start justify-between mb-4">
+          <div className="mb-4 flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-black text-zinc-950 dark:text-white tracking-tight mb-1">
+              <h1 className="mb-1 text-2xl font-black tracking-tight text-zinc-950 dark:text-white">
                 {name}
               </h1>
               <p className="text-sm font-bold text-zinc-500 dark:text-zinc-400">
@@ -68,7 +68,7 @@ export function ProfileHero({
             
             <Link 
               href="/profile/edit"
-              className="h-10 px-4 bg-zinc-100/90 dark:bg-zinc-800/90 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-xl flex items-center gap-2 font-bold text-sm text-zinc-950 dark:text-white transition-all border border-zinc-200/70 dark:border-zinc-700/70"
+              className="inline-flex h-10 items-center gap-2 rounded-xl bg-zinc-100 px-4 text-sm font-semibold text-zinc-950 transition-colors hover:bg-zinc-200 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
             >
               <Gear size={18} weight="regular" />
               Edit

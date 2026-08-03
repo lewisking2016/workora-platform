@@ -12,7 +12,6 @@ import {
   SpinnerGap,
   ShieldCheck,
   TrendUp,
-  TrendDown,
   Heart,
   Bookmark,
   Users,
@@ -31,9 +30,14 @@ interface CurrentUser {
 }
 
 interface GigSummary {
+  id?: string;
+  title?: string;
+  description?: string;
+  created_at?: string;
   view_count?: number;
   likes_count?: number;
   comments_count?: number;
+  price?: string | number;
 }
 
 interface Stats {
@@ -76,7 +80,7 @@ const MetricCard = ({ icon: Icon, label, value, growth, color, subtitle }: Metri
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    className="group rounded-[24px] border border-zinc-100 bg-white p-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900"
+    className="group rounded-[16px] border border-zinc-100 bg-white p-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900"
   >
     <div className="flex items-start justify-between gap-4">
       <div className="flex items-center gap-4">
@@ -103,9 +107,61 @@ const MetricCard = ({ icon: Icon, label, value, growth, color, subtitle }: Metri
   </motion.div>
 );
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const rangeConfig = {
+  '7d': { days: 7, buckets: 7 },
+  '30d': { days: 30, buckets: 6 },
+  '90d': { days: 90, buckets: 9 },
+} as const;
+
+const toNumber = (value: unknown) => Number(value || 0);
+
+const calculateGrowth = (current: number, previous: number) => {
+  if (previous <= 0) return current > 0 ? 100 : 0;
+  return Math.round(((current - previous) / previous) * 100);
+};
+
+const buildChartData = (gigs: GigSummary[], timeRange: '7d' | '30d' | '90d') => {
+  const { days, buckets } = rangeConfig[timeRange];
+  const bucketSize = Math.max(1, Math.ceil(days / buckets));
+  const now = Date.now();
+
+  const data = Array.from({ length: buckets }, (_, index) => {
+    const startAge = days - (index + 1) * bucketSize;
+    const labelDate = new Date(now - Math.max(0, startAge) * DAY_MS);
+    return {
+      day: labelDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      views: 0,
+      engagement: 0,
+      revenue: 0,
+    };
+  });
+
+  gigs.forEach((gig) => {
+    if (!gig.created_at) return;
+    const createdAt = new Date(gig.created_at).getTime();
+    if (Number.isNaN(createdAt)) return;
+
+    const ageDays = Math.floor((now - createdAt) / DAY_MS);
+    if (ageDays < 0 || ageDays >= days) return;
+
+    const bucketIndex = Math.min(buckets - 1, Math.floor(ageDays / bucketSize));
+    const bucket = data[buckets - 1 - bucketIndex];
+    bucket.views += toNumber(gig.view_count);
+    bucket.engagement += toNumber(gig.likes_count) + toNumber(gig.comments_count);
+    bucket.revenue += toNumber(gig.price);
+  });
+
+  return data;
+};
+
 export default function AnalyticsPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [chartData, setChartData] = useState<ChartData[]>([]);
+  const [gigs, setGigs] = useState<GigSummary[]>([]);
+  const [profile, setProfile] = useState<{ id: string; location?: string; created_at?: string } | null>(null);
+  const [ratingAverage, setRatingAverage] = useState('0.0');
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
 
@@ -120,45 +176,93 @@ export default function AnalyticsPage() {
       try {
         const profileRes = await fetch('/api/profile/me');
         const profileData = await profileRes.json();
+        setProfile(profileData.profile || null);
 
-        const gigsRes = await fetch(`/api/gigs/worker/${profileData.profile?.id}`);
-        const gigsJson = await gigsRes.json();
+        const profileId = profileData.profile?.id || '';
+        const [gigsRes, ratingsRes, savedRes] = await Promise.all([
+          profileId ? fetch(`/api/gigs/worker/${profileId}`) : Promise.resolve(null),
+          profileId ? fetch(`/api/profile/ratings/${profileId}`) : Promise.resolve(null),
+          fetch(`/api/gigs/saved/${user.id}`),
+        ]);
+
+        const gigsJson = gigsRes ? await gigsRes.json() : [];
+        const ratingsJson = ratingsRes ? await ratingsRes.json() : { ratings: [], average: '0.0', breakdown: [] };
+        const savedJson = await savedRes.json();
+
         const gigsData: GigSummary[] = Array.isArray(gigsJson) ? gigsJson : [];
+        const ratingsData = ratingsJson && typeof ratingsJson === 'object' ? ratingsJson : { ratings: [], average: '0.0', breakdown: [] };
+        const savedGigs = Array.isArray(savedJson) ? savedJson : [];
+        setGigs(gigsData);
+        setRatingAverage(String(ratingsData.average || '0.0'));
 
-        const totalViews = gigsData.reduce((sum, gig) => sum + (gig.view_count || 0), 0);
-        const totalLikes = gigsData.reduce((sum, gig) => sum + (gig.likes_count || 0), 0);
-        const totalComments = gigsData.reduce((sum, gig) => sum + (gig.comments_count || 0), 0);
+        const totalViews = gigsData.reduce((sum, gig) => sum + toNumber(gig.view_count), 0);
+        const totalLikes = gigsData.reduce((sum, gig) => sum + toNumber(gig.likes_count), 0);
+        const totalComments = gigsData.reduce((sum, gig) => sum + toNumber(gig.comments_count), 0);
         const totalEngagement = totalLikes + totalComments;
+
+        const { days } = rangeConfig[timeRange];
+        const halfWindow = Math.max(1, Math.floor(days / 2));
+        const now = Date.now();
+
+        let recentViews = 0;
+        let previousViews = 0;
+        let recentEngagement = 0;
+        let previousEngagement = 0;
+        let recentIncome = 0;
+        let previousIncome = 0;
+        let activeJobs = 0;
+
+        gigsData.forEach((gig) => {
+          if (!gig.created_at) return;
+          const createdAt = new Date(gig.created_at).getTime();
+          if (Number.isNaN(createdAt)) return;
+
+          const ageDays = Math.floor((now - createdAt) / DAY_MS);
+          if (ageDays < 0 || ageDays >= days) return;
+
+          const views = toNumber(gig.view_count);
+          const engagement = toNumber(gig.likes_count) + toNumber(gig.comments_count);
+          const income = toNumber(gig.price);
+
+          if (ageDays < halfWindow) {
+            recentViews += views;
+            recentEngagement += engagement;
+            recentIncome += income;
+          } else {
+            previousViews += views;
+            previousEngagement += engagement;
+            previousIncome += income;
+          }
+
+          if (ageDays < 14) {
+            activeJobs += 1;
+          }
+        });
+
+        const totalJobs = profileData.profile?.total_gigs || gigsData.length;
+        const chart = buildChartData(gigsData, timeRange);
 
         setStats({
           totalViews,
-          viewGrowth: Math.floor(Math.random() * 30) + 5,
+          viewGrowth: calculateGrowth(recentViews, previousViews),
           totalEngagement,
-          engagementGrowth: Math.floor(Math.random() * 25) + 3,
-          totalJobs: profileData.profile?.total_gigs || 0,
-          completedJobs: profileData.profile?.total_gigs || 0,
-          activeJobs: Math.floor(Math.random() * 5),
-          income: profileData.profile?.total_earnings || 0,
-          incomeGrowth: Math.floor(Math.random() * 20) + 2,
-          trustScore: parseFloat(profileData.profile?.trust_score || 0) * 20,
+          engagementGrowth: calculateGrowth(recentEngagement, previousEngagement),
+          totalJobs,
+          completedJobs: totalJobs,
+          activeJobs,
+          income: profileData.profile?.total_earnings || gigsData.reduce((sum, gig) => sum + toNumber(gig.price), 0),
+          incomeGrowth: calculateGrowth(recentIncome, previousIncome),
+          trustScore: toNumber(profileData.profile?.trust_score) * 20,
           profileVisits: totalViews,
           likes: totalLikes,
           comments: totalComments,
-          saves: Math.floor(totalEngagement * 0.3),
-          followers: Math.floor(totalViews * 0.05),
+          saves: savedGigs.length,
+          followers: Array.isArray(ratingsData.ratings) ? ratingsData.ratings.length : 0,
           avgResponseTime: '< 2h',
-          completionRate: 98
+          completionRate: totalJobs > 0 ? 100 : 0
         });
 
-        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        setChartData(
-          days.map(day => ({
-            day,
-            views: Math.floor(Math.random() * 500) + 200,
-            engagement: Math.floor(Math.random() * 150) + 50,
-            revenue: Math.floor(Math.random() * 5000) + 1000
-          }))
-        );
+        setChartData(chart);
       } catch (err) {
         console.error('Failed to load analytics:', err);
       } finally {
@@ -167,7 +271,7 @@ export default function AnalyticsPage() {
     }
 
     loadAnalytics();
-  }, []);
+  }, [timeRange]);
 
   if (loading) {
     return (
@@ -183,10 +287,17 @@ export default function AnalyticsPage() {
     );
   }
 
+  const maxViews = Math.max(1, ...chartData.map((item) => item.views));
+  const maxEngagement = Math.max(1, ...chartData.map((item) => item.engagement));
+  const topGigs = [...gigs].sort((a, b) => toNumber(b.view_count) - toNumber(a.view_count)).slice(0, 3);
+  const memberSince = profile?.created_at
+    ? new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+    : 'Recently';
+
   return (
     <div className="h-full overflow-y-auto bg-zinc-50 dark:bg-[#0A0E17]">
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-[5%] py-8 pb-32 lg:px-8">
-        <div className="flex flex-col gap-6 rounded-[28px] border border-zinc-100 bg-white p-6 lg:flex-row lg:items-end lg:justify-between lg:p-8 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex flex-col gap-6 rounded-[16px] border border-zinc-100 bg-white p-6 lg:flex-row lg:items-end lg:justify-between lg:p-8 dark:border-zinc-800 dark:bg-zinc-900">
           <div className="flex max-w-2xl flex-col gap-3">
             <div className="inline-flex w-fit items-center gap-2 rounded-full bg-zinc-100 px-3 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
               Performance Dashboard
@@ -250,7 +361,7 @@ export default function AnalyticsPage() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 rounded-[24px] border border-zinc-100 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="lg:col-span-2 rounded-[16px] border border-zinc-100 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-black tracking-tight text-zinc-950 dark:text-white">Performance Overview</h3>
@@ -275,13 +386,13 @@ export default function AnalyticsPage() {
                     <div className="relative flex-1">
                       <div
                         className="w-full cursor-pointer rounded-t-xl bg-gradient-to-t from-[#0066FF] to-[#0052CC] transition-all hover:brightness-110"
-                        style={{ height: `${(d.views / 500) * 100}%` }}
+                        style={{ height: `${Math.max(10, (d.views / maxViews) * 100)}%` }}
                       />
                     </div>
                     <div className="relative flex-1">
                       <div
                         className="w-full cursor-pointer rounded-t-xl bg-gradient-to-t from-[#7000FF] to-[#5C00CC] transition-all hover:brightness-110"
-                        style={{ height: `${(d.engagement / 150) * 100}%` }}
+                        style={{ height: `${Math.max(10, (d.engagement / maxEngagement) * 100)}%` }}
                       />
                     </div>
                   </div>
@@ -291,7 +402,7 @@ export default function AnalyticsPage() {
             </div>
           </div>
 
-          <div className="rounded-[24px] border border-zinc-100 bg-white p-8 text-zinc-950 dark:border-zinc-800 dark:bg-zinc-900 dark:text-white">
+          <div className="rounded-[16px] border border-zinc-100 bg-white p-8 text-zinc-950 dark:border-zinc-800 dark:bg-zinc-900 dark:text-white">
             <div className="relative z-10 flex flex-col gap-2">
               <div className="flex items-center gap-2 text-[#0066FF]">
                 <ShieldCheck size={20} weight="fill" />
@@ -331,15 +442,15 @@ export default function AnalyticsPage() {
           {[
             { icon: Heart, label: 'Total Likes', value: stats?.likes || 0, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-950/20' },
             { icon: ChatCircleDots, label: 'Comments', value: stats?.comments || 0, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/20' },
-            { icon: Bookmark, label: 'Saved', value: stats?.saves || 0, color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-950/20' },
-            { icon: Users, label: 'Followers', value: stats?.followers || 0, color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-950/20' },
+            { icon: Bookmark, label: 'Saved Works', value: stats?.saves || 0, color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-950/20' },
+            { icon: Users, label: 'Ratings', value: stats?.followers || 0, color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-950/20' },
           ].map((item, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="flex items-center gap-4 rounded-[24px] border border-zinc-100 bg-white p-6 transition-all hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900"
+              className="flex items-center gap-4 rounded-[16px] border border-zinc-100 bg-white p-6 transition-all hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900"
             >
               <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.bg} ${item.color}`}>
                 <item.icon size={24} weight="fill" />
@@ -353,38 +464,30 @@ export default function AnalyticsPage() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div className="rounded-[24px] border border-zinc-100 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded-[16px] border border-zinc-100 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-black tracking-tight text-zinc-950 dark:text-white">Top Content</h3>
               <VideoCamera size={24} weight="duotone" className="text-[#0066FF]" />
             </div>
 
             <div className="mt-6 flex flex-col gap-3">
-              {[
-                { title: 'Complete House Wiring', views: '4.2K', engagement: '892', trend: 18 },
-                { title: 'Solar Panel Installation', views: '3.8K', engagement: '743', trend: 12 },
-                { title: 'Electrical Fault Repair', views: '2.1K', engagement: '421', trend: -5 },
-              ].map((content, i) => (
-                <div key={i} className="flex items-center justify-between rounded-[18px] bg-zinc-50 p-4 transition-all hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800">
+              {topGigs.map((content, i) => (
+                <div key={content.id || i} className="flex items-center justify-between rounded-[14px] bg-zinc-50 p-4 transition-all hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800">
                   <div className="flex items-center gap-4">
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-100 text-sm font-black text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
                       #{i + 1}
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-black text-zinc-950 dark:text-white">{content.title}</span>
-                      <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{content.views} views / {content.engagement} engagements</span>
+                      <span className="text-sm font-black text-zinc-950 dark:text-white">{content.title || content.description?.slice(0, 48) || 'Untitled gig'}</span>
+                      <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{toNumber(content.view_count).toLocaleString()} views / {(toNumber(content.likes_count) + toNumber(content.comments_count)).toLocaleString()} engagements</span>
                     </div>
-                  </div>
-                  <div className={`flex items-center gap-1 text-xs font-black ${content.trend >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                    {content.trend >= 0 ? <TrendUp size={14} weight="bold" /> : <TrendDown size={14} weight="bold" />}
-                    {Math.abs(content.trend)}%
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="rounded-[24px] border border-zinc-100 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded-[16px] border border-zinc-100 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-black tracking-tight text-zinc-950 dark:text-white">Business Insights</h3>
               <ChartLine size={24} weight="duotone" className="text-[#7000FF]" />
@@ -392,12 +495,12 @@ export default function AnalyticsPage() {
 
             <div className="mt-6 flex flex-col gap-4">
               {[
-                { icon: MapPin, label: 'Service Locations', value: '3 Cities', detail: 'Nairobi, Mombasa, Kisumu' },
-                { icon: Clock, label: 'Avg. Project Time', value: '3.5 Days', detail: 'Faster than 68% of pros' },
-                { icon: CalendarBlank, label: 'Member Since', value: 'Jan 2024', detail: '8 months active' },
-                { icon: Users, label: 'Repeat Clients', value: '24%', detail: 'Above average retention' },
+                { icon: MapPin, label: 'Service Location', value: profile?.location || 'Not set', detail: 'Pulled from your profile' },
+                { icon: Clock, label: 'Member Since', value: memberSince, detail: `${stats?.totalJobs || 0} gigs published` },
+                { icon: CalendarBlank, label: 'Active Jobs', value: String(stats?.activeJobs || 0), detail: 'Published in the last 14 days' },
+                { icon: Users, label: 'Ratings Received', value: String(stats?.followers || 0), detail: `${ratingAverage}/5 average rating` },
               ].map((stat, i) => (
-                <div key={i} className="flex items-start gap-4 rounded-[18px] p-4 transition-all hover:bg-zinc-50 dark:hover:bg-zinc-950">
+                <div key={i} className="flex items-start gap-4 rounded-[14px] p-4 transition-all hover:bg-zinc-50 dark:hover:bg-zinc-950">
                   <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
                     <stat.icon size={20} weight="duotone" />
                   </div>
