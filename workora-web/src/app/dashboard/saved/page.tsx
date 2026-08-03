@@ -73,6 +73,12 @@ export default function SavedPage() {
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<LibraryTab>('items');
+  const [showCreateCollection, setShowCreateCollection] = useState(false);
+  const [collectionTitle, setCollectionTitle] = useState('');
+  const [collectionDescription, setCollectionDescription] = useState('');
+  const [collectionKind, setCollectionKind] = useState('custom');
+  const [collectionPublic, setCollectionPublic] = useState(false);
+  const [collectionSaving, setCollectionSaving] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -116,6 +122,41 @@ export default function SavedPage() {
     { label: 'Saved searches', value: savedSearches.length.toLocaleString(), icon: MagnifyingGlass },
     { label: 'Saved profiles', value: savedProfiles.length.toLocaleString(), icon: UserCircle },
   ]), [collections.length, gigs.length, savedProfiles.length, savedSearches.length]);
+
+  const createCollection = async () => {
+    const title = collectionTitle.trim();
+    if (!title) return;
+
+    setCollectionSaving(true);
+    try {
+      const res = await fetch('/api/profile/collections', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          description: collectionDescription.trim(),
+          kind: collectionKind,
+          is_public: collectionPublic,
+        }),
+      });
+
+      if (!res.ok) throw new Error('Failed to create collection');
+
+      setShowCreateCollection(false);
+      setCollectionTitle('');
+      setCollectionDescription('');
+      setCollectionKind('custom');
+      setCollectionPublic(false);
+      const next = await fetch('/api/profile/collections');
+      const nextData = await next.json();
+      setCollections(Array.isArray(nextData) ? nextData : []);
+      setTab('collections');
+    } catch (error) {
+      console.error('Create collection failed:', error);
+    } finally {
+      setCollectionSaving(false);
+    }
+  };
 
   return (
     <div className="h-full w-full flex flex-col overflow-hidden bg-white dark:bg-black">
@@ -165,6 +206,17 @@ export default function SavedPage() {
               </button>
             ))}
           </div>
+
+          {tab === 'collections' ? (
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowCreateCollection(true)}
+                className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 px-4 py-2 text-xs font-black text-white dark:bg-white dark:text-zinc-950"
+              >
+                Create collection
+              </button>
+            </div>
+          ) : null}
 
           {loading ? (
             <div className="grid grid-cols-3 gap-[2px] md:grid-cols-4">
@@ -225,7 +277,7 @@ export default function SavedPage() {
                 {collections.map((collection) => (
                   <button
                     key={collection.id}
-                    onClick={() => router.push(`/dashboard/saved/collection-${collection.id}`)}
+                    onClick={() => router.push(`/dashboard/saved/collection/${collection.id}`)}
                     className="overflow-hidden rounded-[16px] border border-zinc-100 bg-white text-left dark:border-zinc-900 dark:bg-zinc-950"
                   >
                     <div className="aspect-[16/9] bg-zinc-100 dark:bg-zinc-900">
@@ -307,6 +359,72 @@ export default function SavedPage() {
           )}
         </div>
       </main>
+
+      {showCreateCollection ? (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/40 p-4 backdrop-blur-sm md:items-center">
+          <div className="w-full max-w-xl rounded-[18px] border border-zinc-100 bg-white p-5 shadow-2xl dark:border-zinc-800 dark:bg-zinc-950">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-zinc-400">New collection</p>
+                <h3 className="mt-2 text-xl font-black text-zinc-950 dark:text-white">Create a live collection</h3>
+              </div>
+              <button onClick={() => setShowCreateCollection(false)} className="text-sm font-black text-zinc-500 dark:text-zinc-400">Close</button>
+            </div>
+
+            <div className="mt-5 space-y-4">
+              <div>
+                <label className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-400">Title</label>
+                <input
+                  value={collectionTitle}
+                  onChange={(e) => setCollectionTitle(e.target.value)}
+                  placeholder="Collection title"
+                  className="mt-2 h-12 w-full rounded-xl border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-950 outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-400">Description</label>
+                <textarea
+                  value={collectionDescription}
+                  onChange={(e) => setCollectionDescription(e.target.value)}
+                  placeholder="What lives in this collection?"
+                  className="mt-2 min-h-28 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-medium text-zinc-950 outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-white"
+                />
+              </div>
+              <div className="grid gap-3 md:grid-cols-2">
+                <div>
+                  <label className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-400">Type</label>
+                  <select
+                    value={collectionKind}
+                    onChange={(e) => setCollectionKind(e.target.value)}
+                    className="mt-2 h-12 w-full rounded-xl border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-950 outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-white"
+                  >
+                    <option value="custom">Custom</option>
+                    <option value="saved">Saved</option>
+                    <option value="portfolio">Portfolio</option>
+                  </select>
+                </div>
+                <label className="flex items-center justify-between gap-3 rounded-xl border border-zinc-200 px-4 py-3 dark:border-zinc-800">
+                  <span className="text-sm font-semibold text-zinc-950 dark:text-white">Public collection</span>
+                  <input type="checkbox" checked={collectionPublic} onChange={(e) => setCollectionPublic(e.target.checked)} className="h-5 w-5" />
+                </label>
+              </div>
+            </div>
+
+            <div className="mt-6 flex items-center justify-end gap-3">
+              <button onClick={() => setShowCreateCollection(false)} className="rounded-xl border border-zinc-200 px-4 py-3 text-sm font-black text-zinc-950 dark:border-zinc-800 dark:text-white">
+                Cancel
+              </button>
+              <button
+                onClick={createCollection}
+                disabled={collectionSaving || !collectionTitle.trim()}
+                className="rounded-xl bg-[#0066FF] px-4 py-3 text-sm font-black text-white disabled:opacity-60"
+              >
+                {collectionSaving ? 'Creating...' : 'Create collection'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

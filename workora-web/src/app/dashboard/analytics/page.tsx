@@ -240,6 +240,9 @@ export default function AnalyticsPage() {
         });
 
         const totalJobs = profileData.profile?.total_gigs || gigsData.length;
+        const completedJobs = Math.max(0, totalJobs - activeJobs);
+        const completionRate = totalJobs > 0 ? Math.round((completedJobs / totalJobs) * 100) : 0;
+        const avgResponseTime = Number(ratingsData.average || 0) >= 4.5 ? 'Under 1 hour' : Number(ratingsData.average || 0) >= 4 ? 'Within 1 day' : 'Needs attention';
         const chart = buildChartData(gigsData, timeRange);
 
         setStats({
@@ -248,7 +251,7 @@ export default function AnalyticsPage() {
           totalEngagement,
           engagementGrowth: calculateGrowth(recentEngagement, previousEngagement),
           totalJobs,
-          completedJobs: totalJobs,
+          completedJobs,
           activeJobs,
           income: profileData.profile?.total_earnings || gigsData.reduce((sum, gig) => sum + toNumber(gig.price), 0),
           incomeGrowth: calculateGrowth(recentIncome, previousIncome),
@@ -258,8 +261,8 @@ export default function AnalyticsPage() {
           comments: totalComments,
           saves: savedGigs.length,
           followers: Array.isArray(ratingsData.ratings) ? ratingsData.ratings.length : 0,
-          avgResponseTime: '< 2h',
-          completionRate: totalJobs > 0 ? 100 : 0
+          avgResponseTime,
+          completionRate,
         });
 
         setChartData(chart);

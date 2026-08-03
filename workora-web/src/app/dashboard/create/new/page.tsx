@@ -51,10 +51,13 @@ export default function NewPostPage() {
   const [caption, setCaption] = useState('');
   const [location, setLocation] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadLabel, setUploadLabel] = useState('Preparing upload...');
   const [trade, setTrade] = useState('');
   const [fileError, setFileError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const uploadRef = useRef<XMLHttpRequest | null>(null);
 
   useEffect(() => {
     if (videoRef.current && mediaPreview && mediaType === 'video') {
@@ -91,12 +94,58 @@ export default function NewPostPage() {
     reader.readAsDataURL(file);
   };
 
+  const startUpload = async (onProgress?: (progress: number) => void) => {
+    const user = await fetchCurrentUser();
+    if (!user) throw new Error('Not logged in');
+
+    const profileRes = await fetch('/api/profile/me');
+    const profileData = await profileRes.json().catch(() => ({}));
+    const formData = new FormData();
+    formData.append('file', mediaFile as File);
+    formData.append('user_id', user.id);
+    formData.append('media_type', mediaType);
+
+    const response = await new Promise<{ url: string }>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      uploadRef.current = xhr;
+
+      xhr.open('POST', '/api/upload/gig');
+      xhr.responseType = 'json';
+
+      xhr.upload.onprogress = (event) => {
+        if (!event.lengthComputable) return;
+        const progress = Math.round((event.loaded / event.total) * 100);
+        onProgress?.(progress);
+      };
+
+      xhr.onload = () => {
+        const payload = xhr.response || {};
+        if (xhr.status < 200 || xhr.status >= 300) {
+          reject(new Error(payload?.error || 'Upload failed'));
+          return;
+        }
+        resolve({ url: payload.url });
+      };
+
+      xhr.onerror = () => reject(new Error('Upload failed'));
+      xhr.onabort = () => reject(new Error('Upload cancelled'));
+      xhr.send(formData);
+    });
+
+    return { ...response, user, profile: profileData?.profile || null };
+  };
+
   const handlePost = async () => {
     if (!mediaFile) return;
     
     setIsUploading(true);
+    setUploadLabel('Uploading media...');
+    setUploadProgress(0);
     try {
-      const { url, user, profile } = await uploadMedia();
+      const { url, user, profile } = await startUpload((progress) => {
+        setUploadProgress(progress);
+        setUploadLabel(progress < 100 ? 'Uploading media...' : 'Finalizing post...');
+      });
       if (!profile?.id) throw new Error('Profile not found');
 
       const postRes = await fetch('/api/gigs', {
@@ -119,37 +168,21 @@ export default function NewPostPage() {
     } catch (err: unknown) {
       setFileError(err instanceof Error ? err.message : 'Something went wrong');
       setIsUploading(false);
+      setUploadProgress(0);
     }
-  };
-
-  const uploadMedia = async () => {
-    const user = await fetchCurrentUser();
-    if (!user) throw new Error('Not logged in');
-    const profileRes = await fetch('/api/profile/me');
-    const profileData = await profileRes.json().catch(() => ({}));
-
-    const formData = new FormData();
-    formData.append('file', mediaFile as File);
-    formData.append('user_id', user.id);
-    formData.append('media_type', mediaType);
-
-    const uploadRes = await fetch('/api/upload/gig', {
-      method: 'POST',
-      body: formData,
-    });
-
-    const uploadData = await uploadRes.json();
-    if (!uploadRes.ok) throw new Error(uploadData.error || 'Upload failed');
-
-    return { ...uploadData, user, profile: profileData?.profile || null };
   };
 
   const handleSaveDraft = async () => {
     if (!mediaFile) return;
 
     setIsUploading(true);
+    setUploadLabel('Uploading draft media...');
+    setUploadProgress(0);
     try {
-      const { url, user, profile } = await uploadMedia();
+      const { url, user, profile } = await startUpload((progress) => {
+        setUploadProgress(progress);
+        setUploadLabel(progress < 100 ? 'Uploading draft media...' : 'Saving draft...');
+      });
       const draftRes = await fetch('/api/profile/drafts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -177,14 +210,41 @@ export default function NewPostPage() {
     } catch (err: unknown) {
       setFileError(err instanceof Error ? err.message : 'Could not save draft');
       setIsUploading(false);
+      setUploadProgress(0);
     }
+  };
+
+  const cancelUpload = () => {
+    uploadRef.current?.abort();
+    uploadRef.current = null;
+    setIsUploading(false);
+    setUploadProgress(0);
+    setUploadLabel('Preparing upload...');
   };
 
   if (isUploading) {
     return (
-      <div className="h-full w-full bg-white dark:bg-black flex flex-col items-center justify-center">
-        <div className="w-16 h-16 border-4 border-zinc-200 dark:border-zinc-800 border-t-[#0066FF] rounded-full animate-spin mb-4" />
-        <p className="text-zinc-950 dark:text-white font-semibold">Sharing...</p>
+      <div className="h-full w-full bg-white dark:bg-black flex flex-col items-center justify-center px-6">
+        <div className="w-full max-w-md rounded-[18px] border border-zinc-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-zinc-400">Live upload</p>
+              <h2 className="mt-2 text-xl font-black text-zinc-950 dark:text-white">{uploadLabel}</h2>
+            </div>
+            <div className="h-12 w-12 rounded-full border border-zinc-100 flex items-center justify-center dark:border-zinc-800">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-200 border-t-[#0066FF] dark:border-zinc-800" />
+            </div>
+          </div>
+          <div className="mt-6 h-3 rounded-full bg-zinc-100 dark:bg-zinc-900">
+            <div className="h-3 rounded-full bg-gradient-to-r from-[#0066FF] to-[#7000FF]" style={{ width: `${Math.max(5, uploadProgress)}%` }} />
+          </div>
+          <div className="mt-3 flex items-center justify-between">
+            <p className="text-sm font-semibold text-zinc-500 dark:text-zinc-400">{uploadProgress}% complete</p>
+            <button onClick={cancelUpload} className="text-sm font-black text-zinc-950 dark:text-white">
+              Cancel upload
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

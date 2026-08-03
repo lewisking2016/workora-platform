@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   House, Briefcase, ChatCircleDots, Bell, MagnifyingGlass,
@@ -50,6 +51,7 @@ type FormState = {
 };
 
 export default function BusinessDashboard() {
+  const router = useRouter();
   const [isDark, setIsDark] = useState(false);
   const [tab, setTab] = useState<Tab>('overview');
   const [username, setUsername] = useState('Professional');
@@ -138,6 +140,20 @@ export default function BusinessDashboard() {
   const liveViews = useMemo(() => gigs.reduce((sum, gig) => sum + (Number((gig as { view_count?: number }).view_count || 0)), 0), [gigs]);
   const liveEngagement = useMemo(() => gigs.reduce((sum, gig) => sum + (Number((gig as { likes_count?: number }).likes_count || 0)) + (Number((gig as { comments_count?: number }).comments_count || 0)), 0), [gigs]);
   const liveEarnings = `KSh ${profile?.total_earnings?.toLocaleString() || '0'}`;
+  const profileHealth = useMemo(() => {
+    const checks = [
+      profile?.full_name,
+      profile?.trade,
+      profile?.location,
+      profile?.bio,
+      profile?.title,
+      profile?.pricing_from,
+      profile?.is_verified,
+      gigs.length > 0,
+    ];
+    const filled = checks.filter(Boolean).length;
+    return Math.round((filled / checks.length) * 100);
+  }, [gigs.length, profile?.bio, profile?.full_name, profile?.is_verified, profile?.location, profile?.pricing_from, profile?.title, profile?.trade]);
 
   const TABS: { key: Tab; label: string; icon: React.ElementType }[] = [
     { key: 'overview', label: 'Overview', icon: House },
@@ -186,10 +202,10 @@ export default function BusinessDashboard() {
                 <h3 className="text-sm font-black mb-4">Quick Actions</h3>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   {[
-                    { label: 'Edit Profile', icon: PencilSimple, action: () => setTab('profile') },
-                    { label: 'Upload Work', icon: VideoCamera, action: () => setTab('portfolio') },
-                    { label: 'View Analytics', icon: ChartLineUp, action: () => setTab('analytics') },
-                    { label: 'Settings', icon: GearSix, action: () => {} },
+                    { label: 'Edit Profile', icon: PencilSimple, action: () => router.push('/profile/edit') },
+                    { label: 'Upload Work', icon: VideoCamera, action: () => router.push('/dashboard/create') },
+                    { label: 'View Analytics', icon: ChartLineUp, action: () => router.push('/dashboard/analytics') },
+                    { label: 'Open Inbox', icon: ChatCircleDots, action: () => router.push('/dashboard/messages') },
                   ].map(a => (
                     <button key={a.label} onClick={a.action} className={`flex flex-col items-center gap-2 p-4 rounded-xl border transition-all hover:scale-105 ${isDark ? 'border-zinc-800 hover:bg-zinc-800' : 'border-zinc-100 hover:bg-zinc-50'}`}>
                       <a.icon size={24} className="text-[#0066FF]" />
@@ -257,6 +273,17 @@ export default function BusinessDashboard() {
                 <button onClick={() => setTab('profile')} className="mt-3 h-8 w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg font-black text-[9px] uppercase tracking-widest">
                   Update Pricing
                 </button>
+              </div>
+              <div className={`rounded-2xl border p-5 ${card}`}>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-black">Profile Health</p>
+                  <ShieldCheck size={16} weight="fill" className="text-emerald-500" />
+                </div>
+                <div className="mt-3 flex items-end gap-2">
+                  <span className="text-3xl font-black text-zinc-950 dark:text-white">{profileHealth}%</span>
+                  <span className={`pb-1 text-[10px] font-black uppercase tracking-widest ${muted}`}>complete</span>
+                </div>
+                <p className={`mt-2 text-[10px] font-bold ${muted}`}>Keep your profile, pricing, and proof of work active to attract more leads.</p>
               </div>
             </div>
           </div>

@@ -651,11 +651,22 @@ async function profileRoutes(fastify) {
             'item_type', ci.item_type,
             'gig_id', ci.gig_id,
             'profile_id', ci.profile_id,
-            'position', ci.position
+            'position', ci.position,
+            'gig_title', g.title,
+            'gig_description', g.description,
+            'gig_thumbnail_url', g.thumbnail_url,
+            'gig_video_url', g.video_url,
+            'profile_full_name', wp.full_name,
+            'profile_display_name', wp.display_name,
+            'profile_avatar_url', wp.avatar_url,
+            'profile_trade', wp.trade,
+            'profile_location', wp.location
           ) ORDER BY ci.position ASC, ci.created_at ASC
         ) FILTER (WHERE ci.id IS NOT NULL) AS items
       FROM collections c
       LEFT JOIN collection_items ci ON ci.collection_id = c.id
+      LEFT JOIN gigs g ON g.id = ci.gig_id
+      LEFT JOIN worker_profiles wp ON wp.id = ci.profile_id
       WHERE c.id = $1
       GROUP BY c.id
       LIMIT 1
