@@ -44,11 +44,33 @@ interface Collection {
   save_count?: number;
 }
 
+interface SavedProfile {
+  id: string;
+  profile_id: string;
+  full_name: string;
+  display_name?: string;
+  trade?: string;
+  location?: string;
+  avatar_url?: string;
+  is_verified?: boolean;
+  trust_score?: string | number;
+  username?: string;
+}
+
+interface SavedSearch {
+  id: string;
+  query: string;
+  filters?: Record<string, unknown>;
+  created_at?: string;
+}
+
 type LibraryTab = 'items' | 'collections' | 'profiles' | 'searches';
 
 export default function SavedPage() {
   const [gigs, setGigs] = useState<Gig[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
+  const [savedProfiles, setSavedProfiles] = useState<SavedProfile[]>([]);
+  const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<LibraryTab>('items');
   const router = useRouter();
@@ -62,16 +84,22 @@ export default function SavedPage() {
           return;
         }
 
-        const [savedRes, collectionsRes] = await Promise.all([
+        const [savedRes, collectionsRes, savedProfilesRes, savedSearchesRes] = await Promise.all([
           fetch(`/api/gigs/saved/${user.id}`),
           fetch('/api/profile/collections?kind=saved'),
+          fetch('/api/profile/saved/profiles'),
+          fetch('/api/profile/saved/searches'),
         ]);
 
         const savedData = await savedRes.json();
         const collectionsData = await collectionsRes.json();
+        const savedProfilesData = await savedProfilesRes.json();
+        const savedSearchesData = await savedSearchesRes.json();
 
         setGigs(Array.isArray(savedData) ? savedData : []);
         setCollections(Array.isArray(collectionsData) ? collectionsData : []);
+        setSavedProfiles(Array.isArray(savedProfilesData) ? savedProfilesData : []);
+        setSavedSearches(Array.isArray(savedSearchesData) ? savedSearchesData : []);
       } catch (err) {
         console.error('Saved fetch failed:', err);
       } finally {
@@ -85,9 +113,9 @@ export default function SavedPage() {
   const headerStats = useMemo(() => ([
     { label: 'Saved posts', value: gigs.length.toLocaleString(), icon: Play },
     { label: 'Saved collections', value: collections.length.toLocaleString(), icon: FolderSimple },
-    { label: 'Saved searches', value: 'Live', icon: MagnifyingGlass },
-    { label: 'Saved profiles', value: 'Live', icon: UserCircle },
-  ]), [collections.length, gigs.length]);
+    { label: 'Saved searches', value: savedSearches.length.toLocaleString(), icon: MagnifyingGlass },
+    { label: 'Saved profiles', value: savedProfiles.length.toLocaleString(), icon: UserCircle },
+  ]), [collections.length, gigs.length, savedProfiles.length, savedSearches.length]);
 
   return (
     <div className="h-full w-full flex flex-col overflow-hidden bg-white dark:bg-black">
@@ -229,24 +257,53 @@ export default function SavedPage() {
               </div>
             )
           ) : (
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="rounded-[16px] border border-zinc-100 bg-white p-6 dark:border-zinc-900 dark:bg-zinc-950">
-                <UserCircle size={28} weight="fill" className="text-[#0066FF]" />
-                <h3 className="mt-3 text-lg font-black text-zinc-950 dark:text-white">Saved profiles</h3>
-                <p className="mt-2 text-sm leading-6 text-zinc-500 dark:text-zinc-400">Profiles you save from discovery can be opened here once the profile save model is populated.</p>
-                <button onClick={() => router.push('/dashboard/search')} className="mt-4 rounded-xl border border-zinc-200 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-zinc-950 dark:border-zinc-800 dark:text-white">
-                  Search profiles
-                </button>
+            tab === 'profiles' ? (
+              savedProfiles.length > 0 ? (
+                <div className="grid gap-4 md:grid-cols-2">
+                  {savedProfiles.map((profile) => (
+                    <button
+                      key={profile.id}
+                      onClick={() => router.push(`/profile/${profile.profile_id}`)}
+                      className="flex items-center gap-4 rounded-[16px] border border-zinc-100 bg-white p-4 text-left dark:border-zinc-900 dark:bg-zinc-950"
+                    >
+                      <div className="h-14 w-14 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-900">
+                        {profile.avatar_url ? <SafeMediaThumb src={profile.avatar_url} alt={profile.full_name} className="h-full w-full object-cover" /> : null}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="truncate text-sm font-black text-zinc-950 dark:text-white">{profile.display_name || profile.full_name}</h3>
+                          {profile.is_verified ? <BookmarkSimple size={14} weight="fill" className="text-[#0066FF]" /> : null}
+                        </div>
+                        <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">{profile.trade || 'Profile'} - {profile.location || 'Kenya'}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-[16px] border border-dashed border-zinc-200 bg-zinc-50 p-8 text-center dark:border-zinc-800 dark:bg-zinc-950">
+                  <UserCircle size={32} weight="fill" className="mx-auto text-[#0066FF]" />
+                  <h3 className="mt-3 text-lg font-black text-zinc-950 dark:text-white">No saved profiles yet</h3>
+                  <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">Save a public profile from discovery or profile pages to populate this view.</p>
+                </div>
+              )
+            ) : savedSearches.length > 0 ? (
+              <div className="grid gap-3">
+                {savedSearches.map((search) => (
+                  <div key={search.id} className="rounded-[16px] border border-zinc-100 bg-white p-4 dark:border-zinc-900 dark:bg-zinc-950">
+                    <p className="text-sm font-black text-zinc-950 dark:text-white">{search.query}</p>
+                    <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                      {search.created_at ? new Date(search.created_at).toLocaleString() : 'Saved live'}
+                    </p>
+                  </div>
+                ))}
               </div>
-              <div className="rounded-[16px] border border-zinc-100 bg-white p-6 dark:border-zinc-900 dark:bg-zinc-950">
-                <MagnifyingGlass size={28} weight="fill" className="text-[#0066FF]" />
-                <h3 className="mt-3 text-lg font-black text-zinc-950 dark:text-white">Saved searches</h3>
-                <p className="mt-2 text-sm leading-6 text-zinc-500 dark:text-zinc-400">Search queries can be persisted here once the saved-search backend endpoint is enabled.</p>
-                <button onClick={() => router.push('/dashboard/search')} className="mt-4 rounded-xl border border-zinc-200 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-zinc-950 dark:border-zinc-800 dark:text-white">
-                  Open search
-                </button>
+            ) : (
+              <div className="rounded-[16px] border border-dashed border-zinc-200 bg-zinc-50 p-8 text-center dark:border-zinc-800 dark:bg-zinc-950">
+                <MagnifyingGlass size={32} weight="fill" className="mx-auto text-[#0066FF]" />
+                <h3 className="mt-3 text-lg font-black text-zinc-950 dark:text-white">No saved searches yet</h3>
+                <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">Searches performed in the live discovery view will be stored here.</p>
               </div>
-            </div>
+            )
           )}
         </div>
       </main>

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import {
   Camera,
   FilmReel,
+  Notebook,
   Sparkle,
   UploadSimple,
   Briefcase,
@@ -33,6 +34,7 @@ export default function CreatePage() {
             { title: 'Create reel', desc: 'Open the reel workflow with preview, draft, and publish states.', icon: FilmReel, href: '/dashboard/create/new?type=reel' },
             { title: 'Create story', desc: 'Capture or upload a story and send it straight into the live story tray.', icon: Camera, href: '/dashboard/create/new?type=story' },
             { title: 'Create gig', desc: 'Build a live work post that powers feed, saved, analytics, and pro screens.', icon: Briefcase, href: '/dashboard/create/new?type=gig' },
+            { title: 'Drafts', desc: 'Review saved drafts and continue publishing from the live backend.', icon: Notebook, href: '/dashboard/create/drafts' },
             { title: 'Proof of work', desc: 'Upload a verified work clip, document, or portfolio asset from the backend.', icon: ShieldCheck, href: '/dashboard/create/new?type=proof' },
             { title: 'Upload media', desc: 'Open the media picker, camera, gallery, and thumbnail selection states.', icon: UploadSimple, href: '/dashboard/create/new?type=media' },
           ].map((item) => (

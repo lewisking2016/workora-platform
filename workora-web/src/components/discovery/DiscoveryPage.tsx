@@ -208,6 +208,22 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
       }
       const data = await res.json();
       setProfessionals(Array.isArray(data) ? data : []);
+      if (query.trim().length >= 3) {
+        void fetch('/api/profile/saved/searches', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: query.trim(),
+            filters: {
+              trade: filters.trade,
+              location: filters.location,
+              availability: filters.availability,
+              min_trust: filters.minTrust,
+              sort,
+            },
+          }),
+        }).catch(() => undefined);
+      }
     } catch (err) {
       console.error(err);
       setError('We could not load discovery results right now.');

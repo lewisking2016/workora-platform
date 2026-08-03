@@ -49,7 +49,7 @@ export default function NewPostPage() {
   const [mediaType, setMediaType] = useState<'image' | 'video'>('image');
   const [selectedFilter, setSelectedFilter] = useState(0);
   const [caption, setCaption] = useState('');
-  const [location] = useState('');
+  const [location, setLocation] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [trade, setTrade] = useState('');
   const [fileError, setFileError] = useState('');
@@ -96,33 +96,19 @@ export default function NewPostPage() {
     
     setIsUploading(true);
     try {
-      const user = await fetchCurrentUser();
-      if (!user) throw new Error('Not logged in');
+      const { url, user, profile } = await uploadMedia();
+      if (!profile?.id) throw new Error('Profile not found');
 
-      // Upload media
-      const formData = new FormData();
-      formData.append('file', mediaFile);
-      formData.append('user_id', user.id);
-      formData.append('media_type', mediaType);
-
-      const uploadRes = await fetch('/api/upload/gig', {
-        method: 'POST',
-        body: formData,
-      });
-      
-      const uploadData = await uploadRes.json();
-      if (!uploadRes.ok) throw new Error(uploadData.error || 'Upload failed');
-
-      // Create post
       const postRes = await fetch('/api/gigs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          worker_id: profile.id,
           user_id: user.id,
           title: caption.substring(0, 50) || 'New Work',
           description: caption,
-          video_url: uploadData.url,
-          thumbnail_url: uploadData.url,
+          video_url: url,
+          thumbnail_url: url,
           category: trade || 'work'
         }),
       });
@@ -132,6 +118,64 @@ export default function NewPostPage() {
       router.push('/dashboard/create/published-success');
     } catch (err: unknown) {
       setFileError(err instanceof Error ? err.message : 'Something went wrong');
+      setIsUploading(false);
+    }
+  };
+
+  const uploadMedia = async () => {
+    const user = await fetchCurrentUser();
+    if (!user) throw new Error('Not logged in');
+    const profileRes = await fetch('/api/profile/me');
+    const profileData = await profileRes.json().catch(() => ({}));
+
+    const formData = new FormData();
+    formData.append('file', mediaFile as File);
+    formData.append('user_id', user.id);
+    formData.append('media_type', mediaType);
+
+    const uploadRes = await fetch('/api/upload/gig', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const uploadData = await uploadRes.json();
+    if (!uploadRes.ok) throw new Error(uploadData.error || 'Upload failed');
+
+    return { ...uploadData, user, profile: profileData?.profile || null };
+  };
+
+  const handleSaveDraft = async () => {
+    if (!mediaFile) return;
+
+    setIsUploading(true);
+    try {
+      const { url, user, profile } = await uploadMedia();
+      const draftRes = await fetch('/api/profile/drafts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          draft_type: mode === 'reel' ? 'reel' : mode === 'story' ? 'story' : mode === 'gig' ? 'gig' : mode === 'proof' ? 'proof' : 'post',
+          title: caption.substring(0, 60) || `Draft ${mode}`,
+          description: caption,
+          media_url: url,
+          thumbnail_url: url,
+          profile_id: profile?.id || null,
+          trade: trade || null,
+          location: location || null,
+          audience: 'public',
+          status: 'draft',
+          metadata: {
+            user_id: user.id,
+            media_type: mediaType,
+            selected_filter: FILTERS[selectedFilter]?.name || 'Normal',
+          },
+        }),
+      });
+
+      if (!draftRes.ok) throw new Error('Failed to save draft');
+      router.push('/dashboard/create/drafts');
+    } catch (err: unknown) {
+      setFileError(err instanceof Error ? err.message : 'Could not save draft');
       setIsUploading(false);
     }
   };
@@ -297,8 +341,8 @@ export default function NewPostPage() {
         {step === 'details' && (
           <div className="flex flex-col">
             {/* Small Preview */}
-            <div className="p-4 border-b border-zinc-100 dark:border-zinc-900">
-              <div className="flex gap-3">
+              <div className="p-4 border-b border-zinc-100 dark:border-zinc-900">
+                <div className="flex gap-3">
                 <div className="w-24 h-24 bg-black rounded-lg overflow-hidden shrink-0">
                   {mediaType === 'image' ? (
                     <img 
@@ -331,21 +375,26 @@ export default function NewPostPage() {
                   <Smiley size={20} />
                 </button>
                 <span className="text-xs text-zinc-400">{caption.length}/2,200</span>
+                </div>
               </div>
-            </div>
 
             {/* Options */}
             <div className="divide-y divide-zinc-100 dark:divide-zinc-900">
-              <button className="w-full px-4 py-4 flex items-center justify-between hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors">
-                <div className="flex items-center gap-3">
+              <div className="w-full px-4 py-4 flex items-center justify-between gap-3 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors">
+                <div className="flex items-center gap-3 flex-1">
                   <MapPin size={24} className="text-zinc-950 dark:text-white" />
-                  <div className="text-left">
+                  <div className="text-left flex-1">
                     <p className="text-sm font-medium text-zinc-950 dark:text-white">Add location</p>
-                    {location && <p className="text-xs text-zinc-500">{location}</p>}
+                    <input
+                      type="text"
+                      value={location}
+                      onChange={(e) => setLocation(e.target.value)}
+                      placeholder="Where was this created?"
+                      className="mt-1 w-full bg-transparent text-xs text-zinc-500 outline-none placeholder:text-zinc-400"
+                    />
                   </div>
                 </div>
-                <ArrowRight size={20} className="text-zinc-400" />
-              </button>
+              </div>
 
               <div className="px-4 py-4">
                 <div className="flex items-center gap-3">
@@ -382,6 +431,21 @@ export default function NewPostPage() {
                 <span className="text-sm text-zinc-950 dark:text-white">Turn off commenting</span>
                 <input type="checkbox" className="w-5 h-5" />
               </label>
+            </div>
+
+            <div className="sticky bottom-0 grid grid-cols-2 gap-3 border-t border-zinc-100 bg-white p-4 dark:border-zinc-900 dark:bg-black">
+              <button
+                onClick={handleSaveDraft}
+                className="h-12 rounded-xl border border-zinc-200 text-sm font-black text-zinc-950 dark:border-zinc-800 dark:text-white"
+              >
+                Save draft
+              </button>
+              <button
+                onClick={handlePost}
+                className="h-12 rounded-xl bg-[#0066FF] text-sm font-black text-white"
+              >
+                Publish now
+              </button>
             </div>
           </div>
         )}

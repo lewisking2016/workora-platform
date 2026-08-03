@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ProfileTrustSurface } from '@/components/profile/ProfileTrustSurface';
 import { ProfileStateScreen } from '@/components/system/StatusScreens';
+import { BookmarkSimple } from '@phosphor-icons/react';
 
 type ProfileState =
   | 'ready'
@@ -25,6 +26,7 @@ export default function PublicProfilePage() {
   const [bundle, setBundle] = useState<ProfileBundle | null>(null);
   const [loading, setLoading] = useState(true);
   const [fallbackState, setFallbackState] = useState<Exclude<ProfileState, 'ready'> | null>(null);
+  const [savingProfile, setSavingProfile] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -90,6 +92,20 @@ export default function PublicProfilePage() {
     return <ProfileStateScreen state="not_found" />;
   }
 
+  const saveProfile = async () => {
+    if (!bundle.profile?.id) return;
+    setSavingProfile(true);
+    try {
+      await fetch('/api/profile/saved/profiles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ profile_id: bundle.profile.id }),
+      });
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-zinc-50 px-[5%] py-6 text-zinc-950 dark:bg-black dark:text-white md:px-[8%]">
       <div className="mx-auto max-w-[1280px]">
@@ -98,9 +114,19 @@ export default function PublicProfilePage() {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">Public profile</p>
             <h1 className="mt-1 text-3xl font-black tracking-tight">Live trust details</h1>
           </div>
-          <button onClick={() => router.back()} className="rounded-xl bg-zinc-950 px-4 py-3 text-sm font-semibold text-white dark:bg-white dark:text-zinc-950">
-            Back
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={saveProfile}
+              disabled={savingProfile}
+              className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-950 dark:border-zinc-800 dark:bg-zinc-950 dark:text-white disabled:opacity-60"
+            >
+              <BookmarkSimple size={16} weight="bold" />
+              {savingProfile ? 'Saving' : 'Save profile'}
+            </button>
+            <button onClick={() => router.back()} className="rounded-xl bg-zinc-950 px-4 py-3 text-sm font-semibold text-white dark:bg-white dark:text-zinc-950">
+              Back
+            </button>
+          </div>
         </div>
 
         <ProfileTrustSurface mode="public" bundle={bundle} />

@@ -213,6 +213,40 @@ CREATE TABLE IF NOT EXISTS collection_saves (
     UNIQUE(collection_id, user_id)
 );
 
+CREATE TABLE IF NOT EXISTS post_drafts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    owner_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    draft_type TEXT NOT NULL CHECK (draft_type IN ('post', 'reel', 'story', 'gig', 'proof')),
+    title TEXT,
+    description TEXT,
+    media_url TEXT,
+    thumbnail_url TEXT,
+    trade TEXT,
+    location TEXT,
+    audience TEXT DEFAULT 'public',
+    status TEXT DEFAULT 'draft',
+    metadata JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS saved_profiles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    profile_id UUID REFERENCES worker_profiles(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, profile_id)
+);
+
+CREATE TABLE IF NOT EXISTS saved_searches (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    query TEXT NOT NULL,
+    filters JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, query)
+);
+
 CREATE TABLE IF NOT EXISTS profile_reports (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     reporter_user_id UUID REFERENCES users(id) ON DELETE CASCADE,
@@ -394,6 +428,9 @@ CREATE INDEX IF NOT EXISTS idx_gig_reports_gig ON gig_reports(gig_id);
 CREATE INDEX IF NOT EXISTS idx_collections_owner ON collections(owner_user_id);
 CREATE INDEX IF NOT EXISTS idx_collections_kind ON collections(kind);
 CREATE INDEX IF NOT EXISTS idx_collection_items_collection ON collection_items(collection_id);
+CREATE INDEX IF NOT EXISTS idx_post_drafts_owner ON post_drafts(owner_user_id);
+CREATE INDEX IF NOT EXISTS idx_saved_profiles_user ON saved_profiles(user_id);
+CREATE INDEX IF NOT EXISTS idx_saved_searches_user ON saved_searches(user_id);
 CREATE INDEX IF NOT EXISTS idx_collection_saves_user ON collection_saves(user_id);
 CREATE INDEX IF NOT EXISTS idx_profile_reports_reported ON profile_reports(reported_user_id);
 CREATE INDEX IF NOT EXISTS idx_analytics_event_name ON analytics_events(event_name);

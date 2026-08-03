@@ -731,6 +731,213 @@ async function profileRoutes(fastify) {
     await pool.query('DELETE FROM collection_saves WHERE collection_id = $1 AND user_id = $2', [collectionId, userId]);
     return { saved: false };
   });
+
+  // 23. DRAFTS
+  fastify.get('/drafts', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const userId = resolveActorId(request);
+    const res = await pool.query(
+      `SELECT *
+       FROM post_drafts
+       WHERE owner_user_id = $1
+       ORDER BY updated_at DESC, created_at DESC`,
+      [userId]
+    );
+    return res.rows;
+  });
+
+  fastify.get('/drafts/:draftId', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const { draftId } = request.params;
+    const userId = resolveActorId(request);
+    const res = await pool.query(
+      `SELECT *
+       FROM post_drafts
+       WHERE id = $1 AND owner_user_id = $2
+       LIMIT 1`,
+      [draftId, userId]
+    );
+
+    if (!res.rows[0]) return reply.status(404).send({ message: 'Draft not found' });
+    return res.rows[0];
+  });
+
+  fastify.post('/drafts', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const userId = resolveActorId(request);
+    const {
+      draft_type,
+      title,
+      description,
+      media_url,
+      thumbnail_url,
+      trade,
+      location,
+      audience,
+      status,
+      metadata,
+    } = request.body || {};
+
+    if (!draft_type) return reply.status(400).send({ message: 'draft_type is required' });
+
+    const res = await pool.query(
+      `INSERT INTO post_drafts (
+        owner_user_id,
+        draft_type,
+        title,
+        description,
+        media_url,
+        thumbnail_url,
+        trade,
+        location,
+        audience,
+        status,
+        metadata
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, COALESCE($9, 'public'), COALESCE($10, 'draft'), COALESCE($11, '{}'::jsonb))
+      RETURNING *`,
+      [
+        userId,
+        draft_type,
+        title || null,
+        description || null,
+        media_url || null,
+        thumbnail_url || null,
+        trade || null,
+        location || null,
+        audience || 'public',
+        status || 'draft',
+        metadata || {},
+      ]
+    );
+
+    return res.rows[0];
+  });
+
+  fastify.patch('/drafts/:draftId', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const { draftId } = request.params;
+    const userId = resolveActorId(request);
+    const existing = await pool.query('SELECT id FROM post_drafts WHERE id = $1 AND owner_user_id = $2', [draftId, userId]);
+    if (!existing.rows[0]) return reply.status(404).send({ message: 'Draft not found' });
+
+    const {
+      title,
+      description,
+      media_url,
+      thumbnail_url,
+      trade,
+      location,
+      audience,
+      status,
+      metadata,
+    } = request.body || {};
+
+    const res = await pool.query(
+      `UPDATE post_drafts
+       SET title = COALESCE($1, title),
+           description = COALESCE($2, description),
+           media_url = COALESCE($3, media_url),
+           thumbnail_url = COALESCE($4, thumbnail_url),
+           trade = COALESCE($5, trade),
+           location = COALESCE($6, location),
+           audience = COALESCE($7, audience),
+           status = COALESCE($8, status),
+           metadata = COALESCE($9, metadata),
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id = $10 AND owner_user_id = $11
+       RETURNING *`,
+      [title || null, description || null, media_url || null, thumbnail_url || null, trade || null, location || null, audience || null, status || null, metadata || null, draftId, userId]
+    );
+
+    return res.rows[0];
+  });
+
+  fastify.delete('/drafts/:draftId', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const { draftId } = request.params;
+    const userId = resolveActorId(request);
+    await pool.query('DELETE FROM post_drafts WHERE id = $1 AND owner_user_id = $2', [draftId, userId]);
+    return { deleted: true };
+  });
+
+  // 24. SAVED PROFILES
+  fastify.get('/saved/profiles', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const userId = resolveActorId(request);
+    const res = await pool.query(
+      `SELECT
+         sp.id,
+         sp.created_at,
+         wp.id AS profile_id,
+         wp.full_name,
+         wp.display_name,
+         wp.trade,
+         wp.location,
+         wp.avatar_url,
+         wp.is_verified,
+         wp.trust_score,
+         u.username
+       FROM saved_profiles sp
+       JOIN worker_profiles wp ON wp.id = sp.profile_id
+       LEFT JOIN users u ON u.id = wp.user_id
+       WHERE sp.user_id = $1
+       ORDER BY sp.created_at DESC`,
+      [userId]
+    );
+    return res.rows;
+  });
+
+  fastify.post('/saved/profiles', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const userId = resolveActorId(request);
+    const profileId = String(request.body?.profile_id || '').trim();
+    if (!profileId) return reply.status(400).send({ message: 'profile_id is required' });
+
+    const res = await pool.query(
+      `INSERT INTO saved_profiles (user_id, profile_id)
+       VALUES ($1, $2)
+       ON CONFLICT (user_id, profile_id) DO UPDATE SET created_at = CURRENT_TIMESTAMP
+       RETURNING *`,
+      [userId, profileId]
+    );
+    return res.rows[0];
+  });
+
+  fastify.delete('/saved/profiles/:profileId', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const userId = resolveActorId(request);
+    const { profileId } = request.params;
+    await pool.query('DELETE FROM saved_profiles WHERE user_id = $1 AND profile_id = $2', [userId, profileId]);
+    return { saved: false };
+  });
+
+  // 25. SAVED SEARCHES
+  fastify.get('/saved/searches', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const userId = resolveActorId(request);
+    const res = await pool.query(
+      `SELECT *
+       FROM saved_searches
+       WHERE user_id = $1
+       ORDER BY created_at DESC`,
+      [userId]
+    );
+    return res.rows;
+  });
+
+  fastify.post('/saved/searches', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const userId = resolveActorId(request);
+    const query = String(request.body?.query || '').trim();
+    if (!query) return reply.status(400).send({ message: 'query is required' });
+    const filters = request.body?.filters && typeof request.body.filters === 'object' ? request.body.filters : {};
+
+    const res = await pool.query(
+      `INSERT INTO saved_searches (user_id, query, filters)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (user_id, query) DO UPDATE SET filters = EXCLUDED.filters, created_at = CURRENT_TIMESTAMP
+       RETURNING *`,
+      [userId, query, filters]
+    );
+    return res.rows[0];
+  });
+
+  fastify.delete('/saved/searches/:searchId', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const userId = resolveActorId(request);
+    const { searchId } = request.params;
+    await pool.query('DELETE FROM saved_searches WHERE id = $1 AND user_id = $2', [searchId, userId]);
+    return { saved: false };
+  });
 }
 
 module.exports = profileRoutes;
