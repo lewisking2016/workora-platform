@@ -81,9 +81,24 @@ async function authRoutes(fastify) {
 
   // 2. LOGIN
   fastify.post('/login', async (request, reply) => {
-    const { phone_number, password } = request.body;
+    const identifier = String(request.body?.identifier || request.body?.phone_number || '').trim();
+    const password = request.body?.password;
 
-    const res = await pool.query('SELECT * FROM users WHERE phone_number = $1', [phone_number]);
+    if (!identifier || !password) {
+      return reply.status(400).send({ message: 'Missing login credentials' });
+    }
+
+    const res = await pool.query(
+      `
+        SELECT *
+        FROM users
+        WHERE phone_number = $1
+           OR LOWER(username) = LOWER($1)
+           OR LOWER(email) = LOWER($1)
+        LIMIT 1
+      `,
+      [identifier]
+    );
     const user = res.rows[0];
 
     if (!user || !(await bcrypt.compare(password, user.password_hash))) {

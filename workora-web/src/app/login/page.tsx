@@ -17,7 +17,7 @@ import { persistLegacySession } from '@/lib/session';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
-    phone: '',
+    identifier: '',
     password: '',
   });
 
@@ -28,7 +28,8 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogin = async () => {
-    if (!formData.phone || !formData.password) return;
+    const identifier = formData.identifier.trim();
+    if (!identifier || !formData.password) return;
     
     setLoading(true);
     setLoadingStartTime(Date.now());
@@ -38,7 +39,8 @@ export default function LoginPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          phone_number: formData.phone,
+          identifier,
+          phone_number: identifier,
           password: formData.password,
           rememberMe: rememberMe
         }),
@@ -149,9 +151,9 @@ export default function LoginPage() {
                 type="text" 
                 placeholder="Phone number, username or email"
                 className="h-12 w-full rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-4 outline-none focus:bg-white dark:focus:bg-zinc-800 focus:border-[#0066FF] transition-all font-bold text-xs text-zinc-950 dark:text-white dark:placeholder-zinc-500"
-                value={formData.phone}
+                value={formData.identifier}
                 onChange={(e) => {
-                  setFormData({ ...formData, phone: e.target.value });
+                  setFormData({ ...formData, identifier: e.target.value });
                   setAuthError(null);
                 }}
               />
@@ -194,9 +196,9 @@ export default function LoginPage() {
             </label>
 
             <motion.button 
-              disabled={!formData.phone || !formData.password || loading}
+              disabled={!formData.identifier.trim() || !formData.password || loading}
               onClick={handleLogin}
-              animate={formData.phone && formData.password ? {
+              animate={formData.identifier.trim() && formData.password ? {
                 boxShadow: [
                   "0 10px 20px -5px rgba(0, 102, 255, 0.3)",
                   "0 10px 40px 0px rgba(0, 102, 255, 0.6)",

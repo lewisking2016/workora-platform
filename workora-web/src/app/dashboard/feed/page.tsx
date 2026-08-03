@@ -88,6 +88,9 @@ const timeAgo = (d: string) => {
   return `${Math.floor(hrs / 24)}d ago`;
 };
 
+const BRAND_RING_GRADIENT = 'bg-gradient-to-tr from-[#0057FF] via-[#4F46E5] to-[#8B5CF6]';
+const BRAND_ACTIVE_TEXT = 'text-[#4F46E5]';
+
 export default function PersonalDashboard() {
   const FEED_PAGE_SIZE = 20;
   const [posts, setPosts] = useState<Post[]>([]);
@@ -390,7 +393,7 @@ export default function PersonalDashboard() {
               <div className="flex gap-4 overflow-x-auto px-4 no-scrollbar">
                 {stories.map((story, i) => (
                   <button key={i} className="flex flex-col items-center gap-1.5 min-w-[72px] flex-shrink-0 group/story">
-                    <div className="h-16 w-16 rounded-full flex items-center justify-center bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] p-[2.5px] transform group-hover/story:scale-105 transition-transform">
+                    <div className={`h-16 w-16 rounded-full flex items-center justify-center ${BRAND_RING_GRADIENT} p-[2.5px] transform group-hover/story:scale-105 transition-transform`}>
                       <div className="h-full w-full rounded-full bg-white dark:bg-black flex items-center justify-center p-[3px]">
                         <div className={`h-full w-full rounded-full flex items-center justify-center ${story.color} shadow-inner`}>
                           <span className="text-base font-black">{story.initial}</span>
@@ -429,7 +432,7 @@ export default function PersonalDashboard() {
                   <div className="flex items-center justify-between px-3 py-2">
                     <div className="flex items-center gap-3">
                       <div 
-                        className="h-8 w-8 rounded-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] p-[2px] cursor-pointer" 
+                        className={`h-8 w-8 rounded-full ${BRAND_RING_GRADIENT} p-[2px] cursor-pointer`} 
                         onClick={() => startConversation(post.user_id || post.worker_id)}
                       >
                         <div className="h-full w-full rounded-full bg-white dark:bg-black flex items-center justify-center">
@@ -462,6 +465,7 @@ export default function PersonalDashboard() {
                       src={post.video_url} 
                       poster={post.thumbnail_url || APP_CONFIG.defaults.thumbnail} 
                       className="w-full h-full object-cover" 
+                      autoPlay
                     />
                   </div>
 
@@ -472,7 +476,7 @@ export default function PersonalDashboard() {
                         <Heart 
                           size={26} 
                           weight={post.liked_by_me ? "fill" : "regular"} 
-                          className={`${post.liked_by_me ? "text-red-500" : "text-zinc-950 dark:text-white"} cursor-pointer active:scale-90 transition-transform`} 
+                          className={`${post.liked_by_me ? BRAND_ACTIVE_TEXT : "text-zinc-950 dark:text-white"} cursor-pointer active:scale-90 transition-transform`} 
                           onClick={() => handleLike(post.id)} 
                         />
                         <ChatCircleDots 
@@ -497,7 +501,7 @@ export default function PersonalDashboard() {
                     </div>
                     
                     {/* Likes Count */}
-                    <div className="text-[13px] font-semibold text-zinc-950 dark:text-white">
+                    <div className={`text-[13px] font-semibold ${post.liked_by_me ? BRAND_ACTIVE_TEXT : 'text-zinc-950 dark:text-white'}`}>
                       {(post.likes_count ?? post.real_likes ?? 0).toLocaleString()} likes
                     </div>
                     
