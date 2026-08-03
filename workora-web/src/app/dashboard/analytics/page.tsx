@@ -76,25 +76,24 @@ const MetricCard = ({ icon: Icon, label, value, growth, color, subtitle }: Metri
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    className="group relative overflow-hidden rounded-[22px] border border-white/8 bg-white/5 p-5 lg:p-6 backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-white/12 hover:bg-white/7"
+    className="group rounded-[24px] border border-zinc-100 bg-white p-6 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900"
   >
-    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
     <div className="flex items-start justify-between gap-4">
       <div className="flex items-center gap-4">
-        <div className={`flex h-12 w-12 items-center justify-center rounded-[16px] bg-gradient-to-br ${color} shadow-[0_18px_28px_-18px_rgba(15,23,42,0.6)]`}>
+        <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${color} shadow-sm`}>
           <Icon size={20} weight="regular" className="text-white" />
         </div>
         <div className="flex flex-col">
-          <p className="text-[10px] font-black uppercase tracking-[0.28em] text-white/45">{label}</p>
-          <p className="mt-1 text-3xl font-black tracking-tighter text-white lg:text-[2.15rem]">{value}</p>
-          {subtitle && <p className="mt-2 text-xs font-medium text-white/50">{subtitle}</p>}
+          <p className="text-[10px] font-black uppercase tracking-[0.28em] text-zinc-400 dark:text-zinc-500">{label}</p>
+          <p className="mt-1 text-3xl font-black tracking-tighter text-zinc-950 lg:text-[2.15rem] dark:text-white">{value}</p>
+          {subtitle && <p className="mt-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">{subtitle}</p>}
         </div>
       </div>
       <div
         className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-black ${
           growth >= 0
-            ? 'border-emerald-400/20 bg-emerald-400/10 text-emerald-300'
-            : 'border-rose-400/20 bg-rose-400/10 text-rose-300'
+            ? 'border-emerald-200 bg-emerald-50 text-emerald-600 dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-300'
+            : 'border-rose-200 bg-rose-50 text-rose-600 dark:border-rose-400/20 dark:bg-rose-400/10 dark:text-rose-300'
         }`}
       >
         {growth >= 0 ? <ArrowUp size={14} weight="bold" /> : <ArrowDown size={14} weight="bold" />}
@@ -172,7 +171,7 @@ export default function AnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-[#060913]">
+      <div className="flex h-screen w-full items-center justify-center bg-zinc-50 dark:bg-[#0A0E17]">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
@@ -185,30 +184,28 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="relative h-full overflow-y-auto bg-[#060913] text-white">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,102,255,0.16),transparent_30%),radial-gradient(circle_at_top_right,rgba(112,0,255,0.18),transparent_28%),linear-gradient(180deg,#060913_0%,#090d17_40%,#070a12_100%)]" />
-
-      <div className="relative mx-auto flex max-w-7xl flex-col gap-8 px-[5%] py-8 pb-32 lg:px-8">
-        <div className="flex flex-col gap-6 rounded-[28px] border border-white/8 bg-white/5 p-6 backdrop-blur-xl lg:flex-row lg:items-end lg:justify-between lg:p-8">
+    <div className="h-full overflow-y-auto bg-zinc-50 dark:bg-[#0A0E17]">
+      <div className="mx-auto flex max-w-7xl flex-col gap-8 px-[5%] py-8 pb-32 lg:px-8">
+        <div className="flex flex-col gap-6 rounded-[28px] border border-zinc-100 bg-white p-6 lg:flex-row lg:items-end lg:justify-between lg:p-8 dark:border-zinc-800 dark:bg-zinc-900">
           <div className="flex max-w-2xl flex-col gap-3">
-            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/6 px-3 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-white/60">
+            <div className="inline-flex w-fit items-center gap-2 rounded-full bg-zinc-100 px-3 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
               Performance Dashboard
             </div>
-            <h1 className="text-3xl font-black tracking-tighter text-white lg:text-4xl">Business Analytics</h1>
-            <p className="max-w-xl text-sm font-medium leading-6 text-white/55">
+            <h1 className="text-3xl font-black tracking-tighter text-zinc-950 lg:text-4xl dark:text-white">Business Analytics</h1>
+            <p className="max-w-xl text-sm font-medium leading-6 text-zinc-500 dark:text-zinc-400">
               A cleaner view of your reach, engagement, job flow, and earnings across the last 30 days.
             </p>
           </div>
 
-          <div className="flex items-center gap-2 rounded-full border border-white/8 bg-black/20 p-1.5 shadow-[0_16px_40px_-24px_rgba(0,0,0,0.75)] backdrop-blur-xl">
+          <div className="flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-100 p-1.5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
             {(['7d', '30d', '90d'] as const).map((range) => (
               <button
                 key={range}
                 onClick={() => setTimeRange(range)}
                 className={`rounded-full px-6 py-2.5 text-xs font-black uppercase tracking-[0.22em] transition-all ${
                   timeRange === range
-                    ? 'bg-white text-zinc-950 shadow-md'
-                    : 'text-white/45 hover:text-white'
+                    ? 'bg-white text-zinc-950 shadow-md dark:bg-zinc-900 dark:text-white'
+                    : 'text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white'
                 }`}
               >
                 {range}
@@ -253,25 +250,25 @@ export default function AnalyticsPage() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 rounded-[24px] border border-white/8 bg-white/5 p-8 backdrop-blur-xl">
+          <div className="lg:col-span-2 rounded-[24px] border border-zinc-100 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-black tracking-tight text-white">Performance Overview</h3>
-                <p className="mt-1 text-xs font-medium text-white/45">Weekly trends and patterns</p>
+                <h3 className="text-xl font-black tracking-tight text-zinc-950 dark:text-white">Performance Overview</h3>
+                <p className="mt-1 text-xs font-medium text-zinc-500 dark:text-zinc-400">Weekly trends and patterns</p>
               </div>
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-[#0066FF]" />
-                  <span className="text-xs font-bold text-white/55">Views</span>
+                  <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400">Views</span>
                 </div>
                 <div className="ml-4 flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-[#7000FF]" />
-                  <span className="text-xs font-bold text-white/55">Engagement</span>
+                  <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400">Engagement</span>
                 </div>
               </div>
             </div>
 
-            <div className="mt-6 flex h-64 items-end gap-3 border-b border-l border-white/8 pb-4 pl-4">
+            <div className="mt-6 flex h-64 items-end gap-3 border-b border-l border-zinc-100 pb-4 pl-4 dark:border-zinc-800">
               {chartData.map((d, i) => (
                 <div key={i} className="group flex flex-1 flex-col items-center gap-2">
                   <div className="flex h-full w-full items-end gap-1">
@@ -288,17 +285,13 @@ export default function AnalyticsPage() {
                       />
                     </div>
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-white/35">{d.day}</span>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 dark:text-zinc-500">{d.day}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-[24px] border border-white/8 bg-[linear-gradient(180deg,rgba(9,12,22,0.96),rgba(10,14,25,0.9))] p-8 text-white">
-            <div className="absolute -top-10 -right-10 opacity-5">
-              <ShieldCheck size={200} weight="fill" />
-            </div>
-
+          <div className="rounded-[24px] border border-zinc-100 bg-white p-8 text-zinc-950 dark:border-zinc-800 dark:bg-zinc-900 dark:text-white">
             <div className="relative z-10 flex flex-col gap-2">
               <div className="flex items-center gap-2 text-[#0066FF]">
                 <ShieldCheck size={20} weight="fill" />
@@ -308,27 +301,27 @@ export default function AnalyticsPage() {
             </div>
 
             <div className="relative z-10 mt-6 flex items-end gap-3">
-              <span className="bg-gradient-to-br from-white to-white/60 bg-clip-text text-7xl font-black leading-none tracking-tighter text-transparent">
+              <span className="bg-gradient-to-br from-zinc-950 to-zinc-600 bg-clip-text text-7xl font-black leading-none tracking-tighter text-transparent dark:from-white dark:to-white/60">
                 {Math.round(stats?.trustScore || 0)}
               </span>
               <div className="flex flex-col gap-1 pb-2">
-                <span className="flex items-center gap-1 text-xs font-black uppercase tracking-widest text-emerald-300">
+                <span className="flex items-center gap-1 text-xs font-black uppercase tracking-widest text-emerald-500 dark:text-emerald-300">
                   <TrendUp size={14} weight="bold" /> Top 1%
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-white/30">Scale 0-100</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-white/30">Scale 0-100</span>
               </div>
             </div>
 
-            <div className="relative z-10 my-6 h-px w-full bg-white/10" />
+            <div className="relative z-10 my-6 h-px w-full bg-zinc-100 dark:bg-white/10" />
 
             <div className="relative z-10 flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-white/60">Completion Rate</span>
-                <span className="text-sm font-black text-white">{stats?.completionRate}%</span>
+                <span className="text-xs font-bold text-zinc-500 dark:text-white/60">Completion Rate</span>
+                <span className="text-sm font-black text-zinc-950 dark:text-white">{stats?.completionRate}%</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-white/60">Response Time</span>
-                <span className="text-sm font-black text-white">{stats?.avgResponseTime}</span>
+                <span className="text-xs font-bold text-zinc-500 dark:text-white/60">Response Time</span>
+                <span className="text-sm font-black text-zinc-950 dark:text-white">{stats?.avgResponseTime}</span>
               </div>
             </div>
           </div>
@@ -346,23 +339,23 @@ export default function AnalyticsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="flex items-center gap-4 rounded-[22px] border border-white/8 bg-white/5 p-6 backdrop-blur-xl transition-all hover:border-white/12 hover:bg-white/7"
+              className="flex items-center gap-4 rounded-[24px] border border-zinc-100 bg-white p-6 transition-all hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900"
             >
-              <div className={`flex h-12 w-12 items-center justify-center rounded-[16px] ${item.bg} ${item.color}`}>
+              <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${item.bg} ${item.color}`}>
                 <item.icon size={24} weight="fill" />
               </div>
               <div className="flex flex-col">
-                <span className="text-[10px] font-black uppercase tracking-[0.22em] text-white/45">{item.label}</span>
-                <span className="text-2xl font-black text-white">{item.value.toLocaleString()}</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-400 dark:text-zinc-500">{item.label}</span>
+                <span className="text-2xl font-black text-zinc-950 dark:text-white">{item.value.toLocaleString()}</span>
               </div>
             </motion.div>
           ))}
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <div className="rounded-[24px] border border-white/8 bg-white/5 p-8 backdrop-blur-xl">
+          <div className="rounded-[24px] border border-zinc-100 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
             <div className="flex items-center justify-between">
-              <h3 className="text-xl font-black tracking-tight text-white">Top Content</h3>
+              <h3 className="text-xl font-black tracking-tight text-zinc-950 dark:text-white">Top Content</h3>
               <VideoCamera size={24} weight="duotone" className="text-[#0066FF]" />
             </div>
 
@@ -372,17 +365,17 @@ export default function AnalyticsPage() {
                 { title: 'Solar Panel Installation', views: '3.8K', engagement: '743', trend: 12 },
                 { title: 'Electrical Fault Repair', views: '2.1K', engagement: '421', trend: -5 },
               ].map((content, i) => (
-                <div key={i} className="flex items-center justify-between rounded-[18px] bg-black/20 p-4 transition-all hover:bg-white/7">
+                <div key={i} className="flex items-center justify-between rounded-[18px] bg-zinc-50 p-4 transition-all hover:bg-zinc-100 dark:bg-zinc-950 dark:hover:bg-zinc-800">
                   <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-[14px] bg-white/8 text-sm font-black text-white/45">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-100 text-sm font-black text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
                       #{i + 1}
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-black text-white">{content.title}</span>
-                      <span className="text-xs font-medium text-white/45">{content.views} views / {content.engagement} engagements</span>
+                      <span className="text-sm font-black text-zinc-950 dark:text-white">{content.title}</span>
+                      <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{content.views} views / {content.engagement} engagements</span>
                     </div>
                   </div>
-                  <div className={`flex items-center gap-1 text-xs font-black ${content.trend >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>
+                  <div className={`flex items-center gap-1 text-xs font-black ${content.trend >= 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
                     {content.trend >= 0 ? <TrendUp size={14} weight="bold" /> : <TrendDown size={14} weight="bold" />}
                     {Math.abs(content.trend)}%
                   </div>
@@ -391,9 +384,9 @@ export default function AnalyticsPage() {
             </div>
           </div>
 
-          <div className="rounded-[24px] border border-white/8 bg-white/5 p-8 backdrop-blur-xl">
+          <div className="rounded-[24px] border border-zinc-100 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
             <div className="flex items-center justify-between">
-              <h3 className="text-xl font-black tracking-tight text-white">Business Insights</h3>
+              <h3 className="text-xl font-black tracking-tight text-zinc-950 dark:text-white">Business Insights</h3>
               <ChartLine size={24} weight="duotone" className="text-[#7000FF]" />
             </div>
 
@@ -404,16 +397,16 @@ export default function AnalyticsPage() {
                 { icon: CalendarBlank, label: 'Member Since', value: 'Jan 2024', detail: '8 months active' },
                 { icon: Users, label: 'Repeat Clients', value: '24%', detail: 'Above average retention' },
               ].map((stat, i) => (
-                <div key={i} className="flex items-start gap-4 rounded-[18px] p-4 transition-all hover:bg-white/7">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-white/8 text-white/65">
+                <div key={i} className="flex items-start gap-4 rounded-[18px] p-4 transition-all hover:bg-zinc-50 dark:hover:bg-zinc-950">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
                     <stat.icon size={20} weight="duotone" />
                   </div>
                   <div className="flex-1 flex flex-col gap-1">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-black uppercase tracking-[0.22em] text-white/45">{stat.label}</span>
-                      <span className="text-sm font-black text-white">{stat.value}</span>
+                      <span className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-400 dark:text-zinc-500">{stat.label}</span>
+                      <span className="text-sm font-black text-zinc-950 dark:text-white">{stat.value}</span>
                     </div>
-                    <span className="text-xs font-medium text-white/45">{stat.detail}</span>
+                    <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{stat.detail}</span>
                   </div>
                 </div>
               ))}
