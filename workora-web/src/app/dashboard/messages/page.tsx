@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { PaperPlaneTilt, MagnifyingGlass, Check, Checks, ArrowLeft } from '@phosphor-icons/react';
+import { PaperPlaneTilt, MagnifyingGlass, Check, Checks, ArrowLeft, PushPin, CalendarBlank, BellSlash } from '@phosphor-icons/react';
 import { useSearchParams } from 'next/navigation';
 import { fetchCurrentUser } from '@/lib/session';
 
@@ -13,6 +13,9 @@ interface Conversation {
   last_message_text: string;
   last_message_at: string;
   unread_count: number;
+  is_pinned?: boolean;
+  is_archived?: boolean;
+  is_muted?: boolean;
 }
 
 interface Message {
@@ -108,6 +111,22 @@ export default function MessagesPage() {
     } catch (e) { console.error(e); }
   };
 
+  const updateConversationState = async (patch: Record<string, boolean>) => {
+    if (!activeConv) return;
+    try {
+      const res = await fetch(`/api/messages/conversations/${activeConv.id}/state`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patch),
+      });
+      const data = await res.json();
+      setConversations(prev => prev.map(conv => conv.id === activeConv.id ? { ...conv, ...data } : conv));
+      setActiveConv(prev => prev ? { ...prev, ...data } : prev);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const timeAgo = (d: string) => {
     const diff = Date.now() - new Date(d).getTime();
     const mins = Math.floor(diff / 60000);
@@ -175,6 +194,29 @@ export default function MessagesPage() {
               <div>
                 <p className="text-sm font-black text-zinc-950 dark:text-white">{activeConv.other_username}</p>
                 <p className="text-[10px] text-zinc-400 font-bold">Workora Member</p>
+              </div>
+              <div className="ml-auto flex items-center gap-2">
+                <button
+                  onClick={() => updateConversationState({ is_pinned: !activeConv.is_pinned })}
+                  className={`h-9 rounded-xl px-3 text-xs font-black ${activeConv.is_pinned ? 'bg-[#EEF2FF] text-[#4F46E5]' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300'}`}
+                >
+                  <PushPin size={14} weight="bold" className="inline mr-1" />
+                  {activeConv.is_pinned ? 'Pinned' : 'Pin'}
+                </button>
+                <button
+                  onClick={() => updateConversationState({ is_archived: !activeConv.is_archived })}
+                  className={`h-9 rounded-xl px-3 text-xs font-black ${activeConv.is_archived ? 'bg-[#EEF2FF] text-[#4F46E5]' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300'}`}
+                >
+                  <CalendarBlank size={14} weight="bold" className="inline mr-1" />
+                  {activeConv.is_archived ? 'Archived' : 'Archive'}
+                </button>
+                <button
+                  onClick={() => updateConversationState({ is_muted: !activeConv.is_muted })}
+                  className={`h-9 rounded-xl px-3 text-xs font-black ${activeConv.is_muted ? 'bg-[#EEF2FF] text-[#4F46E5]' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300'}`}
+                >
+                  <BellSlash size={14} weight="bold" className="inline mr-1" />
+                  {activeConv.is_muted ? 'Muted' : 'Mute'}
+                </button>
               </div>
             </div>
 

@@ -8,7 +8,8 @@ import {
   UserCirclePlus, 
   Star,
   SealCheck,
-  Bell
+  Bell,
+  Gear
 } from '@phosphor-icons/react';
 import { fetchCurrentUser } from '@/lib/session';
 import { useRouter } from 'next/navigation';
@@ -23,6 +24,7 @@ interface Notification {
   gig_id?: string;
   text: string;
   created_at: string;
+  is_read?: boolean;
 }
 
 export default function NotificationsPage() {
@@ -43,6 +45,11 @@ export default function NotificationsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const openNotification = async (notif: Notification) => {
+    await fetch(`/api/notifications/${notif.id}/read`, { method: 'PATCH' });
+    router.push(`/dashboard/notifications/${notif.id}`);
   };
 
   useEffect(() => {
@@ -85,7 +92,16 @@ export default function NotificationsPage() {
       
       {/* Instagram-style Top Header */}
       <div className="sticky top-0 z-50 bg-white dark:bg-black border-b border-zinc-100 dark:border-zinc-900 px-4 py-3">
-        <h1 className="text-2xl font-bold text-zinc-950 dark:text-white">Notifications</h1>
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-2xl font-bold text-zinc-950 dark:text-white">Notifications</h1>
+          <button
+            onClick={() => router.push('/dashboard/notifications/settings')}
+            className="inline-flex h-10 items-center gap-2 rounded-xl bg-zinc-100 px-3 text-xs font-black text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
+          >
+            <Gear size={14} weight="bold" />
+            Settings
+          </button>
+        </div>
       </div>
 
       <main className="flex-1 overflow-y-auto bg-white dark:bg-black">
@@ -112,7 +128,7 @@ export default function NotificationsPage() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.03 }}
                   className="px-4 py-3 flex items-center gap-3 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors"
-                  onClick={() => router.push('/dashboard/feed')}
+                  onClick={() => openNotification(notif)}
                 >
                   <div className="relative shrink-0">
                     <div className="h-11 w-11 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-xs font-bold text-zinc-950 dark:text-white uppercase">
@@ -138,6 +154,9 @@ export default function NotificationsPage() {
                     <button className="h-8 px-4 bg-[#0066FF] text-white rounded-lg text-xs font-semibold shrink-0">
                       Follow
                     </button>
+                  )}
+                  {!notif.is_read && (
+                    <div className="h-2 w-2 rounded-full bg-[#0066FF] shrink-0" />
                   )}
                 </motion.div>
               ))}

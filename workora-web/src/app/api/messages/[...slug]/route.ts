@@ -17,3 +17,15 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ sl
   const path = `/messages/${resolvedParams.slug.join('/')}`;
   return proxyRequest(path, request);
 }
+
+export async function PUT(request: Request, { params }: { params: Promise<{ slug: string[] }> }) {
+  const resolvedParams = await params;
+  const path = `/messages/${resolvedParams.slug.join('/')}`;
+  return proxyRequest(path, request);
+}
+
+export async function DELETE(request: Request, { params }: { params: Promise<{ slug: string[] }> }) {
+  const resolvedParams = await params;
+  const path = `/messages/${resolvedParams.slug.join('/')}`;
+  return proxyRequest(path, request);
+}

@@ -264,10 +264,22 @@ DO $$ BEGIN
     ALTER TABLE worker_profiles ADD COLUMN IF NOT EXISTS pricing_from DECIMAL(10, 2) DEFAULT 0.0;
     ALTER TABLE worker_profiles ADD COLUMN IF NOT EXISTS identity_status TEXT DEFAULT 'unverified';
     ALTER TABLE worker_profiles ADD COLUMN IF NOT EXISTS identity_document_url TEXT;
+    ALTER TABLE messages ADD COLUMN IF NOT EXISTS delivery_status TEXT DEFAULT 'sent';
+    ALTER TABLE messages ADD COLUMN IF NOT EXISTS edited_at TIMESTAMP WITH TIME ZONE;
+    ALTER TABLE messages ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE;
     ALTER TABLE auth_login_attempts ADD COLUMN IF NOT EXISTS failed_count INTEGER DEFAULT 0;
     ALTER TABLE auth_login_attempts ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP WITH TIME ZONE;
     ALTER TABLE auth_login_attempts ADD COLUMN IF NOT EXISTS last_failed_at TIMESTAMP WITH TIME ZONE;
     ALTER TABLE auth_login_attempts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
+    ALTER TABLE notification_preferences ADD COLUMN IF NOT EXISTS likes_enabled BOOLEAN DEFAULT TRUE;
+    ALTER TABLE notification_preferences ADD COLUMN IF NOT EXISTS comments_enabled BOOLEAN DEFAULT TRUE;
+    ALTER TABLE notification_preferences ADD COLUMN IF NOT EXISTS follows_enabled BOOLEAN DEFAULT TRUE;
+    ALTER TABLE notification_preferences ADD COLUMN IF NOT EXISTS mentions_enabled BOOLEAN DEFAULT TRUE;
+    ALTER TABLE notification_preferences ADD COLUMN IF NOT EXISTS messages_enabled BOOLEAN DEFAULT TRUE;
+    ALTER TABLE notification_preferences ADD COLUMN IF NOT EXISTS trust_updates_enabled BOOLEAN DEFAULT TRUE;
+    ALTER TABLE notification_preferences ADD COLUMN IF NOT EXISTS system_enabled BOOLEAN DEFAULT TRUE;
+    ALTER TABLE notification_preferences ADD COLUMN IF NOT EXISTS push_enabled BOOLEAN DEFAULT TRUE;
+    ALTER TABLE notification_preferences ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
 EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 
@@ -282,6 +294,17 @@ CREATE TABLE IF NOT EXISTS conversations (
     UNIQUE(participant_1, participant_2)
 );
 
+CREATE TABLE IF NOT EXISTS conversation_states (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    conversation_id UUID REFERENCES conversations(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    is_pinned BOOLEAN DEFAULT FALSE,
+    is_archived BOOLEAN DEFAULT FALSE,
+    is_muted BOOLEAN DEFAULT FALSE,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(conversation_id, user_id)
+);
+
 -- 13. Messages
 CREATE TABLE IF NOT EXISTS messages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -289,7 +312,41 @@ CREATE TABLE IF NOT EXISTS messages (
     sender_id UUID REFERENCES users(id) ON DELETE CASCADE,
     text TEXT NOT NULL,
     is_read BOOLEAN DEFAULT FALSE,
+    delivery_status TEXT DEFAULT 'sent',
+    edited_at TIMESTAMP WITH TIME ZONE,
+    deleted_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS message_attachments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    message_id UUID REFERENCES messages(id) ON DELETE CASCADE,
+    file_url TEXT NOT NULL,
+    file_type TEXT,
+    file_name TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS notification_reads (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    notification_type TEXT NOT NULL,
+    source_id TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, notification_type, source_id)
+);
+
+CREATE TABLE IF NOT EXISTS notification_preferences (
+    user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    likes_enabled BOOLEAN DEFAULT TRUE,
+    comments_enabled BOOLEAN DEFAULT TRUE,
+    follows_enabled BOOLEAN DEFAULT TRUE,
+    mentions_enabled BOOLEAN DEFAULT TRUE,
+    messages_enabled BOOLEAN DEFAULT TRUE,
+    trust_updates_enabled BOOLEAN DEFAULT TRUE,
+    system_enabled BOOLEAN DEFAULT TRUE,
+    push_enabled BOOLEAN DEFAULT TRUE,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 14. Analytics Events
