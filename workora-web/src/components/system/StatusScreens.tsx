@@ -8,16 +8,23 @@ import {
   CalendarBlank,
   ChartBar,
   CheckCircle,
+  ChatCircleDots,
   Compass,
   Eye,
   House,
   MagnifyingGlass,
+  Microphone,
+  Paperclip,
+  PaperPlaneTilt,
+  PushPin,
   LockKey,
   SealQuestion,
   ShieldWarning,
   SpinnerGap,
+  Heart,
   UserCircle,
   UserMinus,
+  Users,
   WarningCircle,
   WifiSlash,
 } from '@phosphor-icons/react';
@@ -936,5 +943,393 @@ export function InlineLoadingState() {
       <SpinnerGap size={16} weight="bold" className="animate-spin text-[#0066FF]" />
       Loading live data
     </div>
+  );
+}
+
+type MessageStateCode =
+  | 'loading'
+  | 'conversations'
+  | 'conversation_detail'
+  | 'new_conversation'
+  | 'new_message'
+  | 'reply_composer'
+  | 'message_edit'
+  | 'message_delete'
+  | 'message_read'
+  | 'message_unread'
+  | 'message_delivered'
+  | 'message_failed'
+  | 'message_retry'
+  | 'attachments'
+  | 'voice_note'
+  | 'media_preview'
+  | 'search'
+  | 'pinned'
+  | 'archived'
+  | 'muted'
+  | 'blocked'
+  | 'no_conversation';
+
+const MESSAGE_COPY: Record<MessageStateCode, { title: string; body: string; icon: ElementType; primary: { label: string; href: string }; secondary?: { label: string; href: string } }> = {
+  loading: {
+    title: 'Message loading state',
+    body: 'The conversation list is loading from the live backend.',
+    icon: SpinnerGap,
+    primary: { label: 'Open messages', href: '/dashboard/messages' },
+  },
+  conversations: {
+    title: 'Conversations list',
+    body: 'Open live conversations, recent threads, and unread states from the backend.',
+    icon: ChatCircleDots,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  conversation_detail: {
+    title: 'Conversation detail',
+    body: 'Open a live message thread to read and reply in context.',
+    icon: ChatCircleDots,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  new_conversation: {
+    title: 'New conversation screen',
+    body: 'Start a new live conversation from your network or search results.',
+    icon: Users,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+    secondary: { label: 'Open search', href: '/dashboard/search' },
+  },
+  new_message: {
+    title: 'New message composer',
+    body: 'Compose a live direct message and send it to the selected person.',
+    icon: PaperPlaneTilt,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  reply_composer: {
+    title: 'Message reply composer',
+    body: 'Reply directly inside a live thread with the current conversation state.',
+    icon: ChatCircleDots,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  message_edit: {
+    title: 'Message edit screen',
+    body: 'Edit an earlier message while keeping the live thread in sync.',
+    icon: ArrowClockwise,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  message_delete: {
+    title: 'Message delete confirmation',
+    body: 'Confirm deletion of a message in a live conversation.',
+    icon: WarningCircle,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  message_read: {
+    title: 'Message read receipt state',
+    body: 'The backend has marked this message as read.',
+    icon: CheckCircle,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  message_unread: {
+    title: 'Message unread state',
+    body: 'This message still needs attention in the live thread.',
+    icon: Bell,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  message_delivered: {
+    title: 'Message delivered state',
+    body: 'The message reached the live conversation successfully.',
+    icon: CheckCircle,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  message_failed: {
+    title: 'Message failed state',
+    body: 'The message could not be delivered and should be retried.',
+    icon: WarningCircle,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  message_retry: {
+    title: 'Message retry state',
+    body: 'Retry a failed live message send.',
+    icon: ArrowClockwise,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  attachments: {
+    title: 'Message attachments screen',
+    body: 'Attach live media, files, or documents before sending a message.',
+    icon: Paperclip,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  voice_note: {
+    title: 'Voice note screen',
+    body: 'Record a voice note for the current conversation.',
+    icon: Microphone,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  media_preview: {
+    title: 'Media message preview',
+    body: 'Preview the media before it is sent in the live thread.',
+    icon: Eye,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  search: {
+    title: 'Message search screen',
+    body: 'Search across live conversations and messages.',
+    icon: MagnifyingGlass,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  pinned: {
+    title: 'Pinned conversation state',
+    body: 'This conversation is pinned for quick access.',
+    icon: PushPin,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  archived: {
+    title: 'Archived conversation state',
+    body: 'This conversation has been archived from the primary inbox.',
+    icon: CalendarBlank,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  muted: {
+    title: 'Muted conversation state',
+    body: 'Notifications for this conversation are muted in the live system.',
+    icon: Bell,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  blocked: {
+    title: 'Blocked conversation state',
+    body: 'This conversation is blocked or restricted by live safety settings.',
+    icon: LockKey,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  no_conversation: {
+    title: 'No conversation state',
+    body: 'You do not have any conversations yet, so the inbox is empty.',
+    icon: ChatCircleDots,
+    primary: { label: 'Open search', href: '/dashboard/search' },
+    secondary: { label: 'Create post', href: '/dashboard/create/new' },
+  },
+};
+
+export function MessageStateScreen({
+  state,
+  title,
+  description,
+  primaryHref,
+  primaryLabel,
+  secondaryHref,
+  secondaryLabel,
+  status,
+}: {
+  state: MessageStateCode;
+  title?: string;
+  description?: string;
+  primaryHref?: string;
+  primaryLabel?: string;
+  secondaryHref?: string;
+  secondaryLabel?: string;
+  status?: SystemStatus | null;
+}) {
+  const copy = MESSAGE_COPY[state];
+  const Icon = copy.icon;
+
+  return (
+    <main className="min-h-[80vh] bg-zinc-50 px-6 py-14 dark:bg-[#0A0E17]">
+      <div className="mx-auto flex max-w-3xl flex-col gap-6 rounded-[20px] border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0066FF]/10 text-[#0066FF]">
+              <Icon size={24} weight="fill" />
+            </div>
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-[0.24em] text-zinc-400">Messaging state</p>
+              <h1 className="text-2xl font-black tracking-tight text-zinc-950 dark:text-white">{title || copy.title}</h1>
+            </div>
+          </div>
+          <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-black ${status?.healthy ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-300' : 'border-zinc-200 bg-zinc-50 text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400'}`}>
+            {status?.healthy ? <CheckCircle size={14} weight="fill" /> : <WifiSlash size={14} weight="fill" />}
+            {status?.service || 'workora-backend'}
+          </div>
+        </div>
+
+        <p className="max-w-2xl text-sm leading-7 text-zinc-600 dark:text-zinc-400">
+          {description || copy.body}
+        </p>
+
+        <div className="flex flex-wrap gap-3">
+          <Link href={primaryHref || copy.primary.href} className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#0066FF] px-5 text-sm font-black text-white">
+            {primaryLabel || copy.primary.label}
+          </Link>
+          <Link href={secondaryHref || copy.secondary?.href || '/dashboard/messages'} className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-zinc-200 px-5 text-sm font-black text-zinc-950 dark:border-zinc-800 dark:text-white">
+            {secondaryLabel || copy.secondary?.label || 'Back'}
+          </Link>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+type NotificationStateCode =
+  | 'inbox'
+  | 'detail'
+  | 'settings'
+  | 'push_permission'
+  | 'empty'
+  | 'read'
+  | 'unread'
+  | 'filtered'
+  | 'like'
+  | 'comment'
+  | 'follow'
+  | 'mention'
+  | 'message'
+  | 'trust_update'
+  | 'system';
+
+const NOTIFICATION_COPY: Record<NotificationStateCode, { title: string; body: string; icon: ElementType; primary: { label: string; href: string }; secondary?: { label: string; href: string } }> = {
+  inbox: {
+    title: 'Notification inbox',
+    body: 'Live likes, comments, follows, ratings, and system updates appear here.',
+    icon: Bell,
+    primary: { label: 'Open notifications', href: '/notifications' },
+  },
+  detail: {
+    title: 'Notification detail',
+    body: 'Open a live notification to see the actor, type, and related content.',
+    icon: Bell,
+    primary: { label: 'Open inbox', href: '/notifications' },
+  },
+  settings: {
+    title: 'Notification settings',
+    body: 'Control how live notifications are delivered and grouped.',
+    icon: Bell,
+    primary: { label: 'Open inbox', href: '/notifications' },
+    secondary: { label: 'Open settings', href: '/settings/security' },
+  },
+  push_permission: {
+    title: 'Push permission prompt',
+    body: 'Allow push notifications so live updates can reach your device.',
+    icon: Bell,
+    primary: { label: 'Open inbox', href: '/notifications' },
+  },
+  empty: {
+    title: 'Notification empty state',
+    body: 'There are no live notifications right now.',
+    icon: Bell,
+    primary: { label: 'Open inbox', href: '/notifications' },
+  },
+  read: {
+    title: 'Notification read state',
+    body: 'This item has already been read in the live inbox.',
+    icon: CheckCircle,
+    primary: { label: 'Open inbox', href: '/notifications' },
+  },
+  unread: {
+    title: 'Notification unread state',
+    body: 'This item still needs attention in the live inbox.',
+    icon: Bell,
+    primary: { label: 'Open inbox', href: '/notifications' },
+  },
+  filtered: {
+    title: 'Notification filtered by type',
+    body: 'The inbox is filtered to only show one notification type.',
+    icon: MagnifyingGlass,
+    primary: { label: 'Open inbox', href: '/notifications' },
+  },
+  like: {
+    title: 'Like notification detail',
+    body: 'Someone liked one of your live posts.',
+    icon: Heart,
+    primary: { label: 'Open inbox', href: '/notifications' },
+  },
+  comment: {
+    title: 'Comment notification detail',
+    body: 'Someone commented on one of your live posts.',
+    icon: ChatCircleDots,
+    primary: { label: 'Open inbox', href: '/notifications' },
+  },
+  follow: {
+    title: 'Follow notification detail',
+    body: 'A live user followed your profile.',
+    icon: UserCircle,
+    primary: { label: 'Open inbox', href: '/notifications' },
+  },
+  mention: {
+    title: 'Mention notification detail',
+    body: 'You were mentioned in a live notification thread.',
+    icon: ChatCircleDots,
+    primary: { label: 'Open inbox', href: '/notifications' },
+  },
+  message: {
+    title: 'Message notification detail',
+    body: 'A new direct message arrived from your live inbox.',
+    icon: PaperPlaneTilt,
+    primary: { label: 'Open inbox', href: '/dashboard/messages' },
+  },
+  trust_update: {
+    title: 'Trust update notification detail',
+    body: 'Your trust score or trust status changed in the live system.',
+    icon: SealQuestion,
+    primary: { label: 'Open trust', href: '/trust' },
+  },
+  system: {
+    title: 'System notification detail',
+    body: 'A platform status or system notice needs your attention.',
+    icon: Bell,
+    primary: { label: 'Open inbox', href: '/notifications' },
+  },
+};
+
+export function NotificationStateScreen({
+  state,
+  title,
+  description,
+  primaryHref,
+  primaryLabel,
+  secondaryHref,
+  secondaryLabel,
+  status,
+}: {
+  state: NotificationStateCode;
+  title?: string;
+  description?: string;
+  primaryHref?: string;
+  primaryLabel?: string;
+  secondaryHref?: string;
+  secondaryLabel?: string;
+  status?: SystemStatus | null;
+}) {
+  const copy = NOTIFICATION_COPY[state];
+  const Icon = copy.icon;
+
+  return (
+    <main className="min-h-[80vh] bg-zinc-50 px-6 py-14 dark:bg-[#0A0E17]">
+      <div className="mx-auto flex max-w-3xl flex-col gap-6 rounded-[20px] border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0066FF]/10 text-[#0066FF]">
+              <Icon size={24} weight="fill" />
+            </div>
+            <div>
+              <p className="text-[11px] font-black uppercase tracking-[0.24em] text-zinc-400">Notification state</p>
+              <h1 className="text-2xl font-black tracking-tight text-zinc-950 dark:text-white">{title || copy.title}</h1>
+            </div>
+          </div>
+          <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-black ${status?.healthy ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-300' : 'border-zinc-200 bg-zinc-50 text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400'}`}>
+            {status?.healthy ? <CheckCircle size={14} weight="fill" /> : <WifiSlash size={14} weight="fill" />}
+            {status?.service || 'workora-backend'}
+          </div>
+        </div>
+
+        <p className="max-w-2xl text-sm leading-7 text-zinc-600 dark:text-zinc-400">
+          {description || copy.body}
+        </p>
+
+        <div className="flex flex-wrap gap-3">
+          <Link href={primaryHref || copy.primary.href} className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#0066FF] px-5 text-sm font-black text-white">
+            {primaryLabel || copy.primary.label}
+          </Link>
+          <Link href={secondaryHref || copy.secondary?.href || '/notifications'} className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-zinc-200 px-5 text-sm font-black text-zinc-950 dark:border-zinc-800 dark:text-white">
+            {secondaryLabel || copy.secondary?.label || 'Back'}
+          </Link>
+        </div>
+      </div>
+    </main>
   );
 }

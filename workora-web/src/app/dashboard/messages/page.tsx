@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { PaperPlaneTilt, MagnifyingGlass, Check, Checks, ArrowLeft } from '@phosphor-icons/react';
+import { useSearchParams } from 'next/navigation';
 import { fetchCurrentUser } from '@/lib/session';
 
 interface Conversation {
@@ -31,6 +32,8 @@ export default function MessagesPage() {
   const [userId, setUserId] = useState('');
   const [username, setUsername] = useState('');
   const [search, setSearch] = useState('');
+  const searchParams = useSearchParams();
+  const initialConversationId = searchParams.get('conversation');
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -47,7 +50,13 @@ export default function MessagesPage() {
 
       setUserId(user.id);
       setUsername(user.username || '');
-      fetchConversations(user.id);
+      const nextConversations = await fetchConversations(user.id);
+      if (initialConversationId) {
+        const match = nextConversations.find((conv) => conv.id === initialConversationId);
+        if (match) {
+          await openConversation(match, user.id);
+        }
+      }
     };
 
     bootstrap();
@@ -61,11 +70,14 @@ export default function MessagesPage() {
     try {
       const res = await fetch(`/api/messages/conversations/${uid}`);
       const data = await res.json();
-      setConversations(Array.isArray(data) ? data : []);
+      const nextConversations = Array.isArray(data) ? data : [];
+      setConversations(nextConversations);
+      return nextConversations as Conversation[];
     } catch (e) { console.error(e); }
+    return [] as Conversation[];
   };
 
-  const openConversation = async (conv: Conversation) => {
+  const openConversation = async (conv: Conversation, uid = userId) => {
     setActiveConv(conv);
     try {
       const res = await fetch(`/api/messages/${conv.id}`);
@@ -74,9 +86,9 @@ export default function MessagesPage() {
       // Mark as read
       await fetch(`/api/messages/${conv.id}/read`, {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId }),
+        body: JSON.stringify({ user_id: uid }),
       });
-      fetchConversations(userId);
+      fetchConversations(uid);
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     } catch (e) { console.error(e); }
   };

@@ -1,17 +1,7 @@
 async function notificationRoutes(fastify) {
   const { pool } = fastify;
 
-  fastify.get('/', { preHandler: fastify.authenticate }, async (request, reply) => {
-    const userId = request.user?.id;
-    if (!userId) {
-      return reply.status(401).send({ message: 'Unauthorized' });
-    }
-
-    const profileRes = await pool.query('SELECT id FROM worker_profiles WHERE user_id = $1 LIMIT 1', [userId]);
-    const profileId = profileRes.rows[0]?.id || null;
-
-    if (!profileId) return [];
-
+  const loadNotificationRows = async (profileId, notificationId = null) => {
     const result = await pool.query(
       `
       WITH owned_gigs AS (
@@ -68,14 +58,15 @@ async function notificationRoutes(fastify) {
       FROM (
         SELECT * FROM likes
         UNION ALL
-      SELECT * FROM comments
-      UNION ALL
-      SELECT * FROM rating_rows
+        SELECT * FROM comments
+        UNION ALL
+        SELECT * FROM rating_rows
       ) activity
+      ${notificationId ? 'WHERE id = $2' : ''}
       ORDER BY created_at DESC
-      LIMIT 30
+      ${notificationId ? 'LIMIT 1' : 'LIMIT 30'}
       `,
-      [profileId]
+      notificationId ? [profileId, notificationId] : [profileId]
     );
 
     return result.rows.map((row) => {
@@ -96,6 +87,39 @@ async function notificationRoutes(fastify) {
         created_at: row.created_at,
       };
     });
+  };
+
+  fastify.get('/', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const userId = request.user?.id;
+    if (!userId) {
+      return reply.status(401).send({ message: 'Unauthorized' });
+    }
+
+    const profileRes = await pool.query('SELECT id FROM worker_profiles WHERE user_id = $1 LIMIT 1', [userId]);
+    const profileId = profileRes.rows[0]?.id || null;
+
+    if (!profileId) return [];
+
+    return loadNotificationRows(profileId);
+  });
+
+  fastify.get('/:notificationId', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const userId = request.user?.id;
+    if (!userId) {
+      return reply.status(401).send({ message: 'Unauthorized' });
+    }
+
+    const profileRes = await pool.query('SELECT id FROM worker_profiles WHERE user_id = $1 LIMIT 1', [userId]);
+    const profileId = profileRes.rows[0]?.id || null;
+
+    if (!profileId) return reply.status(404).send({ message: 'Notification not found' });
+
+    const rows = await loadNotificationRows(profileId, request.params.notificationId);
+    if (!rows.length) {
+      return reply.status(404).send({ message: 'Notification not found' });
+    }
+
+    return rows[0];
   });
 }
 
