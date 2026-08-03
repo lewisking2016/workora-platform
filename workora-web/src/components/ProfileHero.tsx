@@ -26,7 +26,7 @@ export function ProfileHero({
   const avatarColor = getAvatarColor(name);
   
   return (
-    <div className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[32px] p-8">
+    <div className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[24px] p-8">
       <div className="flex items-start gap-6">
         <div className="relative">
           <div className="p-1 rounded-full bg-gradient-to-tr from-[#0066FF] via-[#4F46E5] to-[#7000FF] shadow-[0_20px_40px_-20px_rgba(79,70,229,0.6)]">
@@ -48,10 +48,8 @@ export function ProfileHero({
           </div>
           
           {isVerified && (
-            <div className="absolute -bottom-1 -right-1 bg-white dark:bg-zinc-900 rounded-full p-1 shadow-lg">
-              <div className="rounded-full bg-gradient-to-br from-[#0066FF] via-[#4F46E5] to-[#7000FF] p-1.5">
+            <div className="absolute -bottom-1 -right-1 rounded-full bg-gradient-to-br from-[#0066FF] via-[#4F46E5] to-[#7000FF] p-1.5 shadow-lg">
                 <SealCheck size={18} weight="regular" className="text-white" />
-              </div>
             </div>
           )}
         </div>

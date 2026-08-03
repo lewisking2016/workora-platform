@@ -76,14 +76,12 @@ const MetricCard = ({ icon: Icon, label, value, growth, color, subtitle }: Metri
   <motion.div 
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    className="p-6 lg:p-8 bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[32px] flex flex-col gap-5 group hover:shadow-xl transition-all"
+    className="p-6 lg:p-8 bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[24px] flex flex-col gap-5 group hover:shadow-xl transition-all"
   >
     <div className="flex items-start justify-between gap-4">
       <div className="flex items-center gap-4">
-        <div className={`h-14 w-14 rounded-[20px] bg-gradient-to-br ${color} p-[1px] shadow-[0_14px_30px_-12px_rgba(15,23,42,0.45)] group-hover:scale-105 transition-transform`}>
-          <div className="flex h-full w-full items-center justify-center rounded-[19px] bg-white/95 dark:bg-zinc-950/90 backdrop-blur-sm">
-            <Icon size={22} weight="regular" className="text-zinc-950 dark:text-white" />
-          </div>
+        <div className={`h-14 w-14 rounded-[18px] bg-gradient-to-br ${color} shadow-[0_14px_30px_-12px_rgba(15,23,42,0.45)] flex items-center justify-center group-hover:scale-105 transition-transform`}>
+          <Icon size={22} weight="regular" className="text-white" />
         </div>
         <div className="flex flex-col gap-2">
           <p className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.25em]">{label}</p>
