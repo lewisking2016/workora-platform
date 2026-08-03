@@ -78,19 +78,23 @@ const MetricCard = ({ icon: Icon, label, value, growth, color, subtitle }: Metri
     animate={{ opacity: 1, y: 0 }}
     className="p-6 lg:p-8 bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[32px] flex flex-col gap-5 group hover:shadow-xl transition-all"
   >
-    <div className="flex items-start justify-between">
-      <div className={`h-14 w-14 rounded-2xl bg-gradient-to-br ${color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
-        <Icon size={28} weight="fill" className="text-white" />
+    <div className="flex items-start justify-between gap-4">
+      <div className="flex items-center gap-4">
+        <div className={`h-14 w-14 rounded-[20px] bg-gradient-to-br ${color} p-[1px] shadow-[0_14px_30px_-12px_rgba(15,23,42,0.45)] group-hover:scale-105 transition-transform`}>
+          <div className="flex h-full w-full items-center justify-center rounded-[19px] bg-white/95 dark:bg-zinc-950/90 backdrop-blur-sm">
+            <Icon size={22} weight="regular" className="text-zinc-950 dark:text-white" />
+          </div>
+        </div>
+        <div className="flex flex-col gap-2">
+          <p className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.25em]">{label}</p>
+          <p className="text-4xl font-black text-zinc-950 dark:text-white tracking-tighter">{value}</p>
+          {subtitle && <p className="text-xs font-bold text-zinc-400">{subtitle}</p>}
+        </div>
       </div>
       <div className={`flex items-center gap-1.5 ${growth >= 0 ? 'text-green-500' : 'text-red-500'} font-black text-sm px-3 py-1.5 rounded-full ${growth >= 0 ? 'bg-green-50 dark:bg-green-950/20' : 'bg-red-50 dark:bg-red-950/20'}`}>
          {growth >= 0 ? <ArrowUp size={16} weight="bold" /> : <ArrowDown size={16} weight="bold" />}
          {Math.abs(growth)}%
       </div>
-    </div>
-    <div className="flex flex-col gap-2">
-      <p className="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.25em]">{label}</p>
-      <p className="text-4xl font-black text-zinc-950 dark:text-white tracking-tighter">{value}</p>
-      {subtitle && <p className="text-xs font-bold text-zinc-400">{subtitle}</p>}
     </div>
   </motion.div>
 );
