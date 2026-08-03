@@ -35,10 +35,13 @@ export async function fetchCurrentUser(): Promise<CurrentUser | null> {
   try {
     const res = await fetch('/api/auth/me');
     if (!res.ok) {
+      // Preserve the last known client session if the auth check is temporarily unavailable.
+      // This keeps dashboard modules usable when the JWT cookie is missing or the proxy
+      // returns a transient 401, instead of bouncing the user back to the login screen.
       if (res.status === 401) {
-        clearLegacySession();
+        return readLegacyUser();
       }
-      return null;
+      return readLegacyUser();
     }
 
     const data = await res.json();
