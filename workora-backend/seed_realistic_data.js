@@ -22,14 +22,11 @@ const LOCATIONS = [
   'Ruiru', 'Kikuyu', 'Ngong', 'Limuru', 'Rongai'
 ];
 
-// Realistic Kenyan trades and professions
+// Realistic Kenyan trades and professions (limited to available videos)
 const TRADES = [
-  'Plumber', 'Electrician', 'Carpenter', 'Mason', 'Painter',
-  'Mechanic', 'Welder', 'Tailor', 'Barber', 'Hair Stylist',
-  'Chef', 'Cleaner', 'Gardener', 'Security Guard', 'Driver',
-  'Phone Repair Technician', 'Computer Technician', 'Motorcycle Mechanic',
-  'Shoe Cobbler', 'Upholstery Worker', 'Roofer', 'Tiler',
-  'HVAC Technician', 'Generator Technician', 'Solar Panel Installer'
+  'Plumber',
+  'Electrician', 
+  'Mason' // Construction work
 ];
 
 // Realistic Kenyan names
@@ -52,36 +49,130 @@ const LAST_NAMES = [
   'Omolo', 'Apiyo', 'Macharia', 'Nyambura', 'Kimutai', 'Jelimo'
 ];
 
-// Sample skills by trade
+// Sample skills by trade (updated for available categories)
 const SKILLS_BY_TRADE = {
-  'Plumber': ['Pipe Fitting', 'Drain Cleaning', 'Water Heater Installation', 'Leak Repair'],
-  'Electrician': ['Wiring', 'Circuit Installation', 'Fault Finding', 'Solar Installation'],
-  'Carpenter': ['Furniture Making', 'Door Installation', 'Cabinet Making', 'Wood Finishing'],
-  'Mason': ['Bricklaying', 'Concrete Work', 'Plastering', 'Block Work'],
-  'Painter': ['Interior Painting', 'Exterior Painting', 'Spray Painting', 'Wall Preparation'],
-  'Mechanic': ['Engine Repair', 'Brake Systems', 'Transmission', 'Diagnostics'],
-  'Welder': ['Arc Welding', 'MIG Welding', 'Metal Fabrication', 'Steel Work'],
-  'Tailor': ['Dress Making', 'Suit Tailoring', 'Alterations', 'Custom Fitting'],
-  'Barber': ['Haircuts', 'Shaving', 'Beard Styling', 'Hair Coloring'],
-  'Chef': ['African Cuisine', 'Baking', 'Catering', 'Menu Planning'],
-  'Phone Repair Technician': ['Screen Replacement', 'Battery Replacement', 'Software Repair', 'Water Damage Repair'],
-  'Computer Technician': ['Hardware Repair', 'Software Installation', 'Network Setup', 'Data Recovery'],
+  'Plumber': ['Pipe Fitting', 'Drain Cleaning', 'Water Heater Installation', 'Leak Repair', 'Bathroom Installation'],
+  'Electrician': ['Wiring', 'Circuit Installation', 'Fault Finding', 'Solar Installation', 'Lighting Systems'],
+  'Mason': ['Bricklaying', 'Concrete Work', 'Plastering', 'Block Work', 'Foundation Work'],
 };
 
-// Unsplash image categories for realistic photos
-const UNSPLASH_CATEGORIES = {
-  'Plumber': 'plumbing-tools',
-  'Electrician': 'electrical-work',
-  'Carpenter': 'carpentry-woodwork',
-  'Mason': 'construction-brick',
-  'Painter': 'painting-wall',
-  'Mechanic': 'car-mechanic',
-  'Welder': 'welding-metal',
-  'Tailor': 'sewing-tailoring',
-  'Barber': 'barbershop',
-  'Chef': 'cooking-chef',
-  'Phone Repair Technician': 'phone-repair',
-  'Computer Technician': 'computer-repair',
+// Local video files organized by category
+const VIDEO_FILES_BY_TRADE = {
+  'Plumber': [
+    '/videos/plumbing1.mp4',
+    '/videos/plumbing2.mp4',
+    '/videos/plumbing3.mp4',
+    '/videos/plumbing5.mp4'
+  ],
+  'Electrician': [
+    '/videos/electrical1.mp4',
+    '/videos/electrical2.mp4',
+    '/videos/electrical3.mp4',
+    '/videos/electrical4.mp4',
+    '/videos/electrical5.mp4'
+  ],
+  'Mason': [
+    '/videos/construction.mp4',
+    '/videos/construction2.mp4',
+    '/videos/construction 3.mp4'
+  ]
+};
+
+// Thumbnails from Unsplash for each category
+const THUMBNAIL_BY_TRADE = {
+  'Plumber': 'https://source.unsplash.com/1200x800/?plumbing,pipes',
+  'Electrician': 'https://source.unsplash.com/1200x800/?electrical,wiring',
+  'Mason': 'https://source.unsplash.com/1200x800/?construction,building'
+};
+
+// Realistic titles by trade
+const TITLES_BY_TRADE = {
+  'Plumber': [
+    'Complete bathroom plumbing installation',
+    'Kitchen sink and drainage system repair',
+    'Water heater installation and setup',
+    'Pipe leak repair and replacement',
+    'Drainage system unclogging and cleaning',
+    'Toilet installation and repairs',
+    'Water line installation for new construction',
+    'Shower and bathtub plumbing work'
+  ],
+  'Electrician': [
+    'Complete house rewiring project',
+    'Solar panel installation and connection',
+    'Circuit breaker and panel upgrade',
+    'LED lighting system installation',
+    'Outdoor security lighting setup',
+    'Fault finding and electrical repairs',
+    'Generator installation and wiring',
+    'Smart home electrical setup'
+  ],
+  'Mason': [
+    'Brick wall construction for new building',
+    'Concrete foundation laying work',
+    'Plastering and finishing interior walls',
+    'Block work for residential project',
+    'Paving and compound flooring',
+    'Retaining wall construction',
+    'Fence and gate pillar construction',
+    'Building renovation and repair work'
+  ]
+};
+
+// Realistic descriptions by trade
+const DESCRIPTIONS_BY_TRADE = {
+  'Plumber': [
+    'Professional plumbing installation completed on time. All pipes tested and certified leak-free.',
+    'High-quality plumbing repair using durable materials. Work guaranteed for 6 months.',
+    'Expert plumbing service for residential property. Clean work, no mess left behind.',
+    'Certified plumber with 5+ years experience. Quality workmanship and fair pricing.',
+  ],
+  'Electrician': [
+    'Licensed electrician - All work certified and tested for safety compliance.',
+    'Professional electrical installation with warranty. Using genuine quality materials.',
+    'Expert in residential and commercial electrical work. Fast, reliable, and affordable.',
+    'Certified electrical contractor. All installations meet Kenya Power standards.',
+  ],
+  'Mason': [
+    'Quality masonry work using certified materials. Strong and durable construction.',
+    'Professional building and construction services. Over 10 years experience.',
+    'Expert mason available for all types of construction projects. Fair rates.',
+    'Quality brick and block work. Clean, professional finish guaranteed.',
+  ]
+};
+
+// Realistic comments by trade
+const COMMENTS_BY_TRADE = {
+  'Plumber': [
+    'Fixed my bathroom leak perfectly! No issues since then',
+    'Very professional work. Came on time and finished quickly',
+    'Great plumber! Fair prices and quality materials used',
+    'Highly recommend. My kitchen sink works perfectly now',
+    'Excellent service. Will call again for future work',
+    'Clean work, no mess. Very satisfied with the plumbing',
+    'Best plumber in Nairobi! Fast and reliable',
+    'Quality workmanship. Water pressure is now perfect'
+  ],
+  'Electrician': [
+    'Excellent electrical work! Everything working perfectly',
+    'Very knowledgeable electrician. Solved my power issues',
+    'Professional and affordable. Highly recommended',
+    'Great job on the wiring. Very neat and clean work',
+    'Fixed my electrical fault quickly. Thank you!',
+    'Quality work on solar installation. Saving on bills now',
+    'Best electrician I have worked with. Will hire again',
+    'Very reliable. Completed work ahead of schedule'
+  ],
+  'Mason': [
+    'Excellent masonry work! Wall is strong and beautiful',
+    'Professional mason. Very satisfied with the construction',
+    'Quality brick work. Highly recommend this mason',
+    'Fast and reliable. Building looks great!',
+    'Very skilled mason. Fair pricing for quality work',
+    'Best mason in the area. Clean and professional',
+    'Great construction work. Will hire for next project',
+    'Strong foundation work. Very impressed with quality'
+  ]
 };
 
 function randomItem(arr) {
@@ -100,10 +191,6 @@ function generatePhoneNumber() {
 function generateUsername(firstName, lastName) {
   const rand = randomInt(10, 99);
   return `${firstName.toLowerCase()}${lastName.toLowerCase()}${rand}`;
-}
-
-function getUnsplashImage(category, width = 800, height = 600) {
-  return `https://source.unsplash.com/${width}x${height}/?${category}&sig=${randomInt(1, 999)}`;
 }
 
 function getProfileAvatar(name) {
@@ -251,63 +338,18 @@ async function createGigs(profiles) {
   console.log('\n📸 Creating gigs (proof of work)...');
   const gigs = [];
 
-  // High-quality public MP4s that load reliably in browsers
-  const workVideosByCategory = {
-    'Plumber': [
-      'https://filesamples.com/samples/video/mp4/sample_640x360.mp4',
-      'https://www.w3schools.com/html/mov_bbb.mp4',
-    ],
-    'Electrician': [
-      'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-      'https://filesamples.com/samples/video/mp4/sample_640x360.mp4',
-    ],
-    'Carpenter': [
-      'https://www.w3schools.com/html/mov_bbb.mp4',
-      'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-    ],
-    'Mason': [
-      'https://filesamples.com/samples/video/mp4/sample_640x360.mp4',
-      'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-    ],
-    'Painter': [
-      'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-      'https://www.w3schools.com/html/mov_bbb.mp4',
-    ],
-    'Mechanic': [
-      'https://filesamples.com/samples/video/mp4/sample_640x360.mp4',
-      'https://www.w3schools.com/html/mov_bbb.mp4',
-    ],
-    'Welder': [
-      'https://www.w3schools.com/html/mov_bbb.mp4',
-      'https://filesamples.com/samples/video/mp4/sample_640x360.mp4',
-    ],
-    'default': [
-      'https://filesamples.com/samples/video/mp4/sample_640x360.mp4',
-      'https://www.w3schools.com/html/mov_bbb.mp4',
-      'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-      'https://filesamples.com/samples/video/mp4/sample_640x360.mp4',
-    ]
-  };
-
   for (const profile of profiles) {
-    const gigCount = randomInt(3, 12);
-    const tradeVideos = workVideosByCategory[profile.trade] || workVideosByCategory['default'];
+    const gigCount = randomInt(4, 10);
+    const tradeVideos = VIDEO_FILES_BY_TRADE[profile.trade] || VIDEO_FILES_BY_TRADE['Mason'];
+    const tradeTitles = TITLES_BY_TRADE[profile.trade] || TITLES_BY_TRADE['Mason'];
+    const tradeDescriptions = DESCRIPTIONS_BY_TRADE[profile.trade] || DESCRIPTIONS_BY_TRADE['Mason'];
+    const tradeThumbnail = THUMBNAIL_BY_TRADE[profile.trade] || THUMBNAIL_BY_TRADE['Mason'];
 
     for (let i = 0; i < gigCount; i++) {
-      const category = UNSPLASH_CATEGORIES[profile.trade] || 'work';
       const videoUrl = randomItem(tradeVideos);
-      const thumbnailUrl = getUnsplashImage(category, 1200, 800);
-
-      const titles = [
-        `${profile.trade} work in ${profile.location}`,
-        `Quality ${profile.trade.toLowerCase()} service`,
-        `Professional ${profile.trade.toLowerCase()} project`,
-        `${profile.trade} installation completed`,
-        `Before & after ${profile.trade.toLowerCase()} work`,
-        `${profile.trade} repair service`,
-        `Commercial ${profile.trade.toLowerCase()} project`,
-        `Residential ${profile.trade.toLowerCase()} work`
-      ];
+      const title = randomItem(tradeTitles);
+      const description = randomItem(tradeDescriptions);
+      const thumbnailUrl = `${tradeThumbnail}&sig=${randomInt(1, 999)}`;
 
       const result = await client.query(
         `INSERT INTO gigs (worker_id, user_id, title, description, category, video_url, thumbnail_url, view_count)
@@ -316,8 +358,8 @@ async function createGigs(profiles) {
         [
           profile.id,
           profile.user_id,
-          randomItem(titles),
-          `Professional ${profile.trade.toLowerCase()} work completed in ${profile.location}. High quality materials used.`,
+          title,
+          description,
           profile.trade,
           videoUrl,
           thumbnailUrl,
@@ -325,7 +367,7 @@ async function createGigs(profiles) {
         ]
       );
 
-      gigs.push(result.rows[0]);
+      gigs.push({ ...result.rows[0], trade: profile.trade });
     }
   }
 
@@ -338,20 +380,10 @@ async function addEngagement(gigs, users) {
   let likeCount = 0;
   let commentCount = 0;
 
-  const comments = [
-    'Great work! Highly recommended',
-    'Very professional service',
-    'Excellent quality',
-    'Fast and reliable',
-    'Will hire again',
-    'Top notch work',
-    'Very satisfied with the service',
-    'Affordable and quality',
-    'Best in the business',
-    'Highly skilled professional'
-  ];
-
   for (const gig of gigs) {
+    // Get trade-specific comments
+    const tradeComments = COMMENTS_BY_TRADE[gig.trade] || COMMENTS_BY_TRADE['Mason'];
+    
     // Add random likes
     const likers = users.slice(0, randomInt(5, 30));
     for (const liker of likers) {
@@ -366,12 +398,12 @@ async function addEngagement(gigs, users) {
       }
     }
 
-    // Add random comments
-    const commenters = users.slice(0, randomInt(2, 8));
+    // Add random trade-relevant comments
+    const commenters = users.slice(0, randomInt(3, 8));
     for (const commenter of commenters) {
       await client.query(
         `INSERT INTO gig_comments (gig_id, user_id, text) VALUES ($1, $2, $3)`,
-        [gig.id, commenter.id, randomItem(comments)]
+        [gig.id, commenter.id, randomItem(tradeComments)]
       );
       commentCount++;
     }

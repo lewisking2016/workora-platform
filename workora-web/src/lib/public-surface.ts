@@ -1,4 +1,5 @@
 import { APP_CONFIG } from './config';
+import { getBackendBaseUrl } from './backend-url';
 
 export interface PublicTrade {
   id?: string;
@@ -31,13 +32,6 @@ export interface PublicSurfaceData {
     exploreCount: number;
     verifiedCount: number;
   };
-}
-
-const FALLBACK_BASE_URL = 'http://localhost:3001';
-
-function getBackendBaseUrl() {
-  const value = process.env.NEXT_PUBLIC_API_URL || FALLBACK_BASE_URL;
-  return value === 'base' ? 'http://4.221.170.153:3001' : value;
 }
 
 async function fetchJson<T>(path: string): Promise<T | null> {

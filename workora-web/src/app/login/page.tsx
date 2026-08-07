@@ -79,8 +79,8 @@ export default function LoginPage() {
         role: String(data.user?.role || 'worker'),
       });
 
-      // Redirect to Dashboard
-      window.location.href = '/dashboard/feed';
+      const nextRoute = String(data.user?.role || 'worker') === 'hirer' ? '/dashboard/feed' : '/dashboard/pro';
+      window.location.href = nextRoute;
     } catch (err: unknown) {
       router.push('/auth/error/network_error');
     } finally {

@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { getBackendBaseUrl } from './backend-url';
 
 export async function proxyRequest(targetPath: string, request: Request) {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
 
-    let backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-    if (backendUrl === 'base') backendUrl = 'http://4.221.170.153:3001';
+    const backendUrl = getBackendBaseUrl();
 
     const url = `${backendUrl}${targetPath}`;
     const method = request.method;
