@@ -104,7 +104,9 @@ export default function JoinPage() {
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
         body: JSON.stringify({
           full_name: formData.fullName,
           phone_number: `${selectedCountry.code}${formData.phone}`,
@@ -125,11 +127,14 @@ export default function JoinPage() {
         return;
       }
 
-      persistLegacySession({
-        id: String(data.user?.id || ''),
-        username: String(data.user?.username || formData.username),
-        role: String(data.user?.role || (formData.role === 'pro' ? 'worker' : 'hirer')),
-      });
+      persistLegacySession(
+        {
+          id: String(data.user?.id || ''),
+          username: String(data.user?.username || formData.username),
+          role: String(data.user?.role || (formData.role === 'pro' ? 'worker' : 'hirer')),
+        },
+        data.token ? String(data.token) : undefined
+      );
 
       setStep(3); 
     } catch (err: unknown) {

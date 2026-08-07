@@ -55,8 +55,21 @@ export default function LoginPage() {
     };
   }, []);
 
+  const normalizeIdentifier = (raw: string) => {
+    const value = raw.trim();
+    // Kenyan local format 07XXXXXXXX → +2547XXXXXXXX
+    if (/^0[17]\d{8}$/.test(value)) {
+      return `+254${value.slice(1)}`;
+    }
+    // Bare 7XXXXXXXX without country code
+    if (/^[17]\d{8}$/.test(value)) {
+      return `+254${value}`;
+    }
+    return value;
+  };
+
   const handleLogin = async () => {
-    const identifier = formData.identifier.trim();
+    const identifier = normalizeIdentifier(formData.identifier);
     if (!identifier || !formData.password) return;
     
     setLoading(true);
@@ -65,7 +78,9 @@ export default function LoginPage() {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
         body: JSON.stringify({
           identifier,
           phone_number: identifier,
@@ -83,11 +98,15 @@ export default function LoginPage() {
         return;
       }
 
-      persistLegacySession({
-        id: String(data.user?.id || ''),
-        username: String(data.user?.username || ''),
-        role: String(data.user?.role || 'worker'),
-      });
+      // Persist user + JWT so dashboard /auth/me works even if Set-Cookie is dropped by the host
+      persistLegacySession(
+        {
+          id: String(data.user?.id || ''),
+          username: String(data.user?.username || ''),
+          role: String(data.user?.role || 'worker'),
+        },
+        data.token ? String(data.token) : undefined
+      );
 
       const nextRoute = String(data.user?.role || 'worker') === 'hirer' ? '/dashboard/feed' : '/dashboard/pro';
       window.location.href = nextRoute;

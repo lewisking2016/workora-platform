@@ -98,6 +98,17 @@ async function authRoutes(fastify) {
     }
 
     const normalizedIdentifier = identifier.toLowerCase();
+
+    // Accept Kenyan local numbers (07…) as E.164 (+2547…)
+    const phoneCandidates = [identifier];
+    if (/^0[17]\d{8}$/.test(identifier)) {
+      phoneCandidates.push(`+254${identifier.slice(1)}`);
+    } else if (/^[17]\d{8}$/.test(identifier)) {
+      phoneCandidates.push(`+254${identifier}`);
+    } else if (/^\+2540[17]\d{8}$/.test(identifier)) {
+      phoneCandidates.push(`+254${identifier.slice(4)}`);
+    }
+
     const attemptsRes = await pool.query(
       'SELECT failed_count, locked_until FROM auth_login_attempts WHERE identifier = $1 LIMIT 1',
       [normalizedIdentifier]
@@ -120,12 +131,12 @@ async function authRoutes(fastify) {
       `
         SELECT *
         FROM users
-        WHERE phone_number = $1
-           OR LOWER(username) = LOWER($1)
-           OR LOWER(email) = LOWER($1)
+        WHERE phone_number = ANY($1::text[])
+           OR LOWER(username) = LOWER($2)
+           OR LOWER(email) = LOWER($2)
         LIMIT 1
       `,
-      [identifier]
+      [phoneCandidates, identifier]
     );
     const user = res.rows[0];
 

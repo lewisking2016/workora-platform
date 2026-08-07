@@ -4,6 +4,8 @@ export interface CurrentUser {
   role: string;
 }
 
+const TOKEN_KEY = 'workora_token';
+
 function readLegacyUser(): CurrentUser | null {
   if (typeof window === 'undefined') return null;
 
@@ -24,16 +26,33 @@ function readLegacyUser(): CurrentUser | null {
   }
 }
 
+export function getStoredToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return window.localStorage.getItem(TOKEN_KEY);
+}
+
 export function clearLegacySession() {
   if (typeof window === 'undefined') return;
   window.localStorage.removeItem('workora_user');
   window.localStorage.removeItem('workora_username');
   window.localStorage.removeItem('workora_role');
+  window.localStorage.removeItem(TOKEN_KEY);
 }
 
 export async function fetchCurrentUser(): Promise<CurrentUser | null> {
   try {
-    const res = await fetch('/api/auth/me');
+    const headers: HeadersInit = {};
+    const token = getStoredToken();
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const res = await fetch('/api/auth/me', {
+      credentials: 'include',
+      headers,
+      cache: 'no-store',
+    });
+
     if (!res.ok) {
       if (res.status === 401 || res.status === 403) {
         clearLegacySession();
@@ -57,9 +76,12 @@ export async function fetchCurrentUser(): Promise<CurrentUser | null> {
   }
 }
 
-export function persistLegacySession(user: CurrentUser) {
+export function persistLegacySession(user: CurrentUser, token?: string) {
   if (typeof window === 'undefined') return;
   window.localStorage.setItem('workora_user', JSON.stringify(user));
   window.localStorage.setItem('workora_username', user.username);
   window.localStorage.setItem('workora_role', user.role);
+  if (token) {
+    window.localStorage.setItem(TOKEN_KEY, token);
+  }
 }
