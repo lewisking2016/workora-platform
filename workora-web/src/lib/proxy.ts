@@ -76,7 +76,7 @@ export async function proxyRequest(targetPath: string, request: Request) {
         name: 'token',
         value: data.token,
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: true,
         sameSite: 'lax',
         maxAge: maxAge,
         path: '/',
