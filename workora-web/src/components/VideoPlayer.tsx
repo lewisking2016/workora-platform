@@ -15,7 +15,7 @@ interface VideoPlayerProps {
   onEnded?: () => void;
 }
 
-export function VideoPlayer({ src, poster, className = "", autoPlay = false, loop = true, muted = true, paused = false, onEnded }: VideoPlayerProps) {
+export function VideoPlayer({ src, poster, className = "", autoPlay = true, loop = true, muted = true, paused = false, onEnded }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [isMuted, setIsMuted] = useState(muted);
