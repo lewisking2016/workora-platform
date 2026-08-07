@@ -12,8 +12,10 @@ import {
   SpinnerGap,
   VideoCamera,
   WarningCircle,
+  Briefcase,
+  Sparkle,
 } from '@phosphor-icons/react';
-import { apiFetch, fetchCurrentUser } from '@/lib/session';
+import { apiFetch, fetchCurrentUser, getStoredToken } from '@/lib/session';
 import { VideoPlayer } from '@/components/VideoPlayer';
 
 type ProfileData = {
@@ -54,7 +56,32 @@ export default function DashboardProfilePage() {
     let active = true;
 
     const bootstrap = async () => {
-      const user = await fetchCurrentUser();
+      // Prefer live /me, but don't bounce to login if we already have a local session + token
+      let user = await fetchCurrentUser();
+      if (!user) {
+        const legacy = typeof window !== 'undefined' ? (
+          // readLegacyUser may not be exported — fallback via localStorage
+          (() => {
+            try {
+              const raw = window.localStorage.getItem('workora_user');
+              if (!raw) return null;
+              const parsed = JSON.parse(raw);
+              if (!parsed?.id) return null;
+              return {
+                id: String(parsed.id),
+                username: String(parsed.username || ''),
+                role: String(parsed.role || 'worker'),
+              };
+            } catch {
+              return null;
+            }
+          })()
+        ) : null;
+        if (legacy && getStoredToken()) {
+          user = legacy;
+        }
+      }
+
       if (!active) return;
 
       if (!user?.id) {
@@ -68,8 +95,13 @@ export default function DashboardProfilePage() {
         const res = await apiFetch('/api/profile/me');
         const data = await res.json();
         if (!res.ok) {
-          if (res.status === 401 || res.status === 403) {
+          if ((res.status === 401 || res.status === 403) && !getStoredToken()) {
             router.replace('/login');
+            return;
+          }
+          // Soft fail: keep page usable with username if profile endpoint flakes
+          if (res.status === 401 || res.status === 403) {
+            setError('Session expired. Please log in again.');
             return;
           }
           throw new Error(data?.error || data?.message || 'Failed to load profile');
@@ -79,12 +111,13 @@ export default function DashboardProfilePage() {
         setSkills(Array.isArray(data.skills) ? data.skills : []);
         const items = Array.isArray(data.portfolio) ? data.portfolio : [];
         if (items.length > 0) {
-          setPortfolio(items);
+          setPortfolio(items.filter((g: PortfolioItem) => Boolean(g.video_url)));
         } else if (data.profile?.id) {
           const gRes = await apiFetch(`/api/gigs/worker/${data.profile.id}`);
           const gData = await gRes.json();
-          setPortfolio(Array.isArray(gData) ? gData : []);
+          setPortfolio(Array.isArray(gData) ? gData.filter((g: PortfolioItem) => Boolean(g.video_url)) : []);
         }
+        setError('');
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Something went wrong');
       } finally {
@@ -101,15 +134,15 @@ export default function DashboardProfilePage() {
   const stats = useMemo(
     () => [
       { label: 'Trust', value: profile?.trust_score ? Number(profile.trust_score).toFixed(1) : '—' },
-      { label: 'Works', value: String(profile?.total_gigs ?? portfolio.length ?? 0) },
-      { label: 'From', value: profile?.pricing_from ? `KSh ${Number(profile.pricing_from).toLocaleString()}` : '—' },
+      { label: 'Works', value: String(portfolio.length || profile?.total_gigs || 0) },
+      { label: 'From', value: profile?.pricing_from ? `KSh ${Number(profile.pricing_from).toLocaleString()}` : 'Set price' },
     ],
     [portfolio.length, profile]
   );
 
   if (loading) {
     return (
-      <div className="flex min-h-[70vh] items-center justify-center">
+      <div className="flex min-h-[70vh] items-center justify-center bg-zinc-50 dark:bg-zinc-950">
         <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}>
           <SpinnerGap size={40} className="text-[#0066FF]" weight="bold" />
         </motion.div>
@@ -117,95 +150,91 @@ export default function DashboardProfilePage() {
     );
   }
 
-  if (error || !profile) {
+  if (error && !profile) {
     return (
       <div className="mx-auto flex min-h-[70vh] max-w-lg flex-col items-center justify-center gap-4 px-6 text-center">
         <WarningCircle size={48} className="text-rose-500" weight="duotone" />
         <h1 className="text-2xl font-black tracking-tight text-zinc-950 dark:text-white">Could not load profile</h1>
-        <p className="text-sm text-zinc-500">{error || 'Try again in a moment.'}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="rounded-full bg-zinc-950 px-5 py-3 text-xs font-bold text-white dark:bg-white dark:text-zinc-950"
-        >
-          Retry
-        </button>
+        <p className="text-sm text-zinc-500">{error}</p>
+        <div className="flex gap-3">
+          <button
+            onClick={() => window.location.reload()}
+            className="rounded-full bg-zinc-950 px-5 py-3 text-xs font-bold text-white dark:bg-white dark:text-zinc-950"
+          >
+            Retry
+          </button>
+          <Link href="/login" className="rounded-full border border-zinc-200 px-5 py-3 text-xs font-bold dark:border-zinc-700">
+            Log in again
+          </Link>
+        </div>
       </div>
     );
   }
 
-  return (
-    <div className="mx-auto max-w-5xl px-4 py-8 pb-24 lg:px-6">
-      <motion.section
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="overflow-hidden rounded-[28px] border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
-      >
-        <div className="relative h-40 bg-[radial-gradient(circle_at_20%_20%,rgba(0,102,255,0.35),transparent_45%),radial-gradient(circle_at_80%_0%,rgba(16,185,129,0.25),transparent_40%),linear-gradient(135deg,#0b1220,#111827)]">
-          <div className="absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:28px_28px]" />
-        </div>
+  const displayName = profile?.full_name || username || 'Professional';
 
-        <div className="relative px-6 pb-8 pt-0 sm:px-8">
-          <div className="-mt-12 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+  return (
+    <div className="min-h-screen bg-[#F4F6F8] pb-24 dark:bg-zinc-950">
+      {/* Hero */}
+      <section className="relative overflow-hidden border-b border-zinc-200 bg-zinc-950 text-white dark:border-zinc-800">
+        <div className="absolute inset-0 opacity-60 bg-[radial-gradient(ellipse_at_top_left,_rgba(0,102,255,0.45),_transparent_50%),radial-gradient(ellipse_at_bottom_right,_rgba(16,185,129,0.25),_transparent_45%)]" />
+        <div className="relative mx-auto max-w-5xl px-4 py-10 sm:px-6">
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex items-end gap-4">
-              <div className="flex h-24 w-24 items-center justify-center rounded-3xl border-4 border-white bg-zinc-900 text-3xl font-black text-white dark:border-zinc-950">
-                {(profile.full_name || username || 'W').slice(0, 1).toUpperCase()}
+              <div className="flex h-24 w-24 items-center justify-center rounded-[28px] border border-white/20 bg-white/10 text-4xl font-black backdrop-blur-md">
+                {displayName.slice(0, 1).toUpperCase()}
               </div>
-              <div className="pb-1">
+              <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-black tracking-tight text-zinc-950 dark:text-white">
-                    {profile.full_name || username}
-                  </h1>
-                  {profile.is_verified ? <SealCheck size={22} weight="fill" className="text-[#0066FF]" /> : null}
+                  <h1 className="text-3xl font-black tracking-tight sm:text-4xl">{displayName}</h1>
+                  {profile?.is_verified ? <SealCheck size={26} weight="fill" className="text-[#3B82F6]" /> : null}
                 </div>
-                <p className="text-sm font-semibold text-zinc-500">
-                  {profile.title || profile.trade || 'Workora professional'} · @{username}
+                <p className="mt-1 text-sm font-semibold text-white/70">
+                  {profile?.title || profile?.trade || 'Workora professional'} · @{username}
                 </p>
-                <p className="mt-1 flex items-center gap-1 text-xs font-medium text-zinc-400">
-                  <MapPin size={14} /> {profile.location || 'Kenya'}
+                <p className="mt-2 flex items-center gap-1 text-xs font-medium text-white/50">
+                  <MapPin size={14} /> {profile?.location || 'Kenya'}
                 </p>
               </div>
             </div>
-
             <div className="flex flex-wrap gap-2">
               <Link
-                href="/profile/edit"
-                className="inline-flex items-center gap-2 rounded-full bg-zinc-950 px-4 py-2.5 text-xs font-bold text-white dark:bg-white dark:text-zinc-950"
+                href="/dashboard/pro"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-xs font-bold text-zinc-950"
               >
                 <PencilSimple size={14} weight="bold" /> Edit profile
               </Link>
               <Link
                 href="/dashboard/create"
-                className="inline-flex items-center gap-2 rounded-full border border-zinc-200 px-4 py-2.5 text-xs font-bold text-zinc-950 dark:border-zinc-700 dark:text-white"
+                className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2.5 text-xs font-bold text-white backdrop-blur"
               >
                 <VideoCamera size={14} weight="bold" /> Upload work
               </Link>
             </div>
-          </div>
+          </motion.div>
 
-          {profile.bio ? (
-            <p className="mt-6 max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">{profile.bio}</p>
-          ) : (
-            <p className="mt-6 text-sm text-zinc-400">Add a short bio so clients know what you do best.</p>
-          )}
+          <p className="relative mt-6 max-w-2xl text-sm leading-relaxed text-white/75">
+            {profile?.bio || 'Add a short bio so clients know what you do best.'}
+          </p>
 
-          <div className="mt-6 grid grid-cols-3 gap-3">
+          <div className="relative mt-8 grid grid-cols-3 gap-3">
             {stats.map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-2xl border border-zinc-100 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900"
-              >
-                <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400">{stat.label}</p>
-                <p className="mt-1 text-lg font-black text-zinc-950 dark:text-white">{stat.value}</p>
+              <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur">
+                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/45">{stat.label}</p>
+                <p className="mt-1 text-xl font-black">{stat.value}</p>
               </div>
             ))}
           </div>
         </div>
-      </motion.section>
+      </section>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_280px]">
+      <div className="mx-auto grid max-w-5xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[1fr_280px]">
         <section>
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-black tracking-tight text-zinc-950 dark:text-white">Proof of work</h2>
+            <div>
+              <h2 className="text-xl font-black tracking-tight text-zinc-950 dark:text-white">Proof of work</h2>
+              <p className="text-xs font-semibold text-zinc-500">Videos that show what you deliver</p>
+            </div>
             <Link href="/dashboard/works" className="text-xs font-bold text-[#0066FF]">
               Open works <ArrowRight size={12} className="inline" />
             </Link>
@@ -216,19 +245,24 @@ export default function DashboardProfilePage() {
               {portfolio.map((item, index) => (
                 <motion.div
                   key={item.id}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-950 dark:border-zinc-800"
+                  transition={{ delay: index * 0.04 }}
+                  className="overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
                 >
-                  <div className="aspect-[9/14] sm:aspect-video">
+                  <div className="aspect-[9/14] bg-zinc-950 sm:aspect-video">
                     {item.video_url ? (
-                      <VideoPlayer src={item.video_url} poster={item.thumbnail_url} className="h-full w-full" autoPlay />
+                      <VideoPlayer
+                        src={item.video_url}
+                        poster={item.thumbnail_url}
+                        className="h-full w-full"
+                        autoPlay
+                      />
                     ) : (
                       <div className="flex h-full items-center justify-center text-zinc-500">No media</div>
                     )}
                   </div>
-                  <div className="bg-white p-4 dark:bg-zinc-950">
+                  <div className="p-4">
                     <p className="truncate text-sm font-bold text-zinc-950 dark:text-white">
                       {item.title || 'Untitled work'}
                     </p>
@@ -240,10 +274,11 @@ export default function DashboardProfilePage() {
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-200 px-6 py-16 text-center dark:border-zinc-800">
-              <VideoCamera size={36} className="text-zinc-300" />
-              <p className="mt-3 text-sm font-bold text-zinc-950 dark:text-white">No work on this profile yet</p>
-              <Link href="/dashboard/create" className="mt-4 rounded-full bg-[#0066FF] px-4 py-2 text-xs font-bold text-white">
+            <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-zinc-300 bg-white px-6 py-16 text-center dark:border-zinc-700 dark:bg-zinc-900">
+              <VideoCamera size={40} className="text-zinc-300" />
+              <p className="mt-3 text-base font-black text-zinc-950 dark:text-white">No work on this profile yet</p>
+              <p className="mt-1 max-w-xs text-xs text-zinc-500">Upload a short video of a finished job to attract clients.</p>
+              <Link href="/dashboard/create" className="mt-5 rounded-full bg-[#0066FF] px-5 py-2.5 text-xs font-bold text-white">
                 Upload your first video
               </Link>
             </div>
@@ -251,28 +286,42 @@ export default function DashboardProfilePage() {
         </section>
 
         <aside className="space-y-4">
-          <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-            <h3 className="text-sm font-black text-zinc-950 dark:text-white">Skills</h3>
+          <div className="rounded-3xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="flex items-center gap-2">
+              <Sparkle size={16} className="text-[#0066FF]" weight="fill" />
+              <h3 className="text-sm font-black text-zinc-950 dark:text-white">Skills</h3>
+            </div>
             {skills.length > 0 ? (
               <div className="mt-3 flex flex-wrap gap-2">
                 {skills.map((skill) => (
                   <span
                     key={skill.id}
-                    className="rounded-full bg-zinc-100 px-3 py-1 text-[11px] font-bold text-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+                    className="rounded-full bg-zinc-100 px-3 py-1 text-[11px] font-bold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
                   >
                     {skill.skill_name}
                   </span>
                 ))}
               </div>
             ) : (
-              <p className="mt-2 text-xs text-zinc-400">No skills listed yet.</p>
+              <p className="mt-2 text-xs text-zinc-400">No skills listed yet. Add them from your pro dashboard.</p>
             )}
           </div>
 
-          <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
-            <h3 className="text-sm font-black text-zinc-950 dark:text-white">Trade</h3>
-            <p className="mt-2 text-sm font-semibold text-zinc-600 dark:text-zinc-300">{profile.trade || 'Not set'}</p>
+          <div className="rounded-3xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="flex items-center gap-2">
+              <Briefcase size={16} className="text-emerald-500" weight="fill" />
+              <h3 className="text-sm font-black text-zinc-950 dark:text-white">Trade</h3>
+            </div>
+            <p className="mt-2 text-sm font-semibold text-zinc-600 dark:text-zinc-300">{profile?.trade || 'Not set'}</p>
           </div>
+
+          <Link
+            href="/dashboard/feed"
+            className="flex items-center justify-between rounded-3xl bg-zinc-950 px-5 py-4 text-white dark:bg-white dark:text-zinc-950"
+          >
+            <span className="text-xs font-black uppercase tracking-wider">Back to home feed</span>
+            <ArrowRight size={16} weight="bold" />
+          </Link>
         </aside>
       </div>
     </div>

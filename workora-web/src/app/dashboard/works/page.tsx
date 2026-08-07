@@ -50,18 +50,25 @@ export default function WorksPage() {
 
   const fetchWorks = async () => {
     try {
-      let res = await apiFetch('/api/gigs/feed?scope=reels&page=1&limit=50');
-      if (!res.ok) {
-        res = await apiFetch('/api/gigs/explore?limit=50');
+      const endpoints = [
+        '/api/gigs/feed?scope=reels&page=1&limit=50',
+        '/api/gigs/feed?scope=new&page=1&limit=50',
+        '/api/gigs/explore?limit=50&page=1',
+      ];
+      let worksList: Work[] = [];
+      for (const endpoint of endpoints) {
+        const res = await apiFetch(endpoint);
+        if (!res.ok) continue;
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          worksList = data.filter((item: Work) => Boolean(item.video_url));
+          if (worksList.length > 0) break;
+        }
       }
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        setWorks(data.filter((item: Work) => Boolean(item.video_url)));
-      } else {
-        setWorks([]);
-      }
+      setWorks(worksList);
     } catch (err) {
       console.error('Works fetch failed:', err);
+      setWorks([]);
     } finally {
       setLoading(false);
     }

@@ -9,6 +9,17 @@ function readBearer(request: Request): string | null {
   return match?.[1]?.trim() || null;
 }
 
+function withQuery(targetPath: string, request: Request) {
+  // Preserve caller query string unless the path already includes one
+  if (targetPath.includes('?')) return targetPath;
+  try {
+    const incoming = new URL(request.url).search;
+    return incoming ? `${targetPath}${incoming}` : targetPath;
+  } catch {
+    return targetPath;
+  }
+}
+
 export async function proxyRequest(targetPath: string, request: Request) {
   try {
     const cookieStore = await cookies();
@@ -17,7 +28,8 @@ export async function proxyRequest(targetPath: string, request: Request) {
     const token = cookieToken || headerToken;
 
     const backendUrl = getBackendBaseUrl();
-    const url = `${backendUrl}${targetPath}`;
+    const resolvedPath = withQuery(targetPath, request);
+    const url = `${backendUrl}${resolvedPath}`;
     const method = request.method;
 
     let body: BodyInit | undefined = undefined;

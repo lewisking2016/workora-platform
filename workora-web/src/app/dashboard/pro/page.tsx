@@ -13,7 +13,7 @@ import {
 import Link from 'next/link';
 import Image from 'next/image';
 import { VideoPlayer } from '@/components/VideoPlayer';
-import { apiFetch, fetchCurrentUser } from '@/lib/session';
+import { apiFetch, fetchCurrentUser, getStoredToken } from '@/lib/session';
 
 type Tab = 'overview' | 'profile' | 'portfolio' | 'analytics';
 
@@ -101,7 +101,10 @@ export default function BusinessDashboard() {
       if (!mounted) return;
 
       if (!user) {
-        window.location.href = '/login';
+        // Only bounce if there is truly no session token
+        if (!getStoredToken()) {
+          window.location.href = '/login';
+        }
         return;
       }
 

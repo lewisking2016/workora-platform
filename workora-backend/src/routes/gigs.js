@@ -18,13 +18,14 @@ async function gigRoutes(fastify) {
     const trade = request.query.trade ? String(request.query.trade) : null;
     const actorId = resolveActorId(request) || null;
 
+    // Use real_likes (computed) — never base.likes_count (ambiguous when gigs.likes_count exists)
     const orderBy = ({
       new: 'base.created_at DESC',
-      trending: 'base.view_count DESC, base.likes_count DESC, base.created_at DESC',
-      recommended: 'base.creator_trust_score DESC, base.likes_count DESC, base.created_at DESC',
+      trending: 'base.view_count DESC, base.real_likes DESC, base.created_at DESC',
+      recommended: 'base.creator_trust_score DESC, base.real_likes DESC, base.created_at DESC',
       following: 'base.created_at DESC',
       nearby: 'base.created_at DESC',
-      reels: 'base.view_count DESC, base.likes_count DESC, base.created_at DESC'
+      reels: 'base.view_count DESC, base.real_likes DESC, base.created_at DESC'
     })[scope] || 'base.created_at DESC';
 
     const tradeClause = trade ? 'AND base.trade ILIKE $4' : '';
@@ -40,68 +41,105 @@ async function gigRoutes(fastify) {
       new: ''
     })[scope] || '';
 
-    const res = await pool.query(`
-      WITH base AS (
+    try {
+      const res = await pool.query(`
+        WITH base AS (
+          SELECT
+            g.id,
+            g.worker_id,
+            g.user_id,
+            g.title,
+            g.description,
+            g.category,
+            g.video_url,
+            g.thumbnail_url,
+            g.view_count,
+            g.created_at,
+            COALESCE(wp.full_name, up.full_name, u.username, 'Member') AS user_name,
+            COALESCE(u.username, 'member') AS handle,
+            COALESCE(wp.trade, up.trade, g.category, 'Member') AS trade,
+            COALESCE(wp.is_verified, up.is_verified, false) AS verified,
+            COALESCE(wp.avatar_url, up.avatar_url) AS avatar_url,
+            COALESCE(wp.location, up.location, 'Kenya') AS creator_location,
+            COALESCE(wp.trust_score, up.trust_score, 0) AS creator_trust_score,
+            COALESCE(g.user_id, wp.user_id, up.user_id) AS creator_user_id,
+            CASE
+              WHEN $1::uuid IS NULL THEN false
+              ELSE EXISTS (
+                SELECT 1 FROM saved_gigs sg
+                WHERE sg.gig_id = g.id AND sg.user_id = $1
+              )
+            END AS saved_by_me,
+            (SELECT COUNT(*)::int FROM gig_likes WHERE gig_id = g.id) AS likes_count,
+            (SELECT COUNT(*)::int FROM gig_comments WHERE gig_id = g.id) AS comments_count,
+            (SELECT COUNT(*)::int FROM gig_likes WHERE gig_id = g.id) AS real_likes,
+            (SELECT COUNT(*)::int FROM gig_comments WHERE gig_id = g.id) AS real_comments,
+            CASE
+              WHEN $1::uuid IS NULL THEN false
+              ELSE EXISTS (
+                SELECT 1 FROM gig_likes gl
+                WHERE gl.gig_id = g.id AND gl.user_id = $1
+              )
+            END AS liked_by_me,
+            CASE
+              WHEN $1::uuid IS NULL THEN false
+              ELSE EXISTS (
+                SELECT 1 FROM user_follows uf
+                WHERE uf.follower_id = $1 AND uf.following_user_id = COALESCE(g.user_id, wp.user_id, up.user_id)
+              )
+            END AS following_by_me
+          FROM gigs g
+          ${gigAuthorJoins}
+        )
+        SELECT *
+        FROM base
+        WHERE 1 = 1
+          ${tradeClause}
+          ${scopeClause}
+          AND ($1::uuid IS NULL OR NOT EXISTS (
+            SELECT 1 FROM gig_hides gh
+            WHERE gh.user_id = $1 AND gh.gig_id = base.id
+          ))
+          AND ($1::uuid IS NULL OR NOT EXISTS (
+            SELECT 1 FROM user_mutes um
+            WHERE um.user_id = $1 AND um.muted_user_id = base.creator_user_id
+          ))
+          AND ($1::uuid IS NULL OR NOT EXISTS (
+            SELECT 1 FROM user_blocks ub
+            WHERE ub.blocker_id = $1 AND ub.blocked_user_id = base.creator_user_id
+          ))
+        ORDER BY ${orderBy}
+        LIMIT $2 OFFSET $3
+      `, trade ? [actorId, limit, offset, `%${trade}%`] : [actorId, limit, offset]);
+
+      return res.rows;
+    } catch (err) {
+      request.log.error({ err, scope }, 'Feed query failed — falling back to simple list');
+      const fallback = await pool.query(`
         SELECT
-          g.*,
+          g.id, g.worker_id, g.user_id, g.title, g.description, g.category,
+          g.video_url, g.thumbnail_url, g.view_count, g.created_at,
           COALESCE(wp.full_name, up.full_name, u.username, 'Member') AS user_name,
           COALESCE(u.username, 'member') AS handle,
           COALESCE(wp.trade, up.trade, g.category, 'Member') AS trade,
           COALESCE(wp.is_verified, up.is_verified, false) AS verified,
           COALESCE(wp.avatar_url, up.avatar_url) AS avatar_url,
-          COALESCE(wp.location, up.location, 'Kenya') AS creator_location,
-          COALESCE(wp.trust_score, up.trust_score, 0) AS creator_trust_score,
           COALESCE(g.user_id, wp.user_id, up.user_id) AS creator_user_id,
-          CASE
-            WHEN $1::uuid IS NULL THEN false
-            ELSE EXISTS (
-              SELECT 1 FROM saved_gigs sg
-              WHERE sg.gig_id = g.id AND sg.user_id = $1
-            )
-          END AS saved_by_me,
+          false AS saved_by_me,
+          false AS liked_by_me,
+          false AS following_by_me,
           (SELECT COUNT(*)::int FROM gig_likes WHERE gig_id = g.id) AS likes_count,
           (SELECT COUNT(*)::int FROM gig_comments WHERE gig_id = g.id) AS comments_count,
           (SELECT COUNT(*)::int FROM gig_likes WHERE gig_id = g.id) AS real_likes,
-          (SELECT COUNT(*)::int FROM gig_comments WHERE gig_id = g.id) AS real_comments,
-          CASE
-            WHEN $1::uuid IS NULL THEN false
-            ELSE EXISTS (
-              SELECT 1 FROM gig_likes gl
-              WHERE gl.gig_id = g.id AND gl.user_id = $1
-            )
-          END AS liked_by_me,
-          CASE
-            WHEN $1::uuid IS NULL THEN false
-            ELSE EXISTS (
-              SELECT 1 FROM user_follows uf
-              WHERE uf.follower_id = $1 AND uf.following_user_id = COALESCE(g.user_id, wp.user_id, up.user_id)
-            )
-          END AS following_by_me
+          (SELECT COUNT(*)::int FROM gig_comments WHERE gig_id = g.id) AS real_comments
         FROM gigs g
         ${gigAuthorJoins}
-      )
-      SELECT *
-      FROM base
-      WHERE 1 = 1
-        ${tradeClause}
-        ${scopeClause}
-        AND NOT EXISTS (
-          SELECT 1 FROM gig_hides gh
-          WHERE gh.user_id = $1 AND gh.gig_id = base.id
-        )
-        AND NOT EXISTS (
-          SELECT 1 FROM user_mutes um
-          WHERE um.user_id = $1 AND um.muted_user_id = base.creator_user_id
-        )
-        AND NOT EXISTS (
-          SELECT 1 FROM user_blocks ub
-          WHERE ub.blocker_id = $1 AND ub.blocked_user_id = base.creator_user_id
-        )
-      ORDER BY ${orderBy}
-      LIMIT $2 OFFSET $3
-    `, trade ? [actorId, limit, offset, `%${trade}%`] : [actorId, limit, offset]);
-
-    return res.rows;
+        WHERE COALESCE(g.video_url, '') <> ''
+        ORDER BY g.created_at DESC
+        LIMIT $1 OFFSET $2
+      `, [limit, offset]);
+      return fallback.rows;
+    }
   });
 
   // 2. GET EXPLORE (Trending/Discovery) - DIRECT QUERY (CACHE DISABLED)

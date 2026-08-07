@@ -191,32 +191,27 @@ export default function DashboardFeedPage() {
         setLoadingMore(true);
       }
 
-      const res = await apiFetch(`/api/gigs/feed?scope=${nextScope}&page=${page}&limit=${PAGE_SIZE}`);
+      let res = await apiFetch(`/api/gigs/feed?scope=${nextScope}&page=${page}&limit=${PAGE_SIZE}`);
       if (!res.ok) {
-        // Fallback to explore list so the home feed still shows work during schema gaps
-        const fallback = await apiFetch(`/api/gigs/explore?limit=${PAGE_SIZE}&page=${page}`);
-        if (!fallback.ok) {
-          throw new Error(`Feed request failed with ${res.status}`);
-        }
-        const fallbackData = await fallback.json();
-        const nextPosts = Array.isArray(fallbackData) ? fallbackData : [];
-        setPosts(prev => append ? [...prev, ...nextPosts] : nextPosts);
-        setHasMore(nextPosts.length === PAGE_SIZE);
-        setFeedPage(page);
-        setFeedError(null);
-        return;
+        // Fallback chain so presentation never shows an empty broken feed
+        res = await apiFetch(`/api/gigs/feed?scope=new&page=${page}&limit=${PAGE_SIZE}`);
+      }
+      if (!res.ok) {
+        res = await apiFetch(`/api/gigs/explore?limit=${PAGE_SIZE}&page=${page}`);
+      }
+      if (!res.ok) {
+        throw new Error(`Feed request failed with ${res.status}`);
       }
 
       const data = await res.json();
-      const nextPosts = Array.isArray(data) ? data : [];
+      const nextPosts = (Array.isArray(data) ? data : []).filter(
+        (item: { video_url?: string; id?: string }) => Boolean(item?.id)
+      );
 
       setPosts(prev => append ? [...prev, ...nextPosts] : nextPosts);
       setHasMore(nextPosts.length === PAGE_SIZE);
       setFeedPage(page);
-
-      if (page === 1 && nextPosts.length === 0) {
-        setFeedError(null);
-      }
+      setFeedError(null);
     } catch (error) {
       console.error('Feed fetch failed:', error);
       setFeedError('We could not load this feed right now.');

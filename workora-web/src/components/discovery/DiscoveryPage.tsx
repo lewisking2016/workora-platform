@@ -203,7 +203,10 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
       if (filters.minTrust) params.set('min_trust', filters.minTrust);
       params.set('sort', sort);
 
-      const res = await apiFetch(`/api/search?${params.toString()}`);
+      let res = await apiFetch(`/api/search?${params.toString()}`);
+      if (!res.ok) {
+        res = await apiFetch(`/api/profile/search?${params.toString()}`);
+      }
       if (!res.ok) {
         throw new Error(`Search failed with ${res.status}`);
       }
@@ -247,23 +250,42 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
         apiFetch('/api/profile/collections?kind=saved'),
       ]);
 
+      const loadJson = async (res: Response, fallbackUrl?: string) => {
+        if (res.ok) return res.json();
+        if (fallbackUrl) {
+          const fb = await apiFetch(fallbackUrl);
+          if (fb.ok) return fb.json();
+        }
+        return [];
+      };
+
       const [trustData, recentData, nearbyData, trendData, nearbyGigsData, businessData, collectionsData, savedCollectionsData] = await Promise.all([
-        trustRes.json(),
-        recentRes.json(),
-        nearbyRes.json(),
-        trendRes.ok ? trendRes.json() : apiFetch('/api/gigs/explore?limit=12').then((r) => r.json()),
-        nearbyGigsRes.ok ? nearbyGigsRes.json() : apiFetch('/api/gigs/explore?limit=12').then((r) => r.json()),
-        businessesRes.json(),
-        collectionsRes.json(),
-        savedCollectionsRes.json(),
+        loadJson(trustRes, '/api/profile/search?sort=trust'),
+        loadJson(recentRes, '/api/profile/search?sort=recent'),
+        loadJson(nearbyRes, '/api/profile/search?sort=location'),
+        loadJson(trendRes, '/api/gigs/explore?limit=12'),
+        loadJson(nearbyGigsRes, '/api/gigs/explore?limit=12'),
+        loadJson(businessesRes),
+        loadJson(collectionsRes),
+        loadJson(savedCollectionsRes),
       ]);
+
+      // If trending still empty, pull explore videos so the page always shows work
+      let trending = Array.isArray(trendData) ? trendData.slice(0, 12) : [];
+      if (trending.length === 0) {
+        const exploreRes = await apiFetch('/api/gigs/explore?limit=12');
+        if (exploreRes.ok) {
+          const exploreData = await exploreRes.json();
+          trending = Array.isArray(exploreData) ? exploreData.slice(0, 12) : [];
+        }
+      }
 
       setTrustPros(Array.isArray(trustData) ? trustData.slice(0, 8) : []);
       setFeaturedPros(Array.isArray(recentData) ? recentData.slice(0, 8) : []);
       setNearbyPros(Array.isArray(nearbyData) ? nearbyData.slice(0, 8) : []);
       setRecommendedPros(Array.isArray(trustData) ? trustData.slice(0, 8) : []);
-      setTrendingGigList(Array.isArray(trendData) ? trendData.slice(0, 12) : []);
-      setNearbyGigList(Array.isArray(nearbyGigsData) ? nearbyGigsData.slice(0, 12) : []);
+      setTrendingGigList(trending);
+      setNearbyGigList(Array.isArray(nearbyGigsData) && nearbyGigsData.length ? nearbyGigsData.slice(0, 12) : trending);
       setFeaturedBusinesses(Array.isArray(businessData) ? businessData.slice(0, 8) : []);
       setCollections(Array.isArray(collectionsData) ? collectionsData.slice(0, 8) : []);
       setSavedCollections(Array.isArray(savedCollectionsData) ? savedCollectionsData.slice(0, 8) : []);
