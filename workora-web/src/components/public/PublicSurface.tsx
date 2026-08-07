@@ -1,12 +1,16 @@
 'use client';
 
+import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle, House, ShieldCheck, Sparkle, UsersThree, VideoCamera } from '@phosphor-icons/react';
+import { motion } from 'framer-motion';
+import {
+  ArrowRight, CheckCircle, House, ShieldCheck, Sparkle, UsersThree,
+  VideoCamera, PhoneCall, EnvelopeSimple, BookOpen, Key
+} from '@phosphor-icons/react';
 
 import { SafeMediaThumb } from '@/components/SafeMediaThumb';
 import { VideoPlayer } from '@/components/VideoPlayer';
-import { MeshBackground } from '@/components/MeshBackground';
-import { APP_DEFAULTS, PublicGig, PublicSurfaceData, publicSurfaceTheme } from '@/lib/public-surface';
+import { APP_DEFAULTS, PublicGig, PublicSurfaceData } from '@/lib/public-surface';
 
 type SurfaceVariant =
   | 'about'
@@ -33,103 +37,103 @@ type SurfaceConfig = {
 
 const SURFACE_CONFIG: Record<SurfaceVariant, SurfaceConfig> = {
   about: {
-    kicker: 'About Workora',
-    title: 'Built to make proof visible.',
-    subtitle: 'Workora turns local work, trust, and reputation into something people can actually inspect.',
-    primaryCta: { label: 'Join Workora', href: '/join' },
-    secondaryCta: { label: 'See the platform', href: '/platform' },
-    highlights: ['Verified profiles', 'Proof-of-work media', 'Live trust signals'],
-    body: 'We are building the surface where workers, businesses, and hirers can meet without guesswork.',
+    kicker: 'About system',
+    title: 'Making proof visible across East Africa',
+    subtitle: 'We turn local work, trust, and reputation into something people can verify instantly.',
+    primaryCta: { label: 'Join as helper', href: '/join' },
+    secondaryCta: { label: 'How it works', href: '/platform' },
+    highlights: ['Verified identity checks', 'Proof-of-work captures', 'Direct-to-client connections'],
+    body: 'We are building the trust infrastructure where workers, businesses, and hirers meet without guesswork.',
   },
   business: {
-    kicker: 'For Business',
-    title: 'Find the right pro faster.',
+    kicker: 'For business',
+    title: 'Find the right specialist faster',
     subtitle: 'Browse live work, compare trade specialists, and start with evidence instead of assumptions.',
-    primaryCta: { label: 'Search professionals', href: '/dashboard/search' },
-    secondaryCta: { label: 'Open analytics', href: '/dashboard/analytics' },
-    highlights: ['Trust-first discovery', 'Live availability', 'Actionable analytics'],
+    primaryCta: { label: 'Search workers', href: '/dashboard/search' },
+    secondaryCta: { label: 'Platform details', href: '/platform' },
+    highlights: ['Trust-first discovery', 'Live availability', 'Workforce analytics'],
     body: 'Business users need short paths to trusted people, clear signals, and fewer dead ends.',
   },
   careers: {
-    kicker: 'Careers',
-    title: 'Join the team shaping local trust.',
-    subtitle: 'We build product, systems, and workflows that help people get seen for their real skills.',
-    primaryCta: { label: 'Contact us', href: '/contact' },
-    secondaryCta: { label: 'Read about Workora', href: '/about' },
-    highlights: ['Product design', 'Backend systems', 'Mobile and web'],
+    kicker: 'Careers & Team',
+    title: 'Build the trust layer for the informal economy',
+    subtitle: 'We build products, systems, and workflows that help people get seen for their real skills.',
+    primaryCta: { label: 'Contact engineering', href: '/contact' },
+    secondaryCta: { label: 'About system', href: '/about' },
+    highlights: ['Product engineering', 'Trust protocols', 'Distributed platforms'],
     body: 'If you care about useful software for real users, this is the kind of problem space that matters.',
   },
   contact: {
-    kicker: 'Contact',
-    title: 'Talk to the team behind the platform.',
+    kicker: 'Get in touch',
+    title: 'Talk to the team behind the platform',
     subtitle: 'Support, product questions, partnerships, and verification issues all belong here.',
-    primaryCta: { label: 'Open help center', href: '/help' },
-    secondaryCta: { label: 'Review safety', href: '/safety' },
-    highlights: ['Support routing', 'Partnerships', 'Safety reports'],
+    primaryCta: { label: 'Get support', href: '/help' },
+    secondaryCta: { label: 'Safety checklist', href: '/safety' },
+    highlights: ['Direct support routing', 'Verification help', 'Business queries'],
     body: 'Contact should be fast, traceable, and clearly routed to the right human.',
   },
   help: {
-    kicker: 'Help',
-    title: 'Get unstuck without hunting.',
+    kicker: 'Help & Support',
+    title: 'Get unstuck without hunting',
     subtitle: 'Answers, recovery paths, and escalation steps for the most common account and platform issues.',
     primaryCta: { label: 'Reset password', href: '/forgot' },
-    secondaryCta: { label: 'Read terms', href: '/terms' },
-    highlights: ['Login issues', 'Upload issues', 'Trust questions'],
-    body: 'Support content should not waste time. It should get the user to the next safe step.',
+    secondaryCta: { label: 'Terms of service', href: '/terms' },
+    highlights: ['Login help', 'Media upload issues', 'Trust score questions'],
+    body: 'Support content should not waste time. It should get you to the next safe step.',
   },
   personal: {
-    kicker: 'For Hirers',
-    title: 'Find a person you can trust.',
+    kicker: 'For hirers',
+    title: 'Find a person you can trust',
     subtitle: 'See work history, proof, and reviews before you commit to a conversation.',
-    primaryCta: { label: 'Create account', href: '/join' },
-    secondaryCta: { label: 'Browse trust card', href: '/trust' },
-    highlights: ['Public profiles', 'Proof-of-work', 'Direct messaging'],
+    primaryCta: { label: 'Find a helper', href: '/dashboard/search' },
+    secondaryCta: { label: 'Trust protocols', href: '/trust' },
+    highlights: ['Public profiles', 'Proof-of-work streams', 'Direct messaging'],
     body: 'This side of the product should feel calm, confident, and easy to compare.',
   },
   platform: {
     kicker: 'Platform',
-    title: 'The full Workora system in one place.',
+    title: 'The complete system in one place',
     subtitle: 'Discovery, identity, messaging, uploads, and analytics all sit on the same live platform.',
     primaryCta: { label: 'Open feed', href: '/dashboard/feed' },
-    secondaryCta: { label: 'Open search', href: '/dashboard/search' },
-    highlights: ['Feed', 'Search', 'Messaging'],
-    body: 'The platform page should explain the whole product without drifting into marketing filler.',
+    secondaryCta: { label: 'Search workers', href: '/dashboard/search' },
+    highlights: ['Live feed', 'Advanced search', 'Protected messaging'],
+    body: 'The platform page explains the whole product without drifting into marketing filler.',
   },
   privacy: {
-    kicker: 'Privacy',
-    title: 'How data is handled.',
-    subtitle: 'Clear handling of identity, content, analytics, and support data.',
-    primaryCta: { label: 'Read terms', href: '/terms' },
-    secondaryCta: { label: 'Contact support', href: '/contact' },
-    highlights: ['Access control', 'Data retention', 'Event logging'],
-    body: 'Privacy content should be readable, direct, and attached to real behavior in the product.',
+    kicker: 'Privacy policy',
+    title: 'How your data is handled',
+    subtitle: 'Clear, direct details about identity, content, analytics, and support data handling.',
+    primaryCta: { label: 'Terms of use', href: '/terms' },
+    secondaryCta: { label: 'Contact team', href: '/contact' },
+    highlights: ['Secure encryption', 'Minimal data retention', 'Event logging transparency'],
+    body: 'Privacy content is readable, direct, and attached to real behavior in the product.',
   },
   safety: {
-    kicker: 'Safety',
-    title: 'Trust, reporting, and escalation.',
-    subtitle: 'Paths for abuse, scam reports, harmful content, and platform recovery.',
-    primaryCta: { label: 'Report an issue', href: '/contact' },
-    secondaryCta: { label: 'Read trust', href: '/trust' },
-    highlights: ['Report abuse', 'Block users', 'Verification'],
-    body: 'Safety content should help users act quickly when something feels wrong.',
+    kicker: 'Safety protocol',
+    title: 'Trust, reporting, and escalation',
+    subtitle: 'Paths for abuse reports, block requests, and platform recovery.',
+    primaryCta: { label: 'Report issue', href: '/contact' },
+    secondaryCta: { label: 'Trust ledger', href: '/trust' },
+    highlights: ['Report abuse', 'Block users', 'Vetting validation'],
+    body: 'Safety content helps you act quickly when something feels wrong.',
   },
   terms: {
-    kicker: 'Terms',
-    title: 'The rules for using Workora.',
+    kicker: 'Terms of use',
+    title: 'The rules for using Workora',
     subtitle: 'Permissions, obligations, and responsibilities for everyone using the platform.',
-    primaryCta: { label: 'Read privacy', href: '/privacy' },
+    primaryCta: { label: 'Privacy policy', href: '/privacy' },
     secondaryCta: { label: 'Get help', href: '/help' },
     highlights: ['User obligations', 'Content rules', 'Service limits'],
-    body: 'Terms should be organized, clear, and connected to the real flows users take.',
+    body: 'Terms are organized, clear, and connected to the real flows users take.',
   },
   trust: {
-    kicker: 'Trust',
-    title: 'What makes a profile believable.',
+    kicker: 'Trust ledger',
+    title: 'What makes a profile believable',
     subtitle: 'Verification, media, ratings, and consistent activity are what turn a page into evidence.',
-    primaryCta: { label: 'Open profile', href: '/profile' },
-    secondaryCta: { label: 'Join now', href: '/join' },
-    highlights: ['Verified identity', 'Public work history', 'Ratings'],
-    body: 'The trust page should show the data model that gives the product its point of view.',
+    primaryCta: { label: 'Open dashboard', href: '/dashboard/pro' },
+    secondaryCta: { label: 'Create account', href: '/join' },
+    highlights: ['Verified identity', 'Public work history', 'Authenticated ratings'],
+    body: 'The trust page explains the data model that gives the product its point of view.',
   },
 };
 
@@ -147,31 +151,31 @@ function countByTrade(items: PublicGig[]) {
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className={`border ${publicSurfaceTheme.border} ${publicSurfaceTheme.panel} p-5 tech-card`}>
-      <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${publicSurfaceTheme.soft}`}>{label}</p>
-      <p className={`mt-3 text-2xl font-black tracking-tighter ${publicSurfaceTheme.text}`}>{value}</p>
+    <div className="bg-white border border-zinc-100 p-6 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
+      <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">{label}</p>
+      <p className="mt-2 text-3xl font-black text-zinc-900 tracking-tight">{value}</p>
     </div>
   );
 }
 
 function GigPreview({ gig }: { gig: PublicGig }) {
   return (
-    <article className={`border ${publicSurfaceTheme.border} ${publicSurfaceTheme.surface} tech-card`}>
-      <div className="relative aspect-[4/3] bg-zinc-100">
+    <article className="card overflow-hidden">
+      <div className="relative aspect-[16/10] bg-zinc-100">
         {gig.video_url ? (
-          <VideoPlayer src={gig.video_url} poster={gig.thumbnail_url || undefined} className="h-full w-full" autoPlay={false} />
+          <VideoPlayer src={gig.video_url} poster={gig.thumbnail_url || undefined} className="h-full w-full object-cover" autoPlay={false} />
         ) : (
           <SafeMediaThumb src={gig.thumbnail_url || APP_DEFAULTS.thumbnail} alt={gig.title || 'Workora post'} className="h-full w-full object-cover" />
         )}
       </div>
-      <div className="p-5">
-        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#0066FF]">
-          <ShieldCheck size={14} weight="bold" />
+      <div className="p-6">
+        <div className="flex items-center gap-1.5 text-xs font-bold text-blue-600 uppercase tracking-wider">
+          <ShieldCheck size={16} weight="fill" />
           {gig.trade || gig.category || 'Member'}
         </div>
-        <h3 className={`mt-3 text-lg font-black leading-tight uppercase tracking-tight ${publicSurfaceTheme.text}`}>{gig.title || 'Live proof-of-work post'}</h3>
-        <p className={`mt-2 text-sm leading-relaxed ${publicSurfaceTheme.muted}`}>{gig.description || 'A live post from the feed gives this screen real platform context.'}</p>
-        <div className="mt-4 flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+        <h3 className="mt-3 text-lg font-bold text-zinc-900 tracking-tight leading-snug">{gig.title || 'Live proof-of-work post'}</h3>
+        <p className="mt-2 text-sm text-zinc-500 leading-relaxed line-clamp-2">{gig.description || 'A live post from the feed.'}</p>
+        <div className="mt-4 pt-4 border-t border-zinc-50 flex items-center justify-between text-xs text-zinc-400 font-semibold uppercase">
           <span>{gig.user_name || gig.handle || 'Member'}</span>
           <span>{Number(gig.likes_count || 0)} likes</span>
         </div>
@@ -182,9 +186,9 @@ function GigPreview({ gig }: { gig: PublicGig }) {
 
 function LegalPanel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className={`border ${publicSurfaceTheme.border} ${publicSurfaceTheme.surface} p-6 md:p-8 tech-card`}>
-      <h2 className={`text-2xl font-black tracking-tighter uppercase ${publicSurfaceTheme.text}`}>{title}</h2>
-      <div className={`mt-4 space-y-4 text-sm leading-relaxed ${publicSurfaceTheme.muted}`}>{children}</div>
+    <section className="card p-8 md:p-10 space-y-6">
+      <h2 className="text-zinc-900 text-3xl leading-tight font-black">{title}</h2>
+      <div className="space-y-4 text-zinc-500 leading-relaxed text-base">{children}</div>
     </section>
   );
 }
@@ -192,155 +196,209 @@ function LegalPanel({ title, children }: { title: string; children: React.ReactN
 export function PublicSurface({ variant, data }: { variant: SurfaceVariant; data: PublicSurfaceData }) {
   const config = SURFACE_CONFIG[variant];
   const topTrades = countByTrade(data.feed.length ? data.feed : data.explore);
-  const spotlight = (data.feed.length ? data.feed : data.explore).slice(0, 4);
+  const spotlight = (data.feed.length ? data.feed : data.explore).slice(0, 3);
   const supportMode = ['help', 'contact', 'careers'].includes(variant);
   const legalMode = ['privacy', 'terms', 'safety'].includes(variant);
 
   return (
-    <main className={`relative mx-auto max-w-screen-2xl px-5 py-12 md:px-8 lg:px-10 ${publicSurfaceTheme.surface} pt-24`}>
-      <MeshBackground />
-      <section className="relative z-10 grid gap-12 lg:grid-cols-[1.2fr_0.8fr] lg:items-start mb-24">
-        <div className="space-y-8">
-          <div className="inline-flex items-center gap-2 border border-black/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-black">
-            <Sparkle size={14} weight="bold" />
-            {config.kicker}
-          </div>
-          <h1 className={`max-w-3xl text-5xl font-black tracking-tighter md:text-7xl uppercase leading-[0.9] ${publicSurfaceTheme.text}`}>{config.title}</h1>
-          <p className={`max-w-2xl text-lg leading-relaxed md:text-xl ${publicSurfaceTheme.muted}`}>{config.subtitle}</p>
-          <p className={`max-w-2xl text-sm leading-relaxed ${publicSurfaceTheme.muted}`}>{config.body}</p>
-          <div className="flex flex-wrap gap-4 pt-4">
-            <Link href={config.primaryCta.href} className="inline-flex h-14 items-center justify-center gap-3 bg-black px-8 text-xs font-black uppercase tracking-widest text-white transition-all hover:bg-[#0066FF]">
-              {config.primaryCta.label}
-              <ArrowRight size={16} weight="bold" />
-            </Link>
-            <Link href={config.secondaryCta.href} className={`inline-flex h-14 items-center justify-center gap-3 border border-black/10 px-8 text-xs font-black uppercase tracking-widest ${publicSurfaceTheme.text} transition-colors hover:bg-zinc-50`}>
-              {config.secondaryCta.label}
-            </Link>
-          </div>
-        </div>
+    <main className="min-h-screen bg-transparent text-zinc-900 pt-28 pb-20">
+      
+      {/* 1. Header Hero section */}
+      <section className="max-w-6xl mx-auto px-6 mb-20">
+        <div className="grid lg:grid-cols-[1.25fr_0.75fr] gap-12 items-start">
+          <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="space-y-6"
+          >
+            <span className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-full uppercase tracking-wider">
+              <Sparkle size={14} weight="fill" />
+              {config.kicker}
+            </span>
+            <h1 className="text-zinc-900 font-black leading-tight tracking-tight">
+              {config.title}
+            </h1>
+            <p className="text-zinc-500 text-xl leading-relaxed max-w-2xl">
+              {config.subtitle}
+            </p>
+            <div className="flex flex-wrap gap-3 pt-2">
+              <Link href={config.primaryCta.href} className="btn inline-flex h-14 items-center justify-center gap-2 bg-[#0066FF] px-8 text-sm font-bold text-white rounded-2xl shadow-xl shadow-blue-500/25">
+                {config.primaryCta.label}
+                <ArrowRight size={18} weight="bold" />
+              </Link>
+              <Link href={config.secondaryCta.href} className="btn inline-flex h-14 items-center justify-center gap-2 border-2 border-zinc-200 px-8 text-sm font-bold text-zinc-800 rounded-2xl bg-white">
+                {config.secondaryCta.label}
+              </Link>
+            </div>
+          </motion.div>
 
-        <div className={`border ${publicSurfaceTheme.border} ${publicSurfaceTheme.panel} p-8 tech-card`}>
-          <div className="flex items-center justify-between gap-3 mb-8">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-[#0066FF]">System Snapshot</p>
-              <p className={`mt-1 text-xs uppercase font-bold tracking-tight ${publicSurfaceTheme.muted}`}>Real-time platform data</p>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="grid grid-cols-2 gap-4 bg-zinc-50/50 p-6 rounded-3xl border border-zinc-100"
+          >
+            <div className="col-span-2 pb-2">
+              <span className="dot-pulse text-green-500 mr-2" />
+              <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Live Platform Data</span>
             </div>
-            <div className="border border-black/5 p-3 text-black">
-              <VideoCamera size={20} weight="thin" />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-px bg-black/5 border border-black/5">
-            <StatCard label="Trades" value={String(data.stats.tradeCount)} />
-            <StatCard label="Feed posts" value={String(data.stats.feedCount)} />
-            <StatCard label="Explore posts" value={String(data.stats.exploreCount)} />
+            <StatCard label="Active trades" value={String(data.stats.tradeCount)} />
             <StatCard label="Verified posts" value={String(data.stats.verifiedCount)} />
-          </div>
+            <StatCard label="Explore feed" value={String(data.stats.exploreCount)} />
+            <StatCard label="Work records" value={String(data.stats.feedCount)} />
+          </motion.div>
         </div>
       </section>
 
-      <section className="relative z-10 grid gap-12 lg:grid-cols-[1fr_0.8fr] mb-24">
-        <div className={`border ${publicSurfaceTheme.border} ${publicSurfaceTheme.surface} p-8 tech-card`}>
-          <div className="flex items-center justify-between gap-3 mb-8">
+      {/* 2. Grid split section */}
+      <section className="max-w-6xl mx-auto px-6 grid lg:grid-cols-[1fr_0.85fr] gap-12 mb-20">
+        
+        {/* Left: Active Capabilities / Trades */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="card p-8 space-y-6"
+        >
+          <div className="flex items-center justify-between border-b border-zinc-50 pb-4">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-[#0066FF]">Active Nodes</p>
-              <h2 className={`mt-2 text-3xl font-black tracking-tighter uppercase ${publicSurfaceTheme.text}`}>Verified Capabilities</h2>
+              <span className="text-xs font-bold text-blue-600 uppercase tracking-widest">Active Capability Nodes</span>
+              <h2 className="mt-1 text-zinc-900 text-2xl font-black">Trade distribution</h2>
             </div>
-            <UsersThree size={24} weight="thin" className="text-black" />
+            <UsersThree size={32} weight="thin" className="text-zinc-400" />
           </div>
-          <div className="flex flex-wrap gap-2 mb-12">
-            {data.trades.length > 0 ? data.trades.slice(0, 12).map((trade) => (
-              <span key={trade} className={`inline-flex items-center border border-black/10 px-4 py-2 text-[10px] font-bold uppercase tracking-widest ${publicSurfaceTheme.text}`}>
+
+          <div className="flex flex-wrap gap-2">
+            {data.trades.length > 0 ? data.trades.slice(0, 10).map((trade) => (
+              <span key={trade} className="px-3.5 py-1.5 border border-zinc-200/80 rounded-xl text-xs font-bold text-zinc-600 bg-white">
                 {trade}
               </span>
             )) : (
-              <span className={`text-xs uppercase font-bold ${publicSurfaceTheme.muted}`}>Scanning network for active nodes...</span>
+              <span className="text-xs font-medium text-zinc-400">Scanning network for active nodes...</span>
             )}
           </div>
 
-          <div className="grid gap-px bg-black/5 border border-black/5 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2">
             {topTrades.map((item) => (
-              <div key={item.trade} className={`bg-white p-6`}>
-                <p className={`text-xs font-black uppercase tracking-widest ${publicSurfaceTheme.text}`}>{item.trade}</p>
-                <p className={`mt-2 text-xs font-bold uppercase tracking-tight ${publicSurfaceTheme.soft}`}>{item.count} active entries</p>
+              <div key={item.trade} className="bg-zinc-50/50 border border-zinc-100 p-5 rounded-2xl">
+                <p className="text-sm font-black text-zinc-800 tracking-tight">{item.trade}</p>
+                <p className="mt-1.5 text-xs font-semibold text-zinc-400 uppercase tracking-wider">{item.count} members active</p>
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        <div className={`border ${publicSurfaceTheme.border} ${publicSurfaceTheme.surface} p-8 tech-card`}>
-          <div className="flex items-center justify-between gap-3 mb-8">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-[#0066FF]">Data Stream</p>
-              <h2 className={`mt-2 text-3xl font-black tracking-tighter uppercase ${publicSurfaceTheme.text}`}>Proof of Work</h2>
-            </div>
-            <House size={24} weight="thin" className="text-black" />
+        {/* Right: Data Stream Spotlight */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="space-y-6"
+        >
+          <div className="flex items-center gap-3">
+            <span className="dot-pulse text-[#0066FF]" />
+            <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Live Proof Stream</span>
           </div>
           <div className="grid gap-6">
-            {spotlight.length > 0 ? spotlight.map((gig) => <GigPreview key={gig.id} gig={gig} />) : (
-              <div className={`p-8 border border-dashed border-black/10 text-center`}>
-                <p className={`text-xs uppercase font-bold tracking-widest ${publicSurfaceTheme.muted}`}>Waiting for live data transmission...</p>
+            {spotlight.length > 0 ? (
+              spotlight.map((gig) => <GigPreview key={gig.id} gig={gig} />)
+            ) : (
+              <div className="p-12 border-2 border-dashed border-zinc-200 rounded-3xl text-center">
+                <p className="text-sm text-zinc-400">Waiting for live data transmission...</p>
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
+
       </section>
 
+      {/* 3. Support/Escalation details */}
       {supportMode && (
-        <section className="relative z-10 grid gap-6 lg:grid-cols-3 mb-24">
-          {config.highlights.map((item) => (
-            <div key={item} className={`border ${publicSurfaceTheme.border} ${publicSurfaceTheme.surface} p-8 tech-card`}>
-              <div className="flex items-center gap-2 text-[#0066FF] mb-4">
-                <CheckCircle size={18} weight="bold" />
-                <p className="text-[10px] font-black uppercase tracking-widest">{item}</p>
+        <section className="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-6 mb-20">
+          {config.highlights.map((item, idx) => (
+            <motion.div
+              key={item}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1 }}
+              className="card p-8 flex flex-col gap-4 hover:border-blue-100"
+            >
+              <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                {idx === 0 ? <Key size={20} weight="bold" /> : idx === 1 ? <PhoneCall size={20} weight="bold" /> : <EnvelopeSimple size={20} weight="bold" />}
               </div>
-              <p className={`text-sm leading-relaxed ${publicSurfaceTheme.muted}`}>
-                {variant === 'help' && 'Technical resolution paths and direct human escalation protocols.'}
-                {variant === 'contact' && 'Direct communication interface for verified platform support.'}
-                {variant === 'careers' && "Join the engineering team building Africa's trust infrastructure."}
+              <h4 className="font-bold text-zinc-900">{item}</h4>
+              <p className="text-sm text-zinc-500 leading-relaxed">
+                {variant === 'help' && 'Step-by-step resolution paths and direct verification verification options.'}
+                {variant === 'contact' && 'Secure communications link directly routed to verification administrators.'}
+                {variant === 'careers' && 'Build modern frameworks, infrastructure platforms, and trust registries.'}
               </p>
-            </div>
+            </motion.div>
           ))}
         </section>
       )}
 
+      {/* 4. Legal / Documentation text */}
       {legalMode && (
-        <section className="relative z-10 grid gap-12 lg:grid-cols-[1.2fr_0.8fr] mb-24">
-          <LegalPanel title={config.title}>
-            <p>{config.body}</p>
-            <p className="font-bold">
-              SYSTEM PROTOCOL: Data is processed in accordance with privacy-first standards.
-            </p>
-          </LegalPanel>
+        <section className="max-w-6xl mx-auto px-6 grid lg:grid-cols-[1.25fr_0.75fr] gap-12 mb-20">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+          >
+            <LegalPanel title={config.title}>
+              <p className="text-zinc-600">{config.body}</p>
+              <p className="bg-zinc-50 border border-zinc-100 p-4 rounded-xl font-medium text-sm text-zinc-500 flex items-start gap-3">
+                <BookOpen size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                <span>All documents, records, verification logs, and user identity credentials are handled in accordance with privacy-first standards.</span>
+              </p>
+            </LegalPanel>
+          </motion.div>
 
-          <div className={`border ${publicSurfaceTheme.border} ${publicSurfaceTheme.panel} p-8 tech-card`}>
-            <p className="text-[10px] font-black uppercase tracking-widest text-[#0066FF] mb-6">Linked Protocols</p>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="card p-8 space-y-6"
+          >
+            <span className="text-xs font-bold text-blue-600 uppercase tracking-widest">Linked Protocols</span>
             <div className="space-y-3">
               {config.highlights.map((item) => (
-                <div key={item} className={`border border-black/5 bg-white p-4`}>
-                  <p className={`text-xs font-black uppercase tracking-widest ${publicSurfaceTheme.text}`}>{item}</p>
+                <div key={item} className="flex items-center gap-3 p-4 bg-zinc-50/50 border border-zinc-100 rounded-xl">
+                  <CheckCircle size={18} weight="fill" className="text-blue-600" />
+                  <span className="text-sm font-bold text-zinc-700">{item}</span>
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
         </section>
       )}
 
-      <section className="relative z-10 border border-black/10 bg-zinc-50 p-12 lg:p-16">
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-[#0066FF]">System Ready</p>
-            <h2 className={`mt-2 text-4xl font-black tracking-tighter uppercase leading-none ${publicSurfaceTheme.text}`}>Execute <br /> Platform Initialization</h2>
+      {/* 5. Execute action strip */}
+      <section className="max-w-6xl mx-auto px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="bg-gradient-to-br from-zinc-900 to-zinc-950 p-10 md:p-14 rounded-3xl text-white shadow-xl flex flex-col md:flex-row md:items-center md:justify-between gap-8"
+        >
+          <div className="space-y-2">
+            <span className="dot-pulse text-green-400 mr-2" />
+            <span className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Execute verification</span>
+            <h2 className="text-white text-3xl md:text-4xl leading-tight font-black">Join Workora today</h2>
           </div>
-          <div className="flex flex-wrap gap-4">
-            <Link href="/dashboard/feed" className="inline-flex h-14 items-center justify-center bg-black px-8 text-xs font-black uppercase tracking-widest text-white hover:bg-[#0066FF] transition-all">
-              Initialize Feed
+          <div className="flex flex-wrap gap-3">
+            <Link href="/dashboard/feed" className="btn inline-flex h-12 items-center justify-center bg-[#0066FF] px-6 text-sm font-bold text-white rounded-xl">
+              Open feed
             </Link>
-            <Link href="/login" className={`inline-flex h-14 items-center justify-center border border-black/10 px-8 text-xs font-black uppercase tracking-widest ${publicSurfaceTheme.text} hover:bg-white transition-all`}>
-              System Sign-in
+            <Link href="/login" className="btn inline-flex h-12 items-center justify-center border border-zinc-750 px-6 text-sm font-bold text-zinc-200 rounded-xl bg-zinc-800 hover:bg-zinc-700">
+              Sign in
             </Link>
           </div>
-        </div>
+        </motion.div>
       </section>
+
     </main>
   );
 }
