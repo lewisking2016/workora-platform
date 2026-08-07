@@ -12,8 +12,8 @@
   --brand: #0066FF; /* primary */
   --brand-secondary: #00D1FF; /* accent */
   --brand-dark: #7000FF; /* deep accent */
-  --mesh-color: rgba(0,0,0,0.035); /* subtle black mesh */
-  --glow-color: rgba(0,0,0,0.06); /* subtle dark glow for mesh */
+  --mesh-color: rgba(0,102,255,0.03); /* subtle brand-blue mesh */
+  --glow-color: rgba(0,209,255,0.06); /* subtle aqua glow */
 }
 
 @layer base {

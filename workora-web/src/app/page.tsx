@@ -40,12 +40,10 @@ export default function Home() {
           src={heroImage}
           alt="Workora OS Hero"
           fill
-          className="object-cover brightness-90"
+          className="object-cover"
           priority
         />
-        
-        {/* Overlay for better text readability - Minimal gradient */}
-        <div className="absolute inset-0 bg-gradient-to-r from-white/70 via-white/40 to-transparent" />
+        {/* removed overlay to keep hero image super clear per design request */}
         
         {/* Content */}
         <div className="relative z-10 w-full px-[5%] py-12">
@@ -125,15 +123,15 @@ export default function Home() {
             className="object-cover"
           />
         </div>
-        <div className="flex-1 p-[8%] flex flex-col justify-center gap-8 bg-black text-white">
-          <div className="h-1 w-20 bg-[#0066FF]" />
+        <div className="flex-1 p-[8%] flex flex-col justify-center gap-8 bg-white text-black">
+          <div className="h-1 w-20 bg-[var(--brand)]" />
           <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-none uppercase">
             Precision in <br /> Every Connection
           </h2>
-          <p className="text-zinc-400 text-lg leading-relaxed max-w-lg">
+          <p className="text-zinc-600 text-lg leading-relaxed max-w-lg">
             Our professionals are vetted for technical excellence. From complex circuitry to structural integrity, we ensure mastery at every touchpoint.
           </p>
-          <Link href="/platform" className="inline-flex items-center gap-4 text-sm font-bold uppercase tracking-widest hover:text-[#0066FF] transition-colors">
+          <Link href="/platform" className="inline-flex items-center gap-4 text-sm font-bold uppercase tracking-widest bg-[var(--brand)] text-white px-5 py-3 rounded shadow">
             View Skill Standards <ArrowRight size={20} />
           </Link>
         </div>
@@ -204,7 +202,7 @@ export default function Home() {
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
+          {/* removed dark overlay to keep proof image clear */}
           <div className="absolute bottom-12 left-12 z-20">
             <div className="bg-white p-8 border border-black/10 max-w-xs">
               <div className="flex items-center gap-3 mb-4">
