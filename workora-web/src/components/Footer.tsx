@@ -14,11 +14,11 @@ export function Footer() {
   }
 
   return (
-    <footer className="bg-zinc-50 border-t border-zinc-200 py-16 lg:py-24 px-[5%]">
-      <div className="mx-auto max-w-screen-2xl">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-10 lg:gap-16 mb-12 lg:mb-20">
-          <div className="sm:col-span-2 flex flex-col gap-6">
-            <Link href="/" className="relative flex items-center transition-transform hover:scale-105 origin-left">
+    <footer className="bg-white border-t border-black/10 py-24 px-[5%] relative overflow-hidden">
+      <div className="mx-auto max-w-screen-2xl relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-12 lg:gap-20 mb-20">
+          <div className="sm:col-span-2 flex flex-col gap-8">
+            <Link href="/" className="relative flex items-center transition-transform hover:opacity-80 origin-left">
               <div className="relative h-12 w-40 md:h-14 md:w-44">
                 <Image 
                   src="/logo/workora_logo.png"
@@ -29,42 +29,42 @@ export function Footer() {
                 />
               </div>
             </Link>
-            <p className="text-zinc-600 text-lg max-w-md leading-relaxed">
-              Empowering Africa&apos;s informal workforce through the Digital Trust Passport. 
-              Reputation is the new currency.
+            <p className="text-zinc-500 text-lg max-w-md leading-relaxed">
+              The digital trust layer for Africa&apos;s informal workforce. <br />
+              Reputation is the protocol.
             </p>
           </div>
           <div>
-            <h4 className="font-black mb-6 text-zinc-950 uppercase tracking-widest text-xs">Product</h4>
-            <ul className="flex flex-col gap-4 text-sm text-zinc-600 font-medium">
-              <li><Link href="/explore" className="hover:text-zinc-950 transition-colors">Explore Pros</Link></li>
-              <li><Link href="/trust" className="hover:text-zinc-950 transition-colors">Trust Passport</Link></li>
-              <li><Link href="/safety" className="hover:text-zinc-950 transition-colors">Safety First</Link></li>
+            <h4 className="font-black mb-8 text-black uppercase tracking-[0.2em] text-[10px]">Infrastructure</h4>
+            <ul className="flex flex-col gap-5 text-[10px] font-black uppercase tracking-widest text-zinc-400">
+              <li><Link href="/explore" className="hover:text-black transition-colors">Nodes Explorer</Link></li>
+              <li><Link href="/trust" className="hover:text-black transition-colors">Trust Ledger</Link></li>
+              <li><Link href="/safety" className="hover:text-black transition-colors">Security Protocol</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-black mb-6 text-zinc-950 uppercase tracking-widest text-xs">Company</h4>
-            <ul className="flex flex-col gap-4 text-sm text-zinc-600 font-medium">
-              <li><Link href="/about" className="hover:text-zinc-950 transition-colors">About Us</Link></li>
-              <li><Link href="/careers" className="hover:text-zinc-950 transition-colors">Careers</Link></li>
-              <li><Link href="/contact" className="hover:text-zinc-950 transition-colors">Contact</Link></li>
+            <h4 className="font-black mb-8 text-black uppercase tracking-[0.2em] text-[10px]">Company</h4>
+            <ul className="flex flex-col gap-5 text-[10px] font-black uppercase tracking-widest text-zinc-400">
+              <li><Link href="/about" className="hover:text-black transition-colors">About System</Link></li>
+              <li><Link href="/careers" className="hover:text-black transition-colors">Engineering</Link></li>
+              <li><Link href="/contact" className="hover:text-black transition-colors">Interface</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="font-black mb-6 text-zinc-950 uppercase tracking-widest text-xs">Legal</h4>
-            <ul className="flex flex-col gap-4 text-sm text-zinc-600 font-medium">
-              <li><Link href="/help" className="hover:text-zinc-950 transition-colors">Help Center</Link></li>
-              <li><Link href="/terms" className="hover:text-zinc-950 transition-colors">Terms of Service</Link></li>
-              <li><Link href="/privacy" className="hover:text-zinc-950 transition-colors">Privacy Policy</Link></li>
+            <h4 className="font-black mb-8 text-black uppercase tracking-[0.2em] text-[10px]">Legal</h4>
+            <ul className="flex flex-col gap-5 text-[10px] font-black uppercase tracking-widest text-zinc-400">
+              <li><Link href="/help" className="hover:text-black transition-colors">Documentation</Link></li>
+              <li><Link href="/terms" className="hover:text-black transition-colors">Terms of Use</Link></li>
+              <li><Link href="/privacy" className="hover:text-black transition-colors">Privacy Policy</Link></li>
             </ul>
           </div>
         </div>
-        <div className="pt-8 border-t border-zinc-200 flex flex-col md:flex-row justify-between items-center gap-6 text-xs font-bold text-zinc-500 uppercase tracking-wider">
-          <p>© 2026 Workora Platform. A subsidiary of ImeanTech.</p>
-          <div className="flex gap-8">
-            <Link href="#" className="hover:text-zinc-950 transition-colors">Twitter</Link>
-            <Link href="#" className="hover:text-zinc-950 transition-colors">LinkedIn</Link>
-            <Link href="#" className="hover:text-zinc-950 transition-colors">Instagram</Link>
+        <div className="pt-12 border-t border-black/5 flex flex-col md:flex-row justify-between items-center gap-8 text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">
+          <p>© 2026 WORKORA OS. POWERED BY IMEANTECH CORE.</p>
+          <div className="flex gap-10">
+            <Link href="#" className="hover:text-black transition-colors">Terminal</Link>
+            <Link href="#" className="hover:text-black transition-colors">Network</Link>
+            <Link href="#" className="hover:text-black transition-colors">Status</Link>
           </div>
         </div>
       </div>

@@ -31,14 +31,14 @@ import { APP_CONFIG } from '@/lib/config';
 import { useRouter } from 'next/navigation';
 
 const TRADES = [
-  { name: 'Construction', sub: 'Masons, Roofers', icon: Hammer, color: 'text-[#0066FF]' },
-  { name: 'Automotive', sub: 'Mechanics, Body', icon: Car, color: 'text-[#7000FF]' },
-  { name: 'Tech Repair', sub: 'Phones, PC, TV', icon: DeviceMobile, color: 'text-[#0066FF]' },
-  { name: 'Fashion', sub: 'Tailors, Cobblers', icon: TShirt, color: 'text-[#7000FF]' },
-  { name: 'Domestic', sub: 'Cleaners, Cooks', icon: Broom, color: 'text-[#0066FF]' },
-  { name: 'Beauty', sub: 'Barbers, Stylists', icon: Scissors, color: 'text-[#7000FF]' },
-  { name: 'Industrial', sub: 'Welders, Fabricators', icon: Gear, color: 'text-[#0066FF]' },
-  { name: 'Logistics', sub: 'Riders, Drivers', icon: Moped, color: 'text-[#7000FF]' },
+  { name: 'Construction', sub: 'Engineering & Build', icon: Hammer, color: 'text-black' },
+  { name: 'Automotive', sub: 'Systems & Diagnostics', icon: Car, color: 'text-black' },
+  { name: 'Tech Repair', sub: 'Circuitry & Logic', icon: DeviceMobile, color: 'text-black' },
+  { name: 'Fashion', sub: 'Design & Craft', icon: TShirt, color: 'text-black' },
+  { name: 'Domestic', sub: 'Systems Management', icon: Broom, color: 'text-black' },
+  { name: 'Beauty', sub: 'Aesthetic Engineering', icon: Scissors, color: 'text-black' },
+  { name: 'Industrial', sub: 'Fabrication & Welding', icon: Gear, color: 'text-black' },
+  { name: 'Logistics', sub: 'Operations & Flow', icon: Moped, color: 'text-black' },
 ];
 
 const COUNTRIES = [

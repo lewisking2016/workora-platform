@@ -74,14 +74,14 @@ export async function loadPublicSurfaceData(): Promise<PublicSurfaceData> {
 
 export const publicSurfaceTheme = {
   accent: '#0066FF',
-  accentAlt: '#7000FF',
-  surface: 'bg-white dark:bg-[#0A0E17]',
-  panel: 'bg-zinc-50 dark:bg-zinc-900',
-  border: 'border-zinc-200 dark:border-zinc-800',
-  text: 'text-zinc-950 dark:text-white',
-  muted: 'text-zinc-600 dark:text-zinc-400',
-  soft: 'text-zinc-500 dark:text-zinc-500',
-  chip: 'bg-white dark:bg-zinc-900',
+  accentAlt: '#000000',
+  surface: 'bg-white',
+  panel: 'bg-zinc-50',
+  border: 'border-black/5',
+  text: 'text-black',
+  muted: 'text-zinc-500',
+  soft: 'text-zinc-400',
+  chip: 'bg-white border border-black/10',
 } as const;
 
 export const APP_DEFAULTS = APP_CONFIG.defaults;

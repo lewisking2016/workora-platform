@@ -50,6 +50,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body className="min-h-screen bg-white font-display text-foreground pb-20 lg:pb-0">
+        <div className="mesh-glow" />
         {/* Elegant Top Progress Bar */}
         <div className="fixed top-0 left-0 right-0 h-[2px] z-[9999] overflow-hidden">
           <div className="w-full h-full bg-gradient-to-r from-[#0066FF] via-[#00D1FF] to-[#7000FF] shadow-lg shadow-blue-500/20" />

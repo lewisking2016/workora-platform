@@ -146,17 +146,17 @@ function countByTrade(items: PublicGig[]) {
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className={`rounded-2xl border ${publicSurfaceTheme.border} ${publicSurfaceTheme.panel} p-5`}>
-      <p className={`text-[11px] font-black uppercase tracking-[0.24em] ${publicSurfaceTheme.soft}`}>{label}</p>
-      <p className={`mt-3 text-2xl font-black tracking-tight ${publicSurfaceTheme.text}`}>{value}</p>
+    <div className={`border ${publicSurfaceTheme.border} ${publicSurfaceTheme.panel} p-5 tech-card`}>
+      <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${publicSurfaceTheme.soft}`}>{label}</p>
+      <p className={`mt-3 text-2xl font-black tracking-tighter ${publicSurfaceTheme.text}`}>{value}</p>
     </div>
   );
 }
 
 function GigPreview({ gig }: { gig: PublicGig }) {
   return (
-    <article className={`overflow-hidden rounded-3xl border ${publicSurfaceTheme.border} ${publicSurfaceTheme.surface} shadow-sm`}>
-      <div className="relative aspect-[4/3] bg-zinc-100 dark:bg-zinc-900">
+    <article className={`border ${publicSurfaceTheme.border} ${publicSurfaceTheme.surface} tech-card`}>
+      <div className="relative aspect-[4/3] bg-zinc-100">
         {gig.video_url ? (
           <VideoPlayer src={gig.video_url} poster={gig.thumbnail_url || undefined} className="h-full w-full" autoPlay={false} />
         ) : (
@@ -164,13 +164,13 @@ function GigPreview({ gig }: { gig: PublicGig }) {
         )}
       </div>
       <div className="p-5">
-        <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.24em] text-[#0066FF]">
+        <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#0066FF]">
           <ShieldCheck size={14} weight="bold" />
           {gig.trade || gig.category || 'Member'}
         </div>
-        <h3 className={`mt-3 text-lg font-black leading-tight ${publicSurfaceTheme.text}`}>{gig.title || 'Live proof-of-work post'}</h3>
-        <p className={`mt-2 text-sm leading-6 ${publicSurfaceTheme.muted}`}>{gig.description || 'A live post from the feed gives this screen real platform context.'}</p>
-        <div className="mt-4 flex items-center justify-between text-xs font-bold text-zinc-500 dark:text-zinc-400">
+        <h3 className={`mt-3 text-lg font-black leading-tight uppercase tracking-tight ${publicSurfaceTheme.text}`}>{gig.title || 'Live proof-of-work post'}</h3>
+        <p className={`mt-2 text-sm leading-relaxed ${publicSurfaceTheme.muted}`}>{gig.description || 'A live post from the feed gives this screen real platform context.'}</p>
+        <div className="mt-4 flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-zinc-400">
           <span>{gig.user_name || gig.handle || 'Member'}</span>
           <span>{Number(gig.likes_count || 0)} likes</span>
         </div>
@@ -181,9 +181,9 @@ function GigPreview({ gig }: { gig: PublicGig }) {
 
 function LegalPanel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className={`rounded-[28px] border ${publicSurfaceTheme.border} ${publicSurfaceTheme.surface} p-6 md:p-8`}>
-      <h2 className={`text-2xl font-black tracking-tight ${publicSurfaceTheme.text}`}>{title}</h2>
-      <div className={`mt-4 space-y-4 text-sm leading-7 ${publicSurfaceTheme.muted}`}>{children}</div>
+    <section className={`border ${publicSurfaceTheme.border} ${publicSurfaceTheme.surface} p-6 md:p-8 tech-card`}>
+      <h2 className={`text-2xl font-black tracking-tighter uppercase ${publicSurfaceTheme.text}`}>{title}</h2>
+      <div className={`mt-4 space-y-4 text-sm leading-relaxed ${publicSurfaceTheme.muted}`}>{children}</div>
     </section>
   );
 }
@@ -196,38 +196,38 @@ export function PublicSurface({ variant, data }: { variant: SurfaceVariant; data
   const legalMode = ['privacy', 'terms', 'safety'].includes(variant);
 
   return (
-    <main className={`mx-auto max-w-screen-2xl px-5 py-8 md:px-8 lg:px-10 ${publicSurfaceTheme.surface}`}>
-      <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
-        <div className="space-y-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#0066FF]/15 bg-[#0066FF]/8 px-4 py-2 text-[11px] font-black uppercase tracking-[0.24em] text-[#0066FF] dark:bg-[#0066FF]/10">
+    <main className={`mx-auto max-w-screen-2xl px-5 py-12 md:px-8 lg:px-10 ${publicSurfaceTheme.surface} pt-24`}>
+      <section className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr] lg:items-start mb-24">
+        <div className="space-y-8">
+          <div className="inline-flex items-center gap-2 border border-black/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-black">
             <Sparkle size={14} weight="bold" />
             {config.kicker}
           </div>
-          <h1 className={`max-w-3xl text-4xl font-black tracking-tight md:text-6xl ${publicSurfaceTheme.text}`}>{config.title}</h1>
-          <p className={`max-w-2xl text-base leading-8 md:text-lg ${publicSurfaceTheme.muted}`}>{config.subtitle}</p>
-          <p className={`max-w-2xl text-sm leading-7 ${publicSurfaceTheme.muted}`}>{config.body}</p>
-          <div className="flex flex-wrap gap-3">
-            <Link href={config.primaryCta.href} className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#0066FF] px-5 text-sm font-black text-white transition-transform hover:scale-[1.01]">
+          <h1 className={`max-w-3xl text-5xl font-black tracking-tighter md:text-7xl uppercase leading-[0.9] ${publicSurfaceTheme.text}`}>{config.title}</h1>
+          <p className={`max-w-2xl text-lg leading-relaxed md:text-xl ${publicSurfaceTheme.muted}`}>{config.subtitle}</p>
+          <p className={`max-w-2xl text-sm leading-relaxed ${publicSurfaceTheme.muted}`}>{config.body}</p>
+          <div className="flex flex-wrap gap-4 pt-4">
+            <Link href={config.primaryCta.href} className="inline-flex h-14 items-center justify-center gap-3 bg-black px-8 text-xs font-black uppercase tracking-widest text-white transition-all hover:bg-[#0066FF]">
               {config.primaryCta.label}
               <ArrowRight size={16} weight="bold" />
             </Link>
-            <Link href={config.secondaryCta.href} className={`inline-flex h-12 items-center justify-center gap-2 rounded-xl border ${publicSurfaceTheme.border} px-5 text-sm font-black ${publicSurfaceTheme.text} transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900`}>
+            <Link href={config.secondaryCta.href} className={`inline-flex h-14 items-center justify-center gap-3 border border-black/10 px-8 text-xs font-black uppercase tracking-widest ${publicSurfaceTheme.text} transition-colors hover:bg-zinc-50`}>
               {config.secondaryCta.label}
             </Link>
           </div>
         </div>
 
-        <div className={`rounded-[28px] border ${publicSurfaceTheme.border} ${publicSurfaceTheme.panel} p-5 md:p-6`}>
-          <div className="flex items-center justify-between gap-3">
+        <div className={`border ${publicSurfaceTheme.border} ${publicSurfaceTheme.panel} p-8 tech-card`}>
+          <div className="flex items-center justify-between gap-3 mb-8">
             <div>
-              <p className="text-[11px] font-black uppercase tracking-[0.24em] text-[#0066FF]">Live platform snapshot</p>
-              <p className={`mt-1 text-sm ${publicSurfaceTheme.muted}`}>Pulled from the backend just before render.</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#0066FF]">System Snapshot</p>
+              <p className={`mt-1 text-xs uppercase font-bold tracking-tight ${publicSurfaceTheme.muted}`}>Real-time platform data</p>
             </div>
-            <div className="rounded-full bg-[#0066FF]/10 p-3 text-[#0066FF]">
-              <VideoCamera size={20} weight="bold" />
+            <div className="border border-black/5 p-3 text-black">
+              <VideoCamera size={20} weight="thin" />
             </div>
           </div>
-          <div className="mt-5 grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-px bg-black/5 border border-black/5">
             <StatCard label="Trades" value={String(data.stats.tradeCount)} />
             <StatCard label="Feed posts" value={String(data.stats.feedCount)} />
             <StatCard label="Explore posts" value={String(data.stats.exploreCount)} />
@@ -236,47 +236,47 @@ export function PublicSurface({ variant, data }: { variant: SurfaceVariant; data
         </div>
       </section>
 
-      <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_0.8fr]">
-        <div className={`rounded-[28px] border ${publicSurfaceTheme.border} ${publicSurfaceTheme.surface} p-6 md:p-8`}>
-          <div className="flex items-center justify-between gap-3">
+      <section className="grid gap-12 lg:grid-cols-[1fr_0.8fr] mb-24">
+        <div className={`border ${publicSurfaceTheme.border} ${publicSurfaceTheme.surface} p-8 tech-card`}>
+          <div className="flex items-center justify-between gap-3 mb-8">
             <div>
-              <p className="text-[11px] font-black uppercase tracking-[0.24em] text-[#0066FF]">Live trades</p>
-              <h2 className={`mt-2 text-2xl font-black tracking-tight ${publicSurfaceTheme.text}`}>What people are actually offering</h2>
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#0066FF]">Active Nodes</p>
+              <h2 className={`mt-2 text-3xl font-black tracking-tighter uppercase ${publicSurfaceTheme.text}`}>Verified Capabilities</h2>
             </div>
-            <UsersThree size={24} weight="bold" className="text-[#0066FF]" />
+            <UsersThree size={24} weight="thin" className="text-black" />
           </div>
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 mb-12">
             {data.trades.length > 0 ? data.trades.slice(0, 12).map((trade) => (
-              <span key={trade} className={`inline-flex items-center rounded-full border ${publicSurfaceTheme.border} px-3 py-2 text-sm font-bold ${publicSurfaceTheme.text}`}>
+              <span key={trade} className={`inline-flex items-center border border-black/10 px-4 py-2 text-[10px] font-bold uppercase tracking-widest ${publicSurfaceTheme.text}`}>
                 {trade}
               </span>
             )) : (
-              <span className={`text-sm ${publicSurfaceTheme.muted}`}>No trade data yet. The product still loads when the backend is quiet.</span>
+              <span className={`text-xs uppercase font-bold ${publicSurfaceTheme.muted}`}>Scanning network for active nodes...</span>
             )}
           </div>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-px bg-black/5 border border-black/5 sm:grid-cols-2">
             {topTrades.map((item) => (
-              <div key={item.trade} className={`rounded-2xl border ${publicSurfaceTheme.border} ${publicSurfaceTheme.panel} p-4`}>
-                <p className={`text-sm font-black ${publicSurfaceTheme.text}`}>{item.trade}</p>
-                <p className={`mt-2 text-sm ${publicSurfaceTheme.muted}`}>{item.count} live posts in the current preview set.</p>
+              <div key={item.trade} className={`bg-white p-6`}>
+                <p className={`text-xs font-black uppercase tracking-widest ${publicSurfaceTheme.text}`}>{item.trade}</p>
+                <p className={`mt-2 text-xs font-bold uppercase tracking-tight ${publicSurfaceTheme.soft}`}>{item.count} active entries</p>
               </div>
             ))}
           </div>
         </div>
 
-        <div className={`rounded-[28px] border ${publicSurfaceTheme.border} ${publicSurfaceTheme.surface} p-6 md:p-8`}>
-          <div className="flex items-center justify-between gap-3">
+        <div className={`border ${publicSurfaceTheme.border} ${publicSurfaceTheme.surface} p-8 tech-card`}>
+          <div className="flex items-center justify-between gap-3 mb-8">
             <div>
-              <p className="text-[11px] font-black uppercase tracking-[0.24em] text-[#0066FF]">Spotlight</p>
-              <h2 className={`mt-2 text-2xl font-black tracking-tight ${publicSurfaceTheme.text}`}>Real live posts from the feed</h2>
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#0066FF]">Data Stream</p>
+              <h2 className={`mt-2 text-3xl font-black tracking-tighter uppercase ${publicSurfaceTheme.text}`}>Proof of Work</h2>
             </div>
-            <House size={24} weight="bold" className="text-[#0066FF]" />
+            <House size={24} weight="thin" className="text-black" />
           </div>
-          <div className="mt-5 grid gap-4">
+          <div className="grid gap-6">
             {spotlight.length > 0 ? spotlight.map((gig) => <GigPreview key={gig.id} gig={gig} />) : (
-              <div className={`rounded-2xl border ${publicSurfaceTheme.border} ${publicSurfaceTheme.panel} p-5`}>
-                <p className={`text-sm ${publicSurfaceTheme.muted}`}>No live feed items yet. Once content exists, this surface will render it automatically.</p>
+              <div className={`p-8 border border-dashed border-black/10 text-center`}>
+                <p className={`text-xs uppercase font-bold tracking-widest ${publicSurfaceTheme.muted}`}>Waiting for live data transmission...</p>
               </div>
             )}
           </div>
@@ -284,17 +284,17 @@ export function PublicSurface({ variant, data }: { variant: SurfaceVariant; data
       </section>
 
       {supportMode && (
-        <section className="mt-8 grid gap-6 lg:grid-cols-3">
+        <section className="grid gap-6 lg:grid-cols-3 mb-24">
           {config.highlights.map((item) => (
-            <div key={item} className={`rounded-[28px] border ${publicSurfaceTheme.border} ${publicSurfaceTheme.surface} p-6`}>
-              <div className="flex items-center gap-2 text-[#0066FF]">
+            <div key={item} className={`border ${publicSurfaceTheme.border} ${publicSurfaceTheme.surface} p-8 tech-card`}>
+              <div className="flex items-center gap-2 text-[#0066FF] mb-4">
                 <CheckCircle size={18} weight="bold" />
-                <p className="text-sm font-black uppercase tracking-[0.2em]">{item}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest">{item}</p>
               </div>
-              <p className={`mt-3 text-sm leading-7 ${publicSurfaceTheme.muted}`}>
-                {variant === 'help' && 'Every help path should end in a clear action or a human escalation.'}
-                {variant === 'contact' && 'Every support path should collect the right context and route it cleanly.'}
-                {variant === 'careers' && 'Every hiring page should give candidates a concrete next step.'}
+              <p className={`text-sm leading-relaxed ${publicSurfaceTheme.muted}`}>
+                {variant === 'help' && 'Technical resolution paths and direct human escalation protocols.'}
+                {variant === 'contact' && 'Direct communication interface for verified platform support.'}
+                {variant === 'careers' && "Join the engineering team building Africa's trust infrastructure."}
               </p>
             </div>
           ))}
@@ -302,23 +302,20 @@ export function PublicSurface({ variant, data }: { variant: SurfaceVariant; data
       )}
 
       {legalMode && (
-        <section className="mt-8 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+        <section className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr] mb-24">
           <LegalPanel title={config.title}>
             <p>{config.body}</p>
-            <p>
-              Workora records only the data required to operate the service, support trust, and keep the platform usable.
-            </p>
-            <p>
-              If something changes, the product should update in step with the backend rather than relying on stale screen copy.
+            <p className="font-bold">
+              SYSTEM PROTOCOL: Data is processed in accordance with privacy-first standards.
             </p>
           </LegalPanel>
 
-          <div className={`rounded-[28px] border ${publicSurfaceTheme.border} ${publicSurfaceTheme.panel} p-6`}>
-            <p className="text-[11px] font-black uppercase tracking-[0.24em] text-[#0066FF]">Related surfaces</p>
-            <div className="mt-4 space-y-3">
+          <div className={`border ${publicSurfaceTheme.border} ${publicSurfaceTheme.panel} p-8 tech-card`}>
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#0066FF] mb-6">Linked Protocols</p>
+            <div className="space-y-3">
               {config.highlights.map((item) => (
-                <div key={item} className={`rounded-2xl border ${publicSurfaceTheme.border} ${publicSurfaceTheme.surface} p-4`}>
-                  <p className={`text-sm font-black ${publicSurfaceTheme.text}`}>{item}</p>
+                <div key={item} className={`border border-black/5 bg-white p-4`}>
+                  <p className={`text-xs font-black uppercase tracking-widest ${publicSurfaceTheme.text}`}>{item}</p>
                 </div>
               ))}
             </div>
@@ -326,19 +323,18 @@ export function PublicSurface({ variant, data }: { variant: SurfaceVariant; data
         </section>
       )}
 
-      <section className="mt-8 rounded-[28px] border border-[#0066FF]/15 bg-[#0066FF]/8 p-6 md:p-8">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <section className="border border-black/10 bg-zinc-50 p-12 lg:p-16">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-[11px] font-black uppercase tracking-[0.24em] text-[#0066FF]">Next step</p>
-            <h2 className={`mt-2 text-2xl font-black tracking-tight ${publicSurfaceTheme.text}`}>Move from reading to using the product</h2>
-            <p className={`mt-2 text-sm leading-7 ${publicSurfaceTheme.muted}`}>The same live content and navigation will carry the rest of the build.</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#0066FF]">System Ready</p>
+            <h2 className={`mt-2 text-4xl font-black tracking-tighter uppercase leading-none ${publicSurfaceTheme.text}`}>Execute <br /> Platform Initialization</h2>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/dashboard/feed" className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#0066FF] px-5 text-sm font-black text-white">
-              Open feed
+          <div className="flex flex-wrap gap-4">
+            <Link href="/dashboard/feed" className="inline-flex h-14 items-center justify-center bg-black px-8 text-xs font-black uppercase tracking-widest text-white hover:bg-[#0066FF] transition-all">
+              Initialize Feed
             </Link>
-            <Link href="/login" className={`inline-flex h-12 items-center justify-center gap-2 rounded-xl border ${publicSurfaceTheme.border} px-5 text-sm font-black ${publicSurfaceTheme.text}`}>
-              Sign in
+            <Link href="/login" className={`inline-flex h-14 items-center justify-center border border-black/10 px-8 text-xs font-black uppercase tracking-widest ${publicSurfaceTheme.text} hover:bg-white transition-all`}>
+              System Sign-in
             </Link>
           </div>
         </div>
