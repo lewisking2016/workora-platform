@@ -16,13 +16,13 @@ export function TechCard({ children, className = '', hover = true, glow = false 
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={glow ? { duration: 6, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.5 }}
+      transition={glow ? { duration: 1.2, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.35 }}
       whileHover={hover ? { y: -4 } : undefined}
       animate={glow ? { y: [0, -6, 0] } : undefined}
       className={`
         relative overflow-hidden
         bg-white border border-zinc-200
-        ${hover ? 'transition-all duration-300 hover:shadow-xl hover:border-zinc-300' : ''}
+        ${hover ? 'transition-all duration-150 hover:shadow-xl hover:border-zinc-300' : ''}
         ${glow ? 'hover:shadow-blue-500/10' : ''}
         ${className}
       `}

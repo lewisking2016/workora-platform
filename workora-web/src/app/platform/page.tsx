@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { 
@@ -16,6 +16,7 @@ import {
 } from '@phosphor-icons/react';
 import { MeshBackground } from '@/components/MeshBackground';
 import { TechCard } from '@/components/TechCard';
+import { ReelsStrip } from '@/components/ReelsStrip';
 
 export default function PlatformPage() {
   const features = [
@@ -65,7 +66,7 @@ export default function PlatformPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-white text-zinc-950">
+    <main className="min-h-screen bg-transparent text-zinc-950">
       {/* Hero Section with Mesh */}
       <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden pt-20">
         <MeshBackground variant="hero" />
@@ -83,7 +84,15 @@ export default function PlatformPage() {
             </div>
             
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-none animated-text">
-              Everything you need <br />
+              <motion.span 
+                initial={{ opacity: 0, y: 15 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="inline-block"
+              >
+                Everything you need
+              </motion.span>
+              <br />
               <span className="text-inherit">in one platform</span>
             </h1>
             
@@ -96,14 +105,14 @@ export default function PlatformPage() {
                   href="/join"
                   className="group inline-flex items-center justify-center gap-2 h-14 px-8 bg-[var(--brand)] text-white rounded-xl font-bold text-base btn"
                 >
-                  Join
+                  Join free
                   <ArrowRight size={20} weight="bold" className="transition-transform group-hover:translate-x-1" />
                 </Link>
                 <Link
                   href="/dashboard/feed"
                   className="inline-flex items-center justify-center h-14 px-8 bg-white border-2 border-zinc-300 text-zinc-950 rounded-xl font-bold text-base btn"
                 >
-                  Explore
+                  Find helpers
                 </Link>
             </div>
           </motion.div>
@@ -151,41 +160,40 @@ export default function PlatformPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, i) => (
-              <TechCard key={feature.title} hover glow>
-                <div className="p-8">
-                  <div className={`inline-flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br ${feature.color} text-white mb-6 shadow-lg`}>
-                    <feature.icon size={28} weight="bold" />
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="h-full"
+              >
+                <TechCard hover glow className="h-full border border-blue-500/10 hover:border-blue-500/30">
+                  <div className="p-8">
+                    <div className={`inline-flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br ${feature.color} text-white mb-6 shadow-lg`}>
+                      <feature.icon size={28} weight="bold" />
+                    </div>
+                    <h3 className="text-2xl font-black mb-3 text-zinc-950">
+                      {feature.title}
+                    </h3>
+                    <p className="text-zinc-600 leading-relaxed">
+                      {feature.description}
+                    </p>
                   </div>
-                  <h3 className="text-2xl font-black mb-3 text-zinc-950">
-                    {feature.title}
-                  </h3>
-                  <p className="text-zinc-600 leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
-              </TechCard>
+                </TechCard>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Reels strip - show sample platform reels to entice login */}
+      {/* Reels strip - fetch recent reels from backend and show as VideoCard */}
       <section className="py-12 px-6">
         <div className="max-w-7xl mx-auto">
           <h3 className="text-2xl font-black mb-6">Recent Reels</h3>
           <div className="flex gap-4 overflow-x-auto pb-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="w-64 shrink-0">
-                <div className="relative aspect-[9/16] overflow-hidden rounded-2xl">
-                  <img src={`/landing/reel-${(i%3)+1}.jpg`} className="object-cover w-full h-full" alt={`reel-${i}`} />
-                  <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white">
-                    <div className="text-sm font-bold">Worker Name</div>
-                    <div className="text-xs bg-black/40 px-2 py-1 rounded">2.1k</div>
-                  </div>
-                </div>
-                <div className="mt-3 text-sm font-semibold">Quick wiring fix</div>
-              </div>
-            ))}
+            {/* client-side fetch */}
+            <ReelsStrip />
           </div>
         </div>
       </section>

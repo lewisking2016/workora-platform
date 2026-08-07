@@ -61,7 +61,7 @@ export default function BusinessPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-white text-zinc-950">
+    <main className="min-h-screen bg-transparent text-zinc-950">
       {/* Hero */}
       <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden pt-20">
         <MeshBackground variant="hero" />
@@ -79,10 +79,23 @@ export default function BusinessPage() {
             </div>
             
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-none">
-              Hire faster with <br />
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <motion.span 
+                initial={{ opacity: 0, y: 15 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="inline-block"
+              >
+                Hire faster with
+              </motion.span>
+              <br />
+              <motion.span 
+                initial={{ opacity: 0, scale: 0.95 }} 
+                animate={{ opacity: 1, scale: 1 }} 
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent animated-text inline-block"
+              >
                 verified talent
-              </span>
+              </motion.span>
             </h1>
             
             <p className="text-xl sm:text-2xl text-zinc-600 max-w-3xl mx-auto leading-relaxed">
@@ -92,16 +105,16 @@ export default function BusinessPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Link
                 href="/join?type=business"
-                className="group inline-flex items-center justify-center gap-2 h-14 px-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-base hover:shadow-2xl hover:shadow-blue-500/30 hover:scale-105 transition-all"
+                className="group inline-flex items-center justify-center gap-2 h-14 px-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-base hover:shadow-2xl hover:shadow-blue-500/30 hover:scale-105 transition-all btn"
               >
-                Start Hiring Today
+                Start hiring
                 <ArrowRight size={20} weight="bold" className="transition-transform group-hover:translate-x-1" />
               </Link>
               <Link
                 href="/dashboard/search"
-                className="inline-flex items-center justify-center h-14 px-8 bg-white border-2 border-zinc-300 text-zinc-950 rounded-xl font-bold text-base hover:bg-zinc-50 transition-all"
+                className="inline-flex items-center justify-center h-14 px-8 bg-white border-2 border-zinc-300 text-zinc-950 rounded-xl font-bold text-base hover:bg-zinc-50 transition-all btn"
               >
-                Browse Professionals
+                Find helpers
               </Link>
             </div>
           </motion.div>
@@ -122,20 +135,29 @@ export default function BusinessPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {benefits.map((benefit) => (
-              <TechCard key={benefit.title} hover glow>
-                <div className="p-8">
-                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 mb-4">
-                    <benefit.icon size={24} weight="bold" />
+            {benefits.map((benefit, i) => (
+              <motion.div
+                key={benefit.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="h-full"
+              >
+                <TechCard hover glow className="h-full border border-blue-500/10 hover:border-blue-500/30">
+                  <div className="p-8">
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 mb-4">
+                      <benefit.icon size={24} weight="bold" />
+                    </div>
+                    <h3 className="text-xl font-black mb-3 text-zinc-950">
+                      {benefit.title}
+                    </h3>
+                    <p className="text-zinc-600 leading-relaxed">
+                      {benefit.description}
+                    </p>
                   </div>
-                  <h3 className="text-xl font-black mb-3 text-zinc-950">
-                    {benefit.title}
-                  </h3>
-                  <p className="text-zinc-600 leading-relaxed">
-                    {benefit.description}
-                  </p>
-                </div>
-              </TechCard>
+                </TechCard>
+              </motion.div>
             ))}
           </div>
         </div>

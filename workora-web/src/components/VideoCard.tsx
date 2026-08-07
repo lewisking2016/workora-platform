@@ -32,7 +32,7 @@ export function VideoCard({
       <div className="absolute inset-x-0 top-0 flex items-center justify-between p-3 z-10">
         <div className="relative h-8 w-8 overflow-hidden rounded-full border-2 border-white/20">
           <Image
-            src={workerAvatar}
+            src={workerAvatar && workerAvatar.trim() !== '' ? workerAvatar : '/logo/workora_logo.png'}
             alt="Worker"
             fill
             className="object-cover"

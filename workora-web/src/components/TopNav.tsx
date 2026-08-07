@@ -38,7 +38,7 @@ export function TopNav() {
         {/* Left Side: Logo & Links */}
         <div className="flex items-center gap-16">
           <Link href="/" className="relative flex items-center justify-center transition-transform hover:opacity-80">
-            <div className="relative h-12 w-40 md:h-14 md:w-44">
+            <div className="relative h-14 w-48 md:h-16 md:w-56">
               <Image 
                 src="/logo/workora_logo.png"
                 alt="Workora Logo"
