@@ -30,7 +30,7 @@ import {
   Sparkle,
 } from '@phosphor-icons/react';
 import { VideoPlayer } from '@/components/VideoPlayer';
-import { fetchCurrentUser } from '@/lib/session';
+import { apiFetch, fetchCurrentUser } from '@/lib/session';
 import { APP_CONFIG } from '@/lib/config';
 
 type FeedScope = 'new' | 'following' | 'recommended' | 'trending' | 'nearby' | 'reels';
@@ -191,9 +191,20 @@ export default function DashboardFeedPage() {
         setLoadingMore(true);
       }
 
-      const res = await fetch(`/api/gigs/feed?scope=${nextScope}&page=${page}&limit=${PAGE_SIZE}`);
+      const res = await apiFetch(`/api/gigs/feed?scope=${nextScope}&page=${page}&limit=${PAGE_SIZE}`);
       if (!res.ok) {
-        throw new Error(`Feed request failed with ${res.status}`);
+        // Fallback to explore list so the home feed still shows work during schema gaps
+        const fallback = await apiFetch(`/api/gigs/explore?limit=${PAGE_SIZE}&page=${page}`);
+        if (!fallback.ok) {
+          throw new Error(`Feed request failed with ${res.status}`);
+        }
+        const fallbackData = await fallback.json();
+        const nextPosts = Array.isArray(fallbackData) ? fallbackData : [];
+        setPosts(prev => append ? [...prev, ...nextPosts] : nextPosts);
+        setHasMore(nextPosts.length === PAGE_SIZE);
+        setFeedPage(page);
+        setFeedError(null);
+        return;
       }
 
       const data = await res.json();
@@ -224,7 +235,7 @@ export default function DashboardFeedPage() {
 
   const fetchStories = async () => {
     try {
-      const res = await fetch('/api/gigs/stories');
+      const res = await apiFetch('/api/gigs/stories');
       const data = await res.json();
       if (Array.isArray(data)) {
         setStories(data);
@@ -240,7 +251,7 @@ export default function DashboardFeedPage() {
         return;
       }
 
-      const res = await fetch('/api/profile/search?q=');
+      const res = await apiFetch('/api/profile/search?sort=trust');
       const data = await res.json();
       if (Array.isArray(data)) {
         setSuggestedPros(

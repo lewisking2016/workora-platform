@@ -13,7 +13,7 @@ import {
 import Link from 'next/link';
 import Image from 'next/image';
 import { VideoPlayer } from '@/components/VideoPlayer';
-import { fetchCurrentUser } from '@/lib/session';
+import { apiFetch, fetchCurrentUser } from '@/lib/session';
 
 type Tab = 'overview' | 'profile' | 'portfolio' | 'analytics';
 
@@ -68,8 +68,12 @@ export default function BusinessDashboard() {
 
   async function fetchAll() {
     try {
-      const res = await fetch('/api/profile/me');
+      const res = await apiFetch('/api/profile/me');
       const data = await res.json();
+      if (!res.ok) {
+        console.error('profile/me failed', data);
+        return;
+      }
       if (data.profile) {
         setProfile(data.profile);
         setForm({ bio: data.profile.bio || '', trade: data.profile.trade || '', location: data.profile.location || '', full_name: data.profile.full_name || '', title: data.profile.title || '' });
@@ -77,9 +81,14 @@ export default function BusinessDashboard() {
         setExperience(data.experience || []);
         setEducation(data.education || []);
         setCerts(data.certifications || []);
-        const gRes = await fetch(`/api/gigs/worker/${data.profile.id}`);
-        const gData = await gRes.json();
-        setGigs(Array.isArray(gData) ? gData : []);
+        const portfolio = Array.isArray(data.portfolio) ? data.portfolio : [];
+        if (portfolio.length > 0) {
+          setGigs(portfolio);
+        } else {
+          const gRes = await apiFetch(`/api/gigs/worker/${data.profile.id}`);
+          const gData = await gRes.json();
+          setGigs(Array.isArray(gData) ? gData : []);
+        }
       }
     } catch (e) { console.error(e); }
   }
@@ -109,7 +118,7 @@ export default function BusinessDashboard() {
   }, []);
 
   const saveProfile = async () => {
-    await fetch(`/api/profile/update/${userId}`, {
+    await apiFetch(`/api/profile/update/${userId}`, {
       method: 'PATCH', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ bio: form.bio, title: form.title, display_name: form.full_name, location: form.location }),
     });
@@ -119,7 +128,7 @@ export default function BusinessDashboard() {
 
   const addSkill = async () => {
     if (!newSkill.trim() || !profile) return;
-    await fetch('/api/profile/skills', {
+    await apiFetch('/api/profile/skills', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ profile_id: profile.id, skill_name: newSkill, skill_level: 'intermediate' }),
     });
@@ -128,7 +137,7 @@ export default function BusinessDashboard() {
   };
 
   const deleteSkill = async (id: string) => {
-    await fetch(`/api/profile/skills/${id}`, { method: 'DELETE' });
+    await apiFetch(`/api/profile/skills/${id}`, { method: 'DELETE' });
     fetchAll();
   };
 

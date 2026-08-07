@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowClockwise,
   ArrowRight,
-  Buildings,
+  Briefcase,
   ClockCounterClockwise,
   Compass,
   Heart,
@@ -22,6 +22,7 @@ import {
 } from '@phosphor-icons/react';
 import { SafeMediaThumb } from '@/components/SafeMediaThumb';
 import { APP_CONFIG } from '@/lib/config';
+import { apiFetch } from '@/lib/session';
 
 type SurfaceMode = 'search' | 'explore';
 type ViewMode = 'grid' | 'list' | 'map';
@@ -202,7 +203,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
       if (filters.minTrust) params.set('min_trust', filters.minTrust);
       params.set('sort', sort);
 
-      const res = await fetch(`/api/search?${params.toString()}`);
+      const res = await apiFetch(`/api/search?${params.toString()}`);
       if (!res.ok) {
         throw new Error(`Search failed with ${res.status}`);
       }
@@ -236,22 +237,22 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
   const fetchExploreSections = async () => {
     try {
       const [trustRes, recentRes, nearbyRes, trendRes, nearbyGigsRes, businessesRes, collectionsRes, savedCollectionsRes] = await Promise.all([
-        fetch('/api/search?sort=trust'),
-        fetch('/api/search?sort=recent'),
-        fetch(`/api/search?sort=location${filters.location ? `&location=${encodeURIComponent(filters.location)}` : ''}`),
-        fetch('/api/gigs/feed?scope=trending&limit=12'),
-        fetch('/api/gigs/feed?scope=nearby&limit=12'),
-        fetch('/api/profile/businesses'),
-        fetch('/api/profile/collections'),
-        fetch('/api/profile/collections?kind=saved'),
+        apiFetch('/api/search?sort=trust'),
+        apiFetch('/api/search?sort=recent'),
+        apiFetch(`/api/search?sort=location${filters.location ? `&location=${encodeURIComponent(filters.location)}` : ''}`),
+        apiFetch('/api/gigs/feed?scope=trending&limit=12'),
+        apiFetch('/api/gigs/feed?scope=nearby&limit=12'),
+        apiFetch('/api/profile/businesses'),
+        apiFetch('/api/profile/collections'),
+        apiFetch('/api/profile/collections?kind=saved'),
       ]);
 
       const [trustData, recentData, nearbyData, trendData, nearbyGigsData, businessData, collectionsData, savedCollectionsData] = await Promise.all([
         trustRes.json(),
         recentRes.json(),
         nearbyRes.json(),
-        trendRes.json(),
-        nearbyGigsRes.json(),
+        trendRes.ok ? trendRes.json() : apiFetch('/api/gigs/explore?limit=12').then((r) => r.json()),
+        nearbyGigsRes.ok ? nearbyGigsRes.json() : apiFetch('/api/gigs/explore?limit=12').then((r) => r.json()),
         businessesRes.json(),
         collectionsRes.json(),
         savedCollectionsRes.json(),
@@ -802,7 +803,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
                       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Featured businesses</p>
                       <h2 className="mt-1 text-xl font-black">Live business profiles</h2>
                     </div>
-                    <Buildings size={20} className="text-[#4F46E5]" />
+                    <Briefcase size={20} className="text-[#4F46E5]" />
                   </div>
                   <div className="mt-4 grid gap-4 md:grid-cols-2">
                     {featuredBusinesses.length > 0 ? featuredBusinesses.slice(0, 4).map(renderBusinessCard) : (
@@ -1007,7 +1008,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Category browse</p>
                     <h2 className="mt-1 text-xl font-black">Browse by trade</h2>
                   </div>
-                  <Buildings size={20} className="text-[#4F46E5]" />
+                  <Briefcase size={20} className="text-[#4F46E5]" />
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {categories.slice(1, 14).map(category => (

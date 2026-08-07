@@ -109,9 +109,13 @@ async function profileRoutes(fastify) {
         [profileId]
       ),
       pool.query(
-        'SELECT COALESCE(SUM(price), 0) AS total_earnings FROM gigs WHERE worker_id = $1',
+        `SELECT COALESCE(SUM(COALESCE(price, 0)), 0) AS total_earnings
+         FROM gigs WHERE worker_id = $1`,
         [profileId]
-      ),
+      ).catch(async () => ({
+        // Older DBs may not have gigs.price yet
+        rows: [{ total_earnings: 0 }],
+      })),
     ]);
 
     return {
@@ -454,11 +458,11 @@ async function profileRoutes(fastify) {
     }
 
     const orderBy = {
-      trust: 'COALESCE(trust_score, 0) DESC, updated_at DESC',
-      location: 'COALESCE(location, \'Kenya\') ASC, COALESCE(trust_score, 0) DESC',
-      recent: 'updated_at DESC',
-      availability: 'COALESCE(availability_status, \'available\') ASC, COALESCE(trust_score, 0) DESC',
-    }[String(sort || 'trust')];
+      trust: 'COALESCE(p.trust_score, 0) DESC, COALESCE(p.created_at, NOW()) DESC',
+      location: 'COALESCE(p.location, \'Kenya\') ASC, COALESCE(p.trust_score, 0) DESC',
+      recent: 'COALESCE(p.created_at, NOW()) DESC',
+      availability: 'COALESCE(p.availability_status, \'available\') ASC, COALESCE(p.trust_score, 0) DESC',
+    }[String(sort || 'trust')] || 'COALESCE(p.trust_score, 0) DESC';
 
     sql += ` ORDER BY ${orderBy} LIMIT 20`;
     
@@ -467,7 +471,23 @@ async function profileRoutes(fastify) {
       return res.rows;
     } catch (err) {
       console.error('Search query failed:', err);
-      return reply.status(500).send({ error: 'Search failed' });
+      // Fallback: minimal search without optional columns
+      try {
+        const fallback = await pool.query(
+          `SELECT p.*, u.id as user_id,
+                  COALESCE(p.full_name, u.username) as user_name,
+                  COALESCE(p.location, 'Kenya') as location,
+                  'available' as availability_status
+           FROM worker_profiles p
+           JOIN users u ON u.id = p.user_id
+           ORDER BY COALESCE(p.trust_score, 0) DESC
+           LIMIT 20`
+        );
+        return fallback.rows;
+      } catch (fallbackErr) {
+        console.error('Search fallback failed:', fallbackErr);
+        return reply.status(500).send({ error: 'Search failed' });
+      }
     }
   });
 

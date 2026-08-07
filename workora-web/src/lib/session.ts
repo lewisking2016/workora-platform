@@ -85,3 +85,18 @@ export function persistLegacySession(user: CurrentUser, token?: string) {
     window.localStorage.setItem(TOKEN_KEY, token);
   }
 }
+
+/** Authenticated fetch for /api/* — always sends cookie + Bearer token when present. */
+export async function apiFetch(input: string, init: RequestInit = {}) {
+  const headers = new Headers(init.headers || {});
+  const token = getStoredToken();
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+  return fetch(input, {
+    ...init,
+    headers,
+    credentials: 'include',
+    cache: init.cache || 'no-store',
+  });
+}

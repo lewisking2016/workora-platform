@@ -10,7 +10,7 @@ import {
   DotsThree,
   PaperPlaneTilt
 } from '@phosphor-icons/react';
-import { fetchCurrentUser } from '@/lib/session';
+import { fetchCurrentUser, apiFetch } from '@/lib/session';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { APP_CONFIG } from '@/lib/config';
 import { useRouter } from 'next/navigation';
@@ -50,10 +50,13 @@ export default function WorksPage() {
 
   const fetchWorks = async () => {
     try {
-      const res = await fetch('/api/gigs/feed?page=1&limit=50');
+      let res = await apiFetch('/api/gigs/feed?scope=reels&page=1&limit=50');
+      if (!res.ok) {
+        res = await apiFetch('/api/gigs/explore?limit=50');
+      }
       const data = await res.json();
       if (Array.isArray(data)) {
-        setWorks(data);
+        setWorks(data.filter((item: Work) => Boolean(item.video_url)));
       } else {
         setWorks([]);
       }
