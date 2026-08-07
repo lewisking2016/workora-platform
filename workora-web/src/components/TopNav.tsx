@@ -38,7 +38,7 @@ export function TopNav() {
         {/* Left Side: Logo & Links */}
         <div className="flex items-center gap-16">
           <Link href="/" className="relative flex items-center justify-center transition-transform hover:opacity-80">
-            <div className="relative h-10 w-32 md:h-12 md:w-36">
+            <div className="relative h-12 w-40 md:h-14 md:w-44">
               <Image 
                 src="/logo/workora_logo.png"
                 alt="Workora Logo"
@@ -105,19 +105,19 @@ export function TopNav() {
           <div className="flex items-center gap-4">
             <Link 
               href="/login" 
-              data-analytics-label="Sign in"
+              data-analytics-label="Log in"
               data-analytics-event="topnav_sign_in"
-              className="hidden sm:flex h-12 px-6 items-center justify-center text-[10px] font-black uppercase tracking-[0.2em] text-black hover:text-[#0066FF] transition-colors"
+              className="hidden sm:flex h-12 px-6 items-center justify-center text-sm font-semibold text-black hover:text-[var(--brand)] transition-colors"
             >
-              Sign in
+              Log in
             </Link>
             <Link 
               href="/join" 
               data-analytics-label="Get Started"
               data-analytics-event="topnav_get_started"
-              className="h-12 px-8 bg-black text-white font-black text-[10px] uppercase tracking-[0.2em] flex items-center justify-center transition-all hover:bg-[#0066FF] active:scale-95"
+              className="h-12 px-8 bg-[var(--brand)] text-white font-bold text-sm flex items-center justify-center rounded-lg btn"
             >
-              Initialize
+              Get started
             </Link>
             
             {/* Mobile Menu Toggle */}
@@ -191,15 +191,15 @@ export function TopNav() {
                 <Globe size={24} weight="thin" /> {isSwahili ? 'Swahili' : 'English'}
               </button>
               <div className="h-px bg-black/10 w-full" />
-              <Link 
-                href="/login" 
-                data-analytics-label="Sign in"
-                data-analytics-event="mobile_sign_in"
-                onClick={() => setMobileMenuOpen(false)}
-                className="h-16 flex items-center justify-center text-xs font-black uppercase tracking-[0.2em] text-white bg-black hover:bg-[#0066FF] transition-colors"
-              >
-                Execute Sign In
-              </Link>
+                <Link 
+                  href="/login" 
+                  data-analytics-label="Log in"
+                  data-analytics-event="mobile_sign_in"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="h-16 flex items-center justify-center text-base font-bold text-white bg-[var(--brand)] hover:bg-blue-700 transition-colors rounded-lg"
+                >
+                  Log in
+                </Link>
             </div>
           </motion.div>
         )}

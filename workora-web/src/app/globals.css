@@ -16,6 +16,32 @@
   --glow-color: rgba(0,209,255,0.06); /* subtle aqua glow */
 }
 
+/* Button animation utility */
+button, .btn, a.btn, a.button {
+  transition: transform 180ms cubic-bezier(.2,.9,.2,1), box-shadow 180ms ease, background-color 120ms ease;
+}
+button:hover, .btn:hover, a.btn:hover, a.button:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(2,6,23,0.08);
+}
+
+/* Make tech cards pop on hover */
+.tech-card {
+  transition: transform 250ms ease, box-shadow 250ms ease;
+}
+.tech-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 24px 48px rgba(2,6,23,0.06);
+}
+
+/* Ensure mesh is visible but subtle */
+body {
+  background-image: 
+    linear-gradient(var(--mesh-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--mesh-color) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
 @layer base {
   * {
     @apply border-zinc-200;

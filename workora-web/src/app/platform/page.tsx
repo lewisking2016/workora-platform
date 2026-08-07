@@ -94,19 +94,19 @@ export default function PlatformPage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Link
-                href="/join"
-                className="group inline-flex items-center justify-center gap-2 h-14 px-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold text-base hover:shadow-2xl hover:shadow-blue-500/30 hover:scale-105 transition-all"
-              >
-                Get Started
-                <ArrowRight size={20} weight="bold" className="transition-transform group-hover:translate-x-1" />
-              </Link>
-              <Link
-                href="/dashboard/feed"
-                className="inline-flex items-center justify-center h-14 px-8 bg-white border-2 border-zinc-300 text-zinc-950 rounded-xl font-bold text-base hover:bg-zinc-50 transition-all"
-              >
-                Explore Platform
-              </Link>
+                <Link
+                  href="/join"
+                  className="group inline-flex items-center justify-center gap-2 h-14 px-8 bg-[var(--brand)] text-white rounded-xl font-bold text-base btn"
+                >
+                  Join
+                  <ArrowRight size={20} weight="bold" className="transition-transform group-hover:translate-x-1" />
+                </Link>
+                <Link
+                  href="/dashboard/feed"
+                  className="inline-flex items-center justify-center h-14 px-8 bg-white border-2 border-zinc-300 text-zinc-950 rounded-xl font-bold text-base btn"
+                >
+                  Explore
+                </Link>
             </div>
           </motion.div>
         </div>
@@ -166,6 +166,27 @@ export default function PlatformPage() {
                   </p>
                 </div>
               </TechCard>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Reels strip - show sample platform reels to entice login */}
+      <section className="py-12 px-6">
+        <div className="max-w-7xl mx-auto">
+          <h3 className="text-2xl font-black mb-6">Recent Reels</h3>
+          <div className="flex gap-4 overflow-x-auto pb-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="w-64 shrink-0">
+                <div className="relative aspect-[9/16] overflow-hidden rounded-2xl">
+                  <img src={`/landing/reel-${(i%3)+1}.jpg`} className="object-cover w-full h-full" alt={`reel-${i}`} />
+                  <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white">
+                    <div className="text-sm font-bold">Worker Name</div>
+                    <div className="text-xs bg-black/40 px-2 py-1 rounded">2.1k</div>
+                  </div>
+                </div>
+                <div className="mt-3 text-sm font-semibold">Quick wiring fix</div>
+              </div>
             ))}
           </div>
         </div>

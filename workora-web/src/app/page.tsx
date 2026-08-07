@@ -152,7 +152,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-black/5 border border-black/5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             { name: 'Construction', sub: 'Engineering & Build', icon: Hammer },
             { name: 'Automotive', sub: 'Systems & Diagnostics', icon: Car },

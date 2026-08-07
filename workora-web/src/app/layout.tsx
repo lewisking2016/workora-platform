@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/Providers';
+import { MeshBackground } from '@/components/MeshBackground';
 import { BottomNav } from '@/components/BottomNav';
 import { TopNav } from '@/components/TopNav';
 import { Footer } from '@/components/Footer';
@@ -58,6 +59,7 @@ export default function RootLayout({
         </div>
         <Suspense fallback={null}>
           <Providers>
+            <MeshBackground variant="subtle" className="fixed inset-0 pointer-events-none -z-20" />
             <TopNav />
             <main>
               {children}
