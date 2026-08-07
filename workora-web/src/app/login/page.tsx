@@ -34,7 +34,16 @@ export default function LoginPage() {
 
     const bootstrap = async () => {
       const user = await fetchCurrentUser();
-      if (!mounted || !user) return;
+      if (!mounted) return;
+      if (!user) {
+        // Explicitly clear session storage/localstorage to avoid loops
+        if (typeof window !== 'undefined') {
+          window.localStorage.removeItem('workora_user');
+          window.localStorage.removeItem('workora_username');
+          window.localStorage.removeItem('workora_role');
+        }
+        return;
+      }
 
       window.location.href = user.role === 'hirer' ? '/dashboard/feed' : '/dashboard/pro';
     };
