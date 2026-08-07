@@ -65,7 +65,7 @@ export async function proxyRequest(targetPath: string, request: Request) {
     if (
       response.ok &&
       data?.token &&
-      (targetPath === '/auth/login' || targetPath === '/auth/register')
+      (targetPath.startsWith('/auth/login') || targetPath.startsWith('/auth/register'))
     ) {
       const rememberMe = (parsedBody as { rememberMe?: unknown } | null)?.rememberMe === true;
 
