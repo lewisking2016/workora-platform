@@ -31,7 +31,7 @@ export default function Home() {
   const proofImage = "/landing/The Video Feedback.png";
 
   return (
-    <main className="mx-auto max-w-screen-2xl flex flex-col bg-white text-black overflow-x-hidden font-display pt-20">
+    <main className="mx-auto max-w-screen-2xl flex flex-col bg-transparent text-black overflow-x-hidden font-display pt-20">
       
       {/* 1. TECH HERO - Full Background Image */}
       <section className="relative min-h-[90vh] w-full flex items-center border-b border-blue-500/10">
@@ -71,15 +71,15 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link 
                 href="/join" 
-                className="h-14 px-10 bg-blue-500 text-white font-bold text-sm flex items-center justify-center transition-all hover:bg-blue-600 active:scale-95 uppercase tracking-widest shadow-lg shadow-blue-500/30"
+                className="h-14 px-10 bg-blue-500 text-white font-bold text-sm flex items-center justify-center transition-all hover:bg-blue-600 active:scale-95 uppercase tracking-widest shadow-lg shadow-blue-500/30 btn"
               >
-                Initialize <CaretRight weight="bold" size={18} className="ml-2" />
+                Get started <CaretRight weight="bold" size={18} className="ml-2" />
               </Link>
               <Link 
                 href="/platform" 
-                className="h-14 px-10 border border-blue-500/20 bg-white/90 backdrop-blur-sm text-[#1a1a2e] font-bold text-sm flex items-center justify-center transition-all hover:bg-white active:scale-95 uppercase tracking-widest"
+                className="h-14 px-10 border border-blue-500/20 bg-white/90 backdrop-blur-sm text-[#1a1a2e] font-bold text-sm flex items-center justify-center transition-all hover:bg-white active:scale-95 uppercase tracking-widest btn"
               >
-                Documentation
+                How it works
               </Link>
             </div>
           </motion.div>
@@ -87,7 +87,7 @@ export default function Home() {
       </section>
 
       {/* 2. THE TECH STACK (Features) - Squared Grid */}
-      <section className="py-24 px-[5%] grid grid-cols-1 md:grid-cols-3 border-b border-black/5">
+      <section className="py-24 px-[5%] grid grid-cols-1 md:grid-cols-3 border-b border-black/5 bg-transparent">
         {[
           { 
             title: "Verified Protocol", 
@@ -105,11 +105,19 @@ export default function Home() {
             icon: IdentificationBadge 
           }
         ].map((feature, i) => (
-          <div key={i} className="p-12 border-b md:border-b-0 md:border-r last:border-r-0 border-black/5 flex flex-col gap-6 hover:bg-zinc-50 transition-colors group">
+          <motion.div 
+            key={i} 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: i * 0.15 }}
+            whileHover={{ y: -6, scale: 1.01 }}
+            className="p-12 border-b md:border-b-0 md:border-r last:border-r-0 border-black/5 flex flex-col gap-6 hover:bg-zinc-50/50 backdrop-blur-sm transition-all group cursor-pointer"
+          >
             <feature.icon size={40} weight="thin" className="text-black group-hover:text-[#0066FF] transition-colors" />
             <h3 className="text-2xl font-black tracking-tight uppercase">{feature.title}</h3>
             <p className="text-zinc-500 leading-relaxed">{feature.desc}</p>
-          </div>
+          </motion.div>
         ))}
       </section>
 
@@ -123,7 +131,7 @@ export default function Home() {
             className="object-cover"
           />
         </div>
-        <div className="flex-1 p-[8%] flex flex-col justify-center gap-8 bg-white text-black">
+        <div className="flex-1 p-[8%] flex flex-col justify-center gap-8 bg-white/80 backdrop-blur-sm text-black">
           <div className="h-1 w-20 bg-[var(--brand)]" />
           <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-none uppercase">
             Precision in <br /> Every Connection
@@ -131,14 +139,14 @@ export default function Home() {
           <p className="text-zinc-600 text-lg leading-relaxed max-w-lg">
             Our professionals are vetted for technical excellence. From complex circuitry to structural integrity, we ensure mastery at every touchpoint.
           </p>
-          <Link href="/platform" className="inline-flex items-center gap-4 text-sm font-bold uppercase tracking-widest bg-[var(--brand)] text-white px-5 py-3 rounded shadow">
-            View Skill Standards <ArrowRight size={20} />
+          <Link href="/platform" className="inline-flex items-center gap-4 text-sm font-bold uppercase tracking-widest bg-[var(--brand)] text-white px-5 py-3 rounded shadow btn">
+            How it works <ArrowRight size={20} />
           </Link>
         </div>
       </section>
 
       {/* 4. THE SKILL UNIVERSE - Squared Cards */}
-      <section className="py-24 px-[5%] bg-white">
+      <section className="py-24 px-[5%] bg-transparent">
         <div className="flex flex-col gap-12 mb-20">
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter uppercase leading-none">
             The Skill <br /> Universe
@@ -163,9 +171,13 @@ export default function Home() {
             { name: 'Industrial', sub: 'Fabrication & Welding', icon: Gear },
             { name: 'Logistics', sub: 'Operations & Flow', icon: Moped },
           ].map((pillar, i) => (
-            <div
+            <motion.div
               key={pillar.name}
-              className="group tech-card p-12 bg-white flex flex-col gap-8 cursor-pointer"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+              className="group tech-card p-12 bg-white/90 backdrop-blur-sm flex flex-col gap-8 cursor-pointer border border-blue-500/10 hover:border-blue-500/30"
             >
               <pillar.icon size={32} weight="thin" className="text-black group-hover:text-[#0066FF] transition-all" />
               <div>
@@ -176,7 +188,7 @@ export default function Home() {
                 <span className="text-[10px] font-black uppercase tracking-widest text-[#0066FF]">System Active</span>
                 <ArrowRight size={20} className="opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
@@ -220,23 +232,23 @@ export default function Home() {
       </section>
 
       {/* 6. SYSTEM INITIALIZATION (CTA) - Final Section */}
-      <section className="py-32 px-[5%] bg-white flex flex-col items-center text-center gap-12">
+      <section className="py-32 px-[5%] bg-transparent flex flex-col items-center text-center gap-12">
         <h2 className="text-5xl md:text-8xl font-black tracking-tighter uppercase leading-none max-w-5xl">
-          Initialize Your <br /> Professional Network
+          Join Workora <br /> today
         </h2>
         
         <div className="flex flex-col sm:flex-row gap-6 w-full max-w-2xl">
            <Link 
             href="/join" 
-            className="h-16 flex-1 flex items-center justify-center bg-black text-white font-bold text-sm uppercase tracking-widest hover:bg-[#0066FF] transition-all"
+            className="h-16 flex-1 flex items-center justify-center bg-black text-white font-bold text-sm uppercase tracking-widest hover:bg-[#0066FF] transition-all btn"
           >
-            Become a Provider
+            Join as helper
           </Link>
           <Link 
             href="/login" 
-            className="h-16 flex-1 flex items-center justify-center border border-black/10 text-black font-bold text-sm uppercase tracking-widest hover:bg-zinc-50 transition-all"
+            className="h-16 flex-1 flex items-center justify-center border border-black/10 text-black font-bold text-sm uppercase tracking-widest hover:bg-zinc-50 transition-all btn"
           >
-            Access Network
+            Log in
           </Link>
         </div>
       </section>
