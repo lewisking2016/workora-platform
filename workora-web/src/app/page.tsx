@@ -25,7 +25,7 @@ export default function Home() {
     <main className="mx-auto max-w-screen-2xl px-[5%] pt-20 flex flex-col bg-white text-zinc-950 overflow-x-hidden font-display">
       
       {/* 1. THE MASTER HERO - Clean & Borderless */}
-      <section className="relative h-[85vh] min-h-[650px] lg:h-[90vh] w-full flex items-center justify-center overflow-hidden">
+      <section className="relative h-[100vh] min-h-[600px] w-full flex items-center justify-center overflow-hidden">
         {/* Full Bleed Background Image */}
         <div className="absolute inset-0">
           <Image 
@@ -37,43 +37,43 @@ export default function Home() {
             priority
           />
           {/* Gradient Overlay for Text Readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
         </div>
         
         {/* Hero Content - Centered & Elegant */}
-        <div className="relative z-20 max-w-4xl mx-auto text-center px-6">
+        <div className="relative z-20 max-w-4xl mx-auto text-center px-4 sm:px-6">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="flex flex-col items-center gap-8"
+            className="flex flex-col items-center gap-6 sm:gap-8"
           >
-            <div className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white text-xs font-bold uppercase tracking-widest">
+            <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest">
               <div className="h-2 w-2 rounded-full bg-[#0066FF] animate-pulse" />
               The Professional Network
             </div>
             
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight text-white leading-[1.05]">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight text-white leading-[1.1] px-4">
               Africa&apos;s Trusted <br />
               <span className="bg-gradient-to-r from-[#0066FF] via-[#00D1FF] to-[#0066FF] bg-clip-text text-transparent">
                 Professional Network
               </span>
             </h1>
             
-            <p className="text-white/90 text-lg sm:text-xl lg:text-2xl max-w-2xl leading-relaxed font-medium">
+            <p className="text-white/90 text-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl leading-relaxed font-medium px-4">
               Connect with verified craftsmen and professionals. Quality work, verified skills, trusted results.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 mt-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-2 sm:mt-4 w-full sm:w-auto px-4">
               <Link 
                 href="/join" 
-                className="group h-14 px-8 bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-full font-bold text-base flex items-center justify-center transition-all hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/50 active:scale-95"
+                className="group h-12 sm:h-14 px-6 sm:px-8 bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-full font-bold text-sm sm:text-base flex items-center justify-center transition-all hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/50 active:scale-95 whitespace-nowrap"
               >
                 Get Started <CaretRight weight="bold" size={20} className="ml-2 transition-transform group-hover:translate-x-1" />
               </Link>
               <Link 
                 href="/platform" 
-                className="h-14 px-8 bg-white/10 backdrop-blur-xl border border-white/30 text-white rounded-full font-bold text-base flex items-center justify-center transition-all hover:bg-white/20"
+                className="h-12 sm:h-14 px-6 sm:px-8 bg-white/10 backdrop-blur-xl border border-white/30 text-white rounded-full font-bold text-sm sm:text-base flex items-center justify-center transition-all hover:bg-white/20 active:scale-95 whitespace-nowrap"
               >
                 Learn More
               </Link>
@@ -81,12 +81,12 @@ export default function Home() {
           </motion.div>
         </div>
 
-        {/* Scroll Indicator */}
+        {/* Scroll Indicator - Hidden on Mobile */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5, duration: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60"
+          className="hidden sm:flex absolute bottom-8 left-1/2 -translate-x-1/2 flex-col items-center gap-2 text-white/60"
         >
           <span className="text-xs font-bold uppercase tracking-widest">Scroll</span>
           <motion.div
@@ -98,31 +98,31 @@ export default function Home() {
       </section>
 
       {/* 2. THE MACRO DETAIL (Craftsmanship) - Clean White */}
-      <section className="py-24 lg:py-32 px-[5%] flex flex-col lg:flex-row items-center gap-12 lg:gap-20 bg-white">
-        <div className="flex-1 flex flex-col gap-6">
-          <div className="inline-flex h-14 w-14 rounded-2xl bg-gradient-to-br from-[#0066FF] to-[#7000FF] items-center justify-center shadow-lg shadow-blue-500/20">
-            <Lightning size={28} weight="bold" className="text-white" />
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-[5%] flex flex-col lg:flex-row items-center gap-8 sm:gap-10 lg:gap-16 bg-white">
+        <div className="flex-1 flex flex-col gap-4 sm:gap-6 w-full">
+          <div className="inline-flex h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-gradient-to-br from-[#0066FF] to-[#7000FF] items-center justify-center shadow-lg shadow-blue-500/20">
+            <Lightning size={24} weight="bold" className="text-white sm:w-7 sm:h-7" />
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-zinc-950">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-zinc-950">
             Precision in <br />
             every connection
           </h2>
-          <p className="text-zinc-600 text-lg lg:text-xl leading-relaxed max-w-lg">
+          <p className="text-zinc-600 text-base sm:text-lg lg:text-xl leading-relaxed max-w-lg">
             Our professionals don&apos;t just work—they engineer solutions. From intricate wiring to master plumbing, every skill is verified.
           </p>
           <Link 
             href="/platform" 
-            className="inline-flex items-center gap-2 text-[#0066FF] font-bold text-base hover:gap-3 transition-all"
+            className="inline-flex items-center gap-2 text-[#0066FF] font-bold text-sm sm:text-base hover:gap-3 transition-all active:scale-95"
           >
             Learn about our verification <ArrowRight size={20} weight="bold" />
           </Link>
         </div>
-        <div className="flex-1 relative aspect-square w-full max-w-[550px] rounded-3xl overflow-hidden shadow-2xl">
+        <div className="flex-1 relative aspect-square w-full max-w-[550px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl">
           <Image 
             src="/landing/wiring-1.jpg"
             alt="Professional Craftsmanship"
             fill
-            sizes="(max-width: 600px) 100vw, 550px"
+            sizes="(max-width: 768px) 100vw, 550px"
             className="object-cover"
           />
         </div>
