@@ -310,11 +310,12 @@ async function createGigs(profiles) {
       ];
 
       const result = await client.query(
-        `INSERT INTO gigs (worker_id, title, description, category, video_url, thumbnail_url, view_count)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)
+        `INSERT INTO gigs (worker_id, user_id, title, description, category, video_url, thumbnail_url, view_count)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          RETURNING id`,
         [
           profile.id,
+          profile.user_id,
           randomItem(titles),
           `Professional ${profile.trade.toLowerCase()} work completed in ${profile.location}. High quality materials used.`,
           profile.trade,
