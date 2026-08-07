@@ -4,41 +4,36 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #0A0E17;
+  --foreground: #18181b;
   --card: #ffffff;
-  --card-foreground: #0A0E17;
-  --muted: #F1F5F9;
-  --muted-foreground: #64748B;
+  --card-foreground: #18181b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
   --brand: #0066FF;
   --brand-light: #00D1FF;
 }
 
-.dark {
-  --background: #0A0E17;
-  --foreground: #F8FAFC;
-  --card: #161E2C;
-  --card-foreground: #F8FAFC;
-  --muted: #1E293B;
-  --muted-foreground: #94A3B8;
-}
-
 @layer base {
+  * {
+    @apply border-zinc-200;
+  }
+  
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-white text-zinc-950 antialiased;
   }
 
-  h1, h2, h3, h4 {
-    @apply font-bold tracking-tight;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight text-zinc-950;
+  }
+  
+  p {
+    @apply text-zinc-700;
   }
 }
 
 /* Custom Glassmorphism Classes */
 .glass {
-  @apply bg-white/10 backdrop-blur-md border border-white/20;
-}
-
-.dark .glass {
-  @apply bg-black/30 backdrop-blur-md border border-white/10;
+  @apply bg-white/80 backdrop-blur-xl border border-zinc-200;
 }
 
 /* Hide scrollbars but keep functionality */
@@ -58,7 +53,7 @@
   scrollbar-width: none;
 }
 
-/* Hide Google Translate Banner - Aggressive */
+/* Hide Google Translate Banner */
 .goog-te-banner-frame,
 .goog-te-banner-frame.skiptranslate,
 .skiptranslate > iframe,

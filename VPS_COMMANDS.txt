@@ -1,0 +1,30 @@
+Copy and paste these commands into your VPS terminal (you're already logged in):
+
+# 1. Navigate to project directory
+cd /home/lewis/workora-platform
+
+# 2. Fix ownership permissions
+sudo chown -R azureuser:azureuser .
+
+# 3. Pull latest code
+git pull origin main
+
+# 4. Stop current containers
+sudo docker-compose down
+
+# 5. Rebuild and start containers
+sudo docker-compose up -d --build
+
+# 6. Wait for backend to start (wait 20 seconds)
+sleep 20
+
+# 7. Navigate to backend folder
+cd workora-backend
+
+# 8. Run the seed script
+node seed_realistic_data.js
+
+# 9. Test the API
+curl "http://localhost:3001/gigs/feed?page=1&limit=5"
+
+# Done! The platform should now have data with your local videos

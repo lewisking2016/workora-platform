@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Globe, List, X } from '@phosphor-icons/react';
 import { AnimatePresence } from 'framer-motion';
-import { ThemeToggle } from './ThemeToggle';
 import { usePathname } from 'next/navigation';
 
 export function TopNav() {
@@ -28,26 +27,30 @@ export function TopNav() {
   return (
     <nav
       data-analytics-section="top_navigation"
-      className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ease-out ${scrolled ? 'bg-white/40 dark:bg-[#0A0E17]/40 backdrop-blur-2xl saturate-150 py-3' : 'bg-transparent py-6'}`}
+      className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ease-out ${
+        scrolled 
+          ? 'bg-white/80 backdrop-blur-xl shadow-sm border-b border-zinc-200' 
+          : 'bg-white/50 backdrop-blur-md'
+      }`}
     >
-      <div className="mx-auto max-w-screen-2xl px-6 md:px-12 flex items-center justify-between">
+      <div className="mx-auto max-w-screen-2xl px-6 md:px-12 flex items-center justify-between h-20">
         
         {/* Left Side: Logo & Links */}
-        <div className="flex items-center gap-16">
+        <div className="flex items-center gap-12">
           <Link href="/" className="relative flex items-center justify-center transition-transform hover:opacity-80">
-            <div className="relative h-12 w-36 md:h-14 md:w-40">
+            <div className="relative h-10 w-32 md:h-12 md:w-36">
               <Image 
                 src="/logo/workora_logo.png"
                 alt="Workora Logo"
                 fill
-                className="object-contain drop-shadow-sm dark:brightness-0 dark:invert"
+                className="object-contain"
                 priority
               />
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-10">
+          <div className="hidden lg:flex items-center gap-8">
             {[
               { name: 'Personal', href: '/personal' },
               { name: 'Business', href: '/business' },
@@ -60,15 +63,15 @@ export function TopNav() {
                 data-analytics-event="topnav_link_clicked"
                 className="relative group py-2"
               >
-                <span className={`text-sm font-black tracking-wide drop-shadow-sm transition-colors duration-300 ${
-                  pathname === tab.href ? 'text-[#0066FF] dark:text-[#00D1FF]' : 'text-zinc-900 hover:text-[#0066FF] dark:text-zinc-100 dark:hover:text-[#00D1FF]'
+                <span className={`text-sm font-bold tracking-wide transition-colors duration-300 ${
+                  pathname === tab.href ? 'text-[#0066FF]' : 'text-zinc-700 hover:text-[#0066FF]'
                 }`}>
                   {tab.name}
                 </span>
                 {pathname === tab.href && (
                   <motion.div 
                     layoutId="topNavActiveLine"
-                    className="absolute bottom-0 left-0 right-0 h-[2px] rounded-full bg-gradient-to-r from-[#0066FF] to-[#7000FF]"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-gradient-to-r from-[#0066FF] to-[#7000FF]"
                   />
                 )}
               </Link>
@@ -78,11 +81,13 @@ export function TopNav() {
 
         {/* Right Side: Utilities & CTA */}
         <div className="flex items-center gap-6">
-          <div className="hidden md:flex items-center gap-6 mr-2">
-            <Link href="/blog" className="text-sm font-black tracking-wide drop-shadow-sm text-zinc-900 hover:text-[#0066FF] dark:text-zinc-100 dark:hover:text-[#00D1FF] transition-colors">
+          <div className="hidden md:flex items-center gap-6">
+            <Link 
+              href="/blog" 
+              className="text-sm font-bold tracking-wide text-zinc-700 hover:text-[#0066FF] transition-colors"
+            >
               Insights
             </Link>
-            <ThemeToggle />
             <button
               data-analytics-label="Language toggle"
               data-analytics-event="topnav_language_toggle"
@@ -91,9 +96,9 @@ export function TopNav() {
                 document.cookie = `googtrans=${newValue}; path=/`;
                 window.location.reload();
               }}
-              className="flex items-center gap-1.5 text-sm font-black tracking-wide drop-shadow-sm text-zinc-900 hover:text-[#0066FF] dark:text-zinc-100 dark:hover:text-[#00D1FF] transition-colors"
+              className="flex items-center gap-1.5 text-sm font-bold tracking-wide text-zinc-700 hover:text-[#0066FF] transition-colors"
             >
-              <Globe size={18} /> {isSwahili ? 'SW' : 'EN'}
+              <Globe size={18} weight="bold" /> {isSwahili ? 'SW' : 'EN'}
             </button>
           </div>
 
@@ -102,7 +107,7 @@ export function TopNav() {
               href="/login" 
               data-analytics-label="Sign in"
               data-analytics-event="topnav_sign_in"
-              className="hidden sm:flex h-10 px-6 items-center justify-center text-sm font-black text-zinc-900 drop-shadow-sm dark:text-white hover:opacity-70 transition-opacity"
+              className="hidden sm:flex h-10 px-6 items-center justify-center text-sm font-bold text-zinc-700 hover:text-zinc-950 transition-colors"
             >
               Sign in
             </Link>
@@ -110,9 +115,9 @@ export function TopNav() {
               href="/join" 
               data-analytics-label="Get Started"
               data-analytics-event="topnav_get_started"
-              className="group relative h-10 px-6 bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-lg font-black text-sm flex items-center justify-center transition-all hover:scale-105 active:scale-95 shadow-md shadow-blue-500/20"
+              className="h-10 px-6 bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-full font-bold text-sm flex items-center justify-center transition-all hover:scale-105 hover:shadow-lg hover:shadow-blue-500/30 active:scale-95"
             >
-              <span className="relative z-10">Get Started</span>
+              Get Started
             </Link>
             
             {/* Mobile Menu Toggle */}
@@ -120,9 +125,9 @@ export function TopNav() {
               data-analytics-label="Open mobile menu"
               data-analytics-event="topnav_mobile_menu_open"
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden ml-2 h-10 w-10 flex items-center justify-center rounded-lg bg-zinc-50 dark:bg-zinc-800 text-zinc-950 dark:text-white border border-zinc-100 dark:border-zinc-700"
+              className="lg:hidden h-10 w-10 flex items-center justify-center rounded-full bg-zinc-100 text-zinc-950 hover:bg-zinc-200 transition-colors"
             >
-              <List size={24} weight="bold" />
+              <List size={22} weight="bold" />
             </button>
           </div>
         </div>
@@ -135,23 +140,23 @@ export function TopNav() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-[200] bg-white dark:bg-[#0A0E17] flex flex-col px-6 py-6 overflow-y-auto"
+            className="fixed inset-0 z-[200] bg-white flex flex-col px-6 py-6 overflow-y-auto"
           >
             <div className="flex items-center justify-between mb-12">
-              <div className="relative h-12 w-36">
-                <Image src="/logo/workora_logo.png" alt="Workora Logo" fill className="object-contain dark:brightness-0 dark:invert" priority />
+              <div className="relative h-10 w-32">
+                <Image src="/logo/workora_logo.png" alt="Workora Logo" fill className="object-contain" priority />
               </div>
-            <button
-              data-analytics-label="Close mobile menu"
-              data-analytics-event="topnav_mobile_menu_close"
-              onClick={() => setMobileMenuOpen(false)}
-              className="h-10 w-10 flex items-center justify-center rounded-lg bg-zinc-50 dark:bg-zinc-800 text-zinc-950 dark:text-white border border-zinc-100 dark:border-zinc-700"
-            >
-                <X size={24} weight="bold" />
+              <button
+                data-analytics-label="Close mobile menu"
+                data-analytics-event="topnav_mobile_menu_close"
+                onClick={() => setMobileMenuOpen(false)}
+                className="h-10 w-10 flex items-center justify-center rounded-full bg-zinc-100 text-zinc-950"
+              >
+                <X size={22} weight="bold" />
               </button>
             </div>
 
-            <div className="flex flex-col gap-6 text-2xl font-black tracking-tighter">
+            <div className="flex flex-col gap-6 text-2xl font-black tracking-tight">
               {[
                 { name: 'Personal', href: '/personal' },
                 { name: 'Business', href: '/business' },
@@ -164,7 +169,7 @@ export function TopNav() {
                   data-analytics-label={tab.name}
                   data-analytics-event="mobile_nav_link_clicked"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-zinc-950 dark:text-white hover:text-[#0066FF] dark:hover:text-[#00D1FF] transition-colors"
+                  className="text-zinc-950 hover:text-[#0066FF] transition-colors"
                 >
                   {tab.name}
                 </Link>
@@ -172,8 +177,6 @@ export function TopNav() {
             </div>
 
             <div className="mt-12 flex flex-col gap-6">
-              <div className="flex items-center gap-6">
-                <ThemeToggle />
               <button
                 data-analytics-label="Language toggle"
                 data-analytics-event="mobile_language_toggle"
@@ -182,18 +185,17 @@ export function TopNav() {
                   document.cookie = `googtrans=${newValue}; path=/`;
                   window.location.reload();
                 }}
-                  className="flex items-center gap-2 text-lg font-black tracking-wide text-zinc-950 dark:text-white"
-                >
-                  <Globe size={24} /> {isSwahili ? 'Swahili' : 'English'}
-                </button>
-              </div>
-              <hr className="border-zinc-100 dark:border-zinc-800" />
+                className="flex items-center gap-2 text-lg font-bold tracking-wide text-zinc-950"
+              >
+                <Globe size={24} weight="bold" /> {isSwahili ? 'Swahili' : 'English'}
+              </button>
+              <hr className="border-zinc-200" />
               <Link 
                 href="/login" 
                 data-analytics-label="Sign in"
                 data-analytics-event="mobile_sign_in"
                 onClick={() => setMobileMenuOpen(false)}
-                className="h-14 flex items-center justify-center text-lg font-black text-zinc-950 dark:text-white bg-zinc-50 dark:bg-zinc-900 rounded-xl"
+                className="h-14 flex items-center justify-center text-lg font-bold text-zinc-950 bg-zinc-100 rounded-2xl hover:bg-zinc-200 transition-colors"
               >
                 Sign In
               </Link>

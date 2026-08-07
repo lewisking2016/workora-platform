@@ -48,11 +48,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${spaceGrotesk.variable}`}>
+    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <body className="min-h-screen bg-white font-display text-foreground pb-20 lg:pb-0">
-        {/* Radiant Top Progress Bar (Pulse Effect) */}
-        <div className="fixed top-0 left-0 right-0 h-[3px] z-[9999] overflow-hidden">
-          <div className="w-full h-full bg-gradient-to-r from-[#0066FF] via-[#7000FF] to-[#0066FF] shadow-[0_0_15px_rgba(0,102,255,0.8)] animate-pulse" />
+        {/* Elegant Top Progress Bar */}
+        <div className="fixed top-0 left-0 right-0 h-[2px] z-[9999] overflow-hidden">
+          <div className="w-full h-full bg-gradient-to-r from-[#0066FF] via-[#00D1FF] to-[#7000FF] shadow-lg shadow-blue-500/20" />
         </div>
         <Suspense fallback={null}>
           <Providers>
