@@ -16,8 +16,9 @@ export function TechCard({ children, className = '', hover = true, glow = false 
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
+      transition={glow ? { duration: 6, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.5 }}
       whileHover={hover ? { y: -4 } : undefined}
+      animate={glow ? { y: [0, -6, 0] } : undefined}
       className={`
         relative overflow-hidden
         bg-white border border-zinc-200

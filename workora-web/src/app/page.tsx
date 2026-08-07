@@ -58,9 +58,9 @@ export default function Home() {
               Infrastructure for Trust
             </div>
             
-            <h1 className="text-5xl md:text-7xl xl:text-8xl font-black tracking-tighter leading-[0.9] mb-8 text-[#1a1a2e]">
+            <h1 className="text-5xl md:text-7xl xl:text-8xl font-black tracking-tighter leading-[0.9] mb-8 text-[#1a1a2e] animated-text">
               AFRICA&apos;S <br />
-              <span className="text-blue-500">PROFESSIONAL</span> <br />
+              <span className="text-inherit">PROFESSIONAL</span> <br />
               OS
             </h1>
             

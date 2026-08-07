@@ -12,8 +12,8 @@
   --brand: #0066FF; /* primary */
   --brand-secondary: #00D1FF; /* accent */
   --brand-dark: #7000FF; /* deep accent */
-  --mesh-color: rgba(0,102,255,0.03); /* subtle brand-blue mesh */
-  --glow-color: rgba(0,209,255,0.06); /* subtle aqua glow */
+  --mesh-color: rgba(0,102,255,0.06); /* stronger brand-blue mesh */
+  --glow-color: rgba(0,209,255,0.12); /* stronger aqua glow */
 }
 
 /* Button animation utility */
@@ -36,11 +36,46 @@ button:hover, .btn:hover, a.btn:hover, a.button:hover {
 
 /* Ensure mesh is visible but subtle */
 body {
-  background-image: 
+  background-image:
     linear-gradient(var(--mesh-color) 1px, transparent 1px),
     linear-gradient(90deg, var(--mesh-color) 1px, transparent 1px);
-  background-size: 36px 36px;
+  background-size: 28px 28px;
+  animation: meshShift 20s linear infinite;
 }
+
+@keyframes meshShift {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 28px 28px, 28px 28px; }
+}
+
+/* Subtle floating for tech cards when marked */
+@keyframes floatY {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Animated heading effect: subtle gradient sweep */
+.animated-text {
+  background: linear-gradient(90deg, var(--brand), var(--brand-secondary), var(--brand-dark));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-size: 200% 100%;
+  animation: gradientSweep 6s linear infinite;
+}
+
+@keyframes gradientSweep {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Ensure all buttons are visibly animated and accessible */
+button, a[class*="btn"], .btn {
+  will-change: transform, box-shadow;
+}
+
 
 @layer base {
   * {

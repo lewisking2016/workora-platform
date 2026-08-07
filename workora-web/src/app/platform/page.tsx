@@ -82,11 +82,9 @@ export default function PlatformPage() {
               The Complete Platform
             </div>
             
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-none">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-none animated-text">
               Everything you need <br />
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
-                in one platform
-              </span>
+              <span className="text-inherit">in one platform</span>
             </h1>
             
             <p className="text-xl sm:text-2xl text-zinc-600 max-w-3xl mx-auto leading-relaxed">
