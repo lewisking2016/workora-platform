@@ -163,7 +163,7 @@ function GigPreview({ gig }: { gig: PublicGig }) {
     <article className="card overflow-hidden">
       <div className="relative aspect-[16/10] bg-zinc-100">
         {gig.video_url ? (
-          <VideoPlayer src={gig.video_url} poster={gig.thumbnail_url || undefined} className="h-full w-full object-cover" autoPlay={false} />
+          <VideoPlayer src={gig.video_url} poster={gig.thumbnail_url || undefined} className="h-full w-full object-cover" autoPlay intersectionThreshold={0.4} />
         ) : (
           <SafeMediaThumb src={gig.thumbnail_url || APP_DEFAULTS.thumbnail} alt={gig.title || 'Workora post'} className="h-full w-full object-cover" />
         )}
