@@ -43,3 +43,10 @@ Thumbs.db
 .pub-cache/
 .pub/
 build/
+
+# Kiro/Trae Skills (local development only)
+.kiro/skills/
+.trae/skills/
+skills/
+*-skills/
+antigravity-skills-repo/

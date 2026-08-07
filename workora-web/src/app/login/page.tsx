@@ -149,6 +149,7 @@ export default function LoginPage() {
                   src="/logo/workora_logo.png"
                   alt="Workora Logo"
                   fill
+                  sizes="80px"
                   className="object-contain brightness-0 dark:invert"
                   priority
                 />

@@ -5,6 +5,7 @@ import { ArrowRight, CheckCircle, House, ShieldCheck, Sparkle, UsersThree, Video
 
 import { SafeMediaThumb } from '@/components/SafeMediaThumb';
 import { VideoPlayer } from '@/components/VideoPlayer';
+import { MeshBackground } from '@/components/MeshBackground';
 import { APP_DEFAULTS, PublicGig, PublicSurfaceData, publicSurfaceTheme } from '@/lib/public-surface';
 
 type SurfaceVariant =
@@ -196,8 +197,9 @@ export function PublicSurface({ variant, data }: { variant: SurfaceVariant; data
   const legalMode = ['privacy', 'terms', 'safety'].includes(variant);
 
   return (
-    <main className={`mx-auto max-w-screen-2xl px-5 py-12 md:px-8 lg:px-10 ${publicSurfaceTheme.surface} pt-24`}>
-      <section className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr] lg:items-start mb-24">
+    <main className={`relative mx-auto max-w-screen-2xl px-5 py-12 md:px-8 lg:px-10 ${publicSurfaceTheme.surface} pt-24`}>
+      <MeshBackground />
+      <section className="relative z-10 grid gap-12 lg:grid-cols-[1.2fr_0.8fr] lg:items-start mb-24">
         <div className="space-y-8">
           <div className="inline-flex items-center gap-2 border border-black/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-black">
             <Sparkle size={14} weight="bold" />
@@ -236,7 +238,7 @@ export function PublicSurface({ variant, data }: { variant: SurfaceVariant; data
         </div>
       </section>
 
-      <section className="grid gap-12 lg:grid-cols-[1fr_0.8fr] mb-24">
+      <section className="relative z-10 grid gap-12 lg:grid-cols-[1fr_0.8fr] mb-24">
         <div className={`border ${publicSurfaceTheme.border} ${publicSurfaceTheme.surface} p-8 tech-card`}>
           <div className="flex items-center justify-between gap-3 mb-8">
             <div>
@@ -284,7 +286,7 @@ export function PublicSurface({ variant, data }: { variant: SurfaceVariant; data
       </section>
 
       {supportMode && (
-        <section className="grid gap-6 lg:grid-cols-3 mb-24">
+        <section className="relative z-10 grid gap-6 lg:grid-cols-3 mb-24">
           {config.highlights.map((item) => (
             <div key={item} className={`border ${publicSurfaceTheme.border} ${publicSurfaceTheme.surface} p-8 tech-card`}>
               <div className="flex items-center gap-2 text-[#0066FF] mb-4">
@@ -302,7 +304,7 @@ export function PublicSurface({ variant, data }: { variant: SurfaceVariant; data
       )}
 
       {legalMode && (
-        <section className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr] mb-24">
+        <section className="relative z-10 grid gap-12 lg:grid-cols-[1.2fr_0.8fr] mb-24">
           <LegalPanel title={config.title}>
             <p>{config.body}</p>
             <p className="font-bold">
@@ -323,7 +325,7 @@ export function PublicSurface({ variant, data }: { variant: SurfaceVariant; data
         </section>
       )}
 
-      <section className="border border-black/10 bg-zinc-50 p-12 lg:p-16">
+      <section className="relative z-10 border border-black/10 bg-zinc-50 p-12 lg:p-16">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-[10px] font-black uppercase tracking-widest text-[#0066FF]">System Ready</p>

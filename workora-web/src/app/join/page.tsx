@@ -152,7 +152,7 @@ export default function JoinPage() {
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
         <Link href="/" className="relative flex items-center justify-center transition-transform hover:scale-110 mx-auto">
           <div className="relative h-20 w-20">
-            <Image src="/logo/workora_logo.png" alt="Workora Logo" fill className="object-contain brightness-0 dark:invert" priority />
+            <Image src="/logo/workora_logo.png" alt="Workora Logo" fill sizes="80px" className="object-contain brightness-0 dark:invert" priority />
           </div>
         </Link>
       </motion.div>

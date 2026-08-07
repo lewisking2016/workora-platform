@@ -12,6 +12,7 @@ const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
+  weight: ['400', '500', '600', '700', '800', '900'],
 });
 
 const spaceGrotesk = Space_Grotesk({ 
@@ -48,8 +49,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
-      <body className="min-h-screen bg-white font-display text-foreground pb-20 lg:pb-0">
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <body className="min-h-screen bg-white text-foreground pb-20 lg:pb-0 font-sans" suppressHydrationWarning>
         <div className="mesh-glow" />
         {/* Elegant Top Progress Bar */}
         <div className="fixed top-0 left-0 right-0 h-[2px] z-[9999] overflow-hidden">

@@ -24,63 +24,67 @@ import {
 } from '@phosphor-icons/react';
 
 export default function Home() {
-  const heroImage = "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=high-tech%20professional%20artisan%20working%20in%20a%20clean%20minimalist%20workshop%20with%20digital%20overlays%20white%20theme%20ultra-modern%20tech%20aesthetic&image_size=landscape_16_9";
-  const craftImage = "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=close-up%20of%20precision%20engineering%20tools%20on%20a%20white%20grid%20background%20minimalist%20tech%20style%20black%20accents&image_size=square_hd";
-  const trustImage = "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=digital%20trust%20passport%20interface%20with%20biometric%20verification%20elements%20clean%20white%20ui%20tech%20design&image_size=landscape_4_3";
-  const proofImage = "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=high-definition%20video%20interface%20showing%20construction%20proof%20of%20work%20clean%20tech%20dashboard%20white%20theme&image_size=landscape_16_9";
+  // Using local images from public/landing
+  const heroImage = "/landing/workora hero.jpeg";
+  const craftImage = "/landing/wiring-1.jpg";
+  const trustImage = "/landing/verified badge.jpeg";
+  const proofImage = "/landing/The Video Feedback.png";
 
   return (
     <main className="mx-auto max-w-screen-2xl flex flex-col bg-white text-black overflow-x-hidden font-display pt-20">
       
-      {/* 1. TECH HERO - Squared & Minimalist */}
-      <section className="relative min-h-[90vh] w-full flex flex-col lg:flex-row items-center border-b border-black/5">
-        <div className="flex-1 px-[5%] py-12 lg:py-0 flex flex-col justify-center gap-8 relative z-10">
+      {/* 1. TECH HERO - Full Background Image */}
+      <section className="relative min-h-[90vh] w-full flex items-center border-b border-blue-500/10">
+        {/* Full Background Image */}
+        <Image 
+          src={heroImage}
+          alt="Workora OS Hero"
+          fill
+          className="object-cover brightness-90"
+          priority
+        />
+        
+        {/* Overlay for better text readability - Minimal gradient */}
+        <div className="absolute inset-0 bg-gradient-to-r from-white/70 via-white/40 to-transparent" />
+        
+        {/* Content */}
+        <div className="relative z-10 w-full px-[5%] py-12">
           <motion.div 
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
+            className="max-w-3xl"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 border border-black/10 text-[10px] font-bold uppercase tracking-widest mb-6">
-              <Cube size={14} weight="fill" className="text-black" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 border border-blue-500/20 bg-white/90 backdrop-blur-sm text-[10px] font-bold uppercase tracking-widest mb-6">
+              <Cube size={14} weight="fill" className="text-blue-500" />
               Infrastructure for Trust
             </div>
             
-            <h1 className="text-5xl md:text-7xl xl:text-8xl font-black tracking-tighter leading-[0.9] mb-8">
+            <h1 className="text-5xl md:text-7xl xl:text-8xl font-black tracking-tighter leading-[0.9] mb-8 text-[#1a1a2e]">
               AFRICA&apos;S <br />
-              <span className="text-[#0066FF]">PROFESSIONAL</span> <br />
+              <span className="text-blue-500">PROFESSIONAL</span> <br />
               OS
             </h1>
             
-            <p className="text-zinc-500 text-lg md:text-xl max-w-xl leading-relaxed mb-10">
+            <p className="text-slate-700 text-lg md:text-xl max-w-xl leading-relaxed mb-10 font-medium">
               The digital trust layer for the informal workforce. Verified skills, authenticated history, and real-time proof of work.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
               <Link 
                 href="/join" 
-                className="h-14 px-10 bg-black text-white font-bold text-sm flex items-center justify-center transition-all hover:bg-[#0066FF] active:scale-95 uppercase tracking-widest"
+                className="h-14 px-10 bg-blue-500 text-white font-bold text-sm flex items-center justify-center transition-all hover:bg-blue-600 active:scale-95 uppercase tracking-widest shadow-lg shadow-blue-500/30"
               >
                 Initialize <CaretRight weight="bold" size={18} className="ml-2" />
               </Link>
               <Link 
                 href="/platform" 
-                className="h-14 px-10 border border-black/10 text-black font-bold text-sm flex items-center justify-center transition-all hover:bg-zinc-50 active:scale-95 uppercase tracking-widest"
+                className="h-14 px-10 border border-blue-500/20 bg-white/90 backdrop-blur-sm text-[#1a1a2e] font-bold text-sm flex items-center justify-center transition-all hover:bg-white active:scale-95 uppercase tracking-widest"
               >
                 Documentation
               </Link>
             </div>
           </motion.div>
-        </div>
-        
-        <div className="flex-1 w-full h-full min-h-[500px] relative overflow-hidden">
-          <Image 
-            src={heroImage}
-            alt="Workora OS Hero"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-white via-transparent to-transparent hidden lg:block" />
         </div>
       </section>
 

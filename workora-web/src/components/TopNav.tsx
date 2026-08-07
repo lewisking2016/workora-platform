@@ -145,7 +145,7 @@ export function TopNav() {
           >
             <div className="flex items-center justify-between mb-20">
               <div className="relative h-10 w-32">
-                <Image src="/logo/workora_logo.png" alt="Workora Logo" fill className="object-contain" priority />
+                <Image src="/logo/workora_logo.png" alt="Workora Logo" fill sizes="128px" className="object-contain" priority />
               </div>
               <button
                 data-analytics-label="Close mobile menu"
