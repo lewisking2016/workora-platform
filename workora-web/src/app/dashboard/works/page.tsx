@@ -8,12 +8,17 @@ import {
   SealCheck,
   ShareFat,
   DotsThree,
-  PaperPlaneTilt
+  PaperPlaneTilt,
+  Check,
+  WarningCircle,
+  LinkSimple,
+  UserCircle
 } from '@phosphor-icons/react';
 import { fetchCurrentUser, apiFetch } from '@/lib/session';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { APP_CONFIG } from '@/lib/config';
 import { useRouter } from 'next/navigation';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface Work {
   id: string;
@@ -45,6 +50,8 @@ export default function WorksPage() {
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [menuFor, setMenuFor] = useState<Work | null>(null);
+  const [shareFeedback, setShareFeedback] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -105,6 +112,38 @@ export default function WorksPage() {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleShare = async (work: Work) => {
+    const url = `${window.location.origin}/dashboard/post/${work.id}`;
+    const text = `Check out ${work.user_name} on Workora — ${work.description || 'amazing work!'}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'Workora', text, url });
+        return;
+      }
+      throw new Error('no-share');
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') return;
+      try {
+        await navigator.clipboard.writeText(url);
+        setShareFeedback(work.id);
+        setTimeout(() => setShareFeedback(null), 1600);
+      } catch {
+        window.open(`https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`, '_blank');
+      }
+    }
+  };
+
+  const openProfile = (work: Work) => {
+    router.push(`/profile/${work.user_id || work.worker_id}`);
+  };
+
+  const reportWork = async (work: Work) => {
+    try {
+      await apiFetch(`/api/gigs/${work.id}/report`, { method: 'POST' });
+    } catch { /* report errors are silent */ }
+    setMenuFor(null);
   };
 
   const startConversation = async (otherUserId: string) => {
@@ -211,7 +250,13 @@ export default function WorksPage() {
                 <p className="text-white/70 text-xs">{work.trade}</p>
               </div>
             </div>
-            <DotsThree size={24} weight="bold" className="text-white" />
+            <button
+              onClick={() => setMenuFor(work)}
+              aria-label="More options"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm active:scale-90 transition-transform"
+            >
+              <DotsThree size={24} weight="bold" className="text-white" />
+            </button>
           </div>
 
           {/* Right Side Actions */}
@@ -242,7 +287,7 @@ export default function WorksPage() {
             </button>
 
             {/* Comment */}
-            <button className="flex flex-col items-center gap-1">
+            <button onClick={() => router.push(`/dashboard/post/${work.id}`)} className="flex flex-col items-center gap-1 active:scale-90 transition-transform">
               <ChatCircleDots size={32} weight="regular" className="text-white" />
               <span className="text-white text-xs font-semibold">
                 {(work.real_comments || work.comments_count || 0).toLocaleString()}
@@ -259,8 +304,15 @@ export default function WorksPage() {
             </button>
 
             {/* Share */}
-            <button className="flex flex-col items-center gap-1">
-              <ShareFat size={32} weight="regular" className="text-white" />
+            <button onClick={() => handleShare(work)} className="flex flex-col items-center gap-1 active:scale-90 transition-transform">
+              {shareFeedback === work.id ? (
+                <Check size={32} weight="bold" className="text-emerald-400" />
+              ) : (
+                <ShareFat size={32} weight="regular" className="text-white" />
+              )}
+              {shareFeedback === work.id && (
+                <span className="text-[10px] font-semibold text-emerald-400">Copied</span>
+              )}
             </button>
           </div>
 
@@ -279,6 +331,73 @@ export default function WorksPage() {
           </div>
         </section>
       ))}
+
+      {/* ─── Share feedback toast ─── */}
+      <AnimatePresence>
+        {shareFeedback && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="absolute bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 text-xs font-black text-zinc-900 shadow-2xl"
+          >
+            <Check size={14} weight="bold" className="text-emerald-500" />
+            Link copied to clipboard
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ─── Action sheet (⋯) ─── */}
+      <AnimatePresence>
+        {menuFor && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMenuFor(null)}
+              className="fixed inset-0 z-[400] bg-black/70 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', stiffness: 380, damping: 40 }}
+              className="fixed bottom-0 left-0 right-0 z-[410] rounded-t-3xl bg-[#141821] border-t border-white/10 p-4 pb-8 safe-area-bottom"
+            >
+              <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-white/15" />
+              <p className="mb-2 px-2 text-xs font-black uppercase tracking-widest text-white/40">
+                {menuFor.user_name} · {menuFor.trade}
+              </p>
+              {[
+                { icon: LinkSimple, label: 'Copy link', action: () => handleShare(menuFor) },
+                { icon: PaperPlaneTilt, label: 'Send message', action: () => startConversation(menuFor.user_id || menuFor.worker_id) },
+                { icon: UserCircle, label: 'View profile', action: () => openProfile(menuFor) },
+                { icon: WarningCircle, label: 'Report', action: () => reportWork(menuFor), danger: true },
+              ].map((item) => (
+                <button
+                  key={item.label}
+                  onClick={() => { item.action(); setMenuFor(null); }}
+                  className={`flex w-full items-center gap-4 rounded-2xl px-4 py-3.5 text-left transition-colors ${
+                    item.danger
+                      ? 'text-red-400 hover:bg-red-500/10'
+                      : 'text-white hover:bg-white/[0.06]'
+                  }`}
+                >
+                  <item.icon size={20} weight="bold" />
+                  <span className="text-sm font-bold">{item.label}</span>
+                </button>
+              ))}
+              <button
+                onClick={() => setMenuFor(null)}
+                className="mt-2 w-full rounded-2xl bg-white/[0.06] py-3 text-sm font-black text-white/60 hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

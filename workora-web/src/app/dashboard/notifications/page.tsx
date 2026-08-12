@@ -48,8 +48,22 @@ export default function NotificationsPage() {
   };
 
   const openNotification = async (notif: Notification) => {
+    // Mark as read, then route to the actual content the notification points at.
     await apiFetch(`/api/notifications/${notif.id}/read`, { method: 'PATCH' });
-    router.push(`/dashboard/notifications/${notif.id}`);
+    if (notif.gig_id) {
+      router.push(`/dashboard/post/${notif.gig_id}`);
+    } else if (notif.actor_id && (notif.type === 'follow' || notif.type === 'rating')) {
+      router.push(`/profile/${notif.actor_id}`);
+    }
+  };
+
+  const markAllRead = async () => {
+    try {
+      await apiFetch('/api/notifications/read-all', { method: 'PATCH' });
+      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+    } catch (e) {
+      console.error('Mark all read failed', e);
+    }
   };
 
   const [followedBack, setFollowedBack] = useState<Set<string>>(new Set());
@@ -110,17 +124,25 @@ export default function NotificationsPage() {
       <div className="sticky top-0 z-50 bg-white dark:bg-black border-b border-zinc-100 dark:border-zinc-900 px-4 py-3">
         <div className="flex items-center justify-between gap-3">
           <h1 className="text-2xl font-bold text-zinc-950 dark:text-white">Notifications</h1>
-          <button
-            onClick={() => router.push('/dashboard/notifications/settings')}
-            className="inline-flex h-10 items-center gap-2 rounded-xl bg-zinc-100 px-3 text-xs font-black text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
-          >
-            <Gear size={14} weight="bold" />
-            Settings
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={markAllRead}
+              className="inline-flex h-10 items-center rounded-xl bg-zinc-100 px-3 text-xs font-black text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
+            >
+              Mark all read
+            </button>
+            <button
+              onClick={() => router.push('/dashboard/notifications/settings')}
+              className="inline-flex h-10 items-center gap-2 rounded-xl bg-zinc-100 px-3 text-xs font-black text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
+            >
+              <Gear size={14} weight="bold" />
+              Settings
+            </button>
+          </div>
         </div>
       </div>
 
-      <main className="flex-1 overflow-y-auto bg-white dark:bg-black">
+      <main className="flex-1 overflow-y-auto bg-white pb-24 dark:bg-black lg:pb-0">
         <div className="max-w-[660px] mx-auto">
           
           {loading ? (

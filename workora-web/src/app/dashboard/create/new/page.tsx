@@ -493,7 +493,7 @@ export default function NewPostPage() {
               </label>
             </div>
 
-            <div className="sticky bottom-0 grid grid-cols-2 gap-3 border-t border-zinc-100 bg-white p-4 dark:border-zinc-900 dark:bg-black">
+            <div className="sticky bottom-[68px] grid grid-cols-2 gap-3 border-t border-zinc-100 bg-white p-4 dark:border-zinc-900 dark:bg-black lg:bottom-0">
               <button
                 onClick={handleSaveDraft}
                 className="h-12 rounded-xl border border-zinc-200 text-sm font-black text-zinc-950 dark:border-zinc-800 dark:text-white"

@@ -176,7 +176,7 @@ export default function SavedPage() {
         </div>
       </div>
 
-      <main className="flex-1 overflow-y-auto bg-white dark:bg-black">
+      <main className="flex-1 overflow-y-auto bg-white pb-24 dark:bg-black lg:pb-0">
         <div className="max-w-[935px] mx-auto px-4 py-4 space-y-4">
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {headerStats.map((item) => (

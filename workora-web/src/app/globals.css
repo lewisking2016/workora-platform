@@ -204,6 +204,20 @@ a.btn:active {
 }
 
 /* ─────────────────────────────────────────────
+   Safe-area insets (iPhone notches / Android gestures)
+───────────────────────────────────────────── */
+.safe-area-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 0px);
+}
+.safe-area-top {
+  padding-top: max(env(safe-area-inset-top), 0px);
+}
+.safe-area-x {
+  padding-left: max(env(safe-area-inset-left), 0px);
+  padding-right: max(env(safe-area-inset-right), 0px);
+}
+
+/* ─────────────────────────────────────────────
    Google Translate suppression
 ───────────────────────────────────────────── */
 .goog-te-banner-frame,

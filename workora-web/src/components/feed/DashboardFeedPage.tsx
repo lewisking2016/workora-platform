@@ -553,7 +553,7 @@ export default function DashboardFeedPage() {
         </div>
       </div>
 
-      <main className="mx-auto grid max-w-[1200px] gap-6 px-3 py-4 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-6">
+      <main className="mx-auto grid max-w-[1200px] gap-6 px-3 py-4 pb-24 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-6 lg:pb-8">
         <section className="min-w-0">
           <div className="mb-4 overflow-hidden rounded-2xl bg-white shadow-sm shadow-black/5 dark:bg-zinc-950">
             <div className="flex gap-4 overflow-x-auto px-4 py-4 no-scrollbar">

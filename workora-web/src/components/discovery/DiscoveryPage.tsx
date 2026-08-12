@@ -616,7 +616,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
     : 'Browse live professionals and work by what people are doing now.';
 
   return (
-    <div className="min-h-full bg-[#f7f8fc] text-zinc-950 dark:bg-black dark:text-white">
+    <div className="min-h-full pb-24 bg-[#f7f8fc] text-zinc-950 dark:bg-black dark:text-white lg:pb-0">
       <div className="sticky top-0 z-30 border-b border-zinc-200/70 bg-white/95 backdrop-blur-xl dark:border-zinc-900 dark:bg-black/90">
         <div className="mx-auto max-w-[1280px] px-4 py-4 sm:px-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

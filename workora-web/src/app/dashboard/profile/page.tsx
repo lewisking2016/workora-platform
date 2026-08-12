@@ -388,7 +388,7 @@ export default function DashboardProfilePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="sticky top-[64px] z-30 -mx-4 mt-5 border-b border-zinc-200 bg-white/90 px-4 backdrop-blur-lg dark:border-zinc-800 dark:bg-[#0A0E17]/90 sm:-mx-6 sm:px-6"
+            className="sticky top-0 z-30 -mx-4 mt-5 border-b border-zinc-200 bg-white/90 px-4 backdrop-blur-lg dark:border-zinc-800 dark:bg-[#0A0E17]/90 sm:-mx-6 sm:px-6"
           >
             <div className="flex gap-1 overflow-x-auto scrollbar-hide">
               {tabs.map((t) => (

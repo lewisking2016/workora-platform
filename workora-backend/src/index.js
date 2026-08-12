@@ -179,6 +179,7 @@ fastify.register(require('./routes/notifications'), { prefix: '/notifications' }
 fastify.register(require('./routes/upload'), { prefix: '/upload' });
 fastify.register(require('./routes/messages'), { prefix: '/messages' });
 fastify.register(require('./routes/analytics'), { prefix: '/analytics' });
+fastify.register(require('./routes/jobs'), { prefix: '/jobs' });
 
 // System Settings
 fastify.get('/settings', async (request, reply) => {

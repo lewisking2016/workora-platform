@@ -18,7 +18,7 @@ export default function CreatePage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-full w-full bg-zinc-50 dark:bg-[#0A0E17]">
+    <div className="min-h-full w-full bg-zinc-50 pb-24 dark:bg-[#0A0E17] lg:pb-0">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-8 lg:px-6">
         <div className="rounded-[18px] border border-zinc-100 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
           <p className="text-[11px] font-black uppercase tracking-[0.28em] text-zinc-400">Create hub</p>

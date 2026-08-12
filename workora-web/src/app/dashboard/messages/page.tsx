@@ -228,7 +228,7 @@ export default function MessagesPage() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto pb-24 lg:pb-4">
           {filtered.length > 0 ? filtered.map(conv => (
             <button key={conv.id} onClick={() => openConversation(conv)}
               className={`w-full flex items-center gap-3 p-4 border-b border-zinc-50 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors text-left ${activeConv?.id === conv.id ? 'bg-zinc-50 dark:bg-zinc-900' : ''}`}>

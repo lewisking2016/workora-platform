@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import {
   House, Briefcase, ChatCircleDots, Bell, MagnifyingGlass,
   PencilSimple, VideoCamera, ChartLineUp, MapPin, Check,
-  Moon, Sun, Crown, ShieldCheck, Plus, Trash, GearSix,
+  Crown, ShieldCheck, Plus, Trash, GearSix,
   User, Notebook, Certificate, Sparkle, ArrowRight,
   CaretRight, FadersHorizontal
 } from '@phosphor-icons/react';
@@ -52,7 +52,8 @@ type FormState = {
 
 export default function BusinessDashboard() {
   const router = useRouter();
-  const [isDark, setIsDark] = useState(false);
+  // Dark-first to match the platform's premium dark dashboard identity.
+  const [isDark] = useState(true);
   const [tab, setTab] = useState<Tab>('overview');
   const [username, setUsername] = useState('Professional');
   const [userId, setUserId] = useState('');
@@ -177,7 +178,7 @@ export default function BusinessDashboard() {
   return (
     <div className="h-full w-full">
       {/* Tab Bar */}
-      <div className={`border-b ${isDark ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-200 bg-white/50'} backdrop-blur-sm sticky top-14 z-40`}>
+      <div className={`border-b ${isDark ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-200 bg-white/50'} backdrop-blur-sm sticky top-0 z-40`}>
         <div className="max-w-[1200px] mx-auto px-4 lg:px-6 flex gap-1 overflow-x-auto no-scrollbar">
           {TABS.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)} className={`flex items-center gap-2 px-5 py-3 text-xs font-bold border-b-2 transition-all whitespace-nowrap ${tab === t.key ? `border-[#0066FF] ${isDark ? 'text-white' : 'text-zinc-950'}` : `border-transparent ${muted} hover:${isDark ? 'text-white' : 'text-zinc-950'}`}`}>

@@ -14,17 +14,22 @@ import {
   List,
   VideoCamera,
   SignOut,
-  CaretRight
+  CaretRight,
+  Briefcase,
+  Suitcase,
+  GearSix
 } from '@phosphor-icons/react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { fetchCurrentUser } from '@/lib/session';
+import { usePathname, useRouter } from 'next/navigation';
+import { AnimatePresence, motion } from 'framer-motion';
+import { clearLegacySession, fetchCurrentUser } from '@/lib/session';
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [username, setUsername] = useState('');
+  const [moreOpen, setMoreOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -44,6 +49,7 @@ export function Sidebar() {
     { icon: PlusSquare, label: 'Create', href: '/dashboard/create' },
     { icon: BookmarkSimple, label: 'Saved', href: '/dashboard/saved' },
     { icon: ChartBar, label: 'Analytics', href: '/dashboard/analytics' },
+    { icon: Briefcase, label: 'Business', href: '/dashboard/business' },
     { icon: UserCircle, label: 'Profile', href: '/dashboard/profile' },
   ];
 
@@ -107,13 +113,61 @@ export function Sidebar() {
         </nav>
 
         {/* Bottom: user + more */}
-        <div className="p-3 space-y-2 border-t border-white/5 mt-4">
+        <div className="relative p-3 space-y-2 border-t border-white/5 mt-4">
+          <AnimatePresence>
+            {moreOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setMoreOpen(false)}
+                />
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute bottom-full left-3 mb-2 z-50 w-64 rounded-2xl border border-white/[0.08] bg-[#0D1120] p-1.5 shadow-2xl"
+                >
+                  {[
+                    { icon: Suitcase, label: 'Browse Jobs', href: '/dashboard/jobs' },
+                    { icon: Briefcase, label: 'Business Hub', href: '/dashboard/business' },
+                    { icon: GearSix, label: 'Notification settings', href: '/dashboard/notifications/settings' },
+                  ].map((item) => (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      onClick={() => setMoreOpen(false)}
+                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-bold text-white/60 hover:text-white hover:bg-white/[0.06] transition-colors"
+                    >
+                      <item.icon size={18} className="text-[#4D9FFF]" />
+                      {item.label}
+                    </Link>
+                  ))}
+                  <div className="my-1.5 border-t border-white/[0.06]" />
+                  <button
+                    onClick={() => {
+                      clearLegacySession();
+                      document.cookie = 'token=; Max-Age=0; path=/';
+                      router.push('/login');
+                    }}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-bold text-red-400 hover:bg-red-500/10 transition-colors"
+                  >
+                    <SignOut size={18} />
+                    Sign out
+                  </button>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+
           <button
             data-analytics-label="More"
             data-analytics-event="sidebar_more_clicked"
+            onClick={() => setMoreOpen((v) => !v)}
             className="flex items-center gap-3.5 w-full p-3 rounded-xl text-white/50 hover:text-white hover:bg-white/[0.05] transition-colors text-[14px] font-bold"
           >
             <List size={22} /> More
+            <CaretRight size={12} className={`ml-auto transition-transform ${moreOpen ? 'rotate-90' : ''}`} />
           </button>
 
           <Link href="/dashboard/profile" className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.04] border border-white/[0.06] hover:bg-white/[0.07] transition-colors group">

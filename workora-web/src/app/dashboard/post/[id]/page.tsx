@@ -11,7 +11,10 @@ import {
   DotsThree,
   SealCheck,
   Smiley,
-  WarningCircle
+  WarningCircle,
+  LinkSimple,
+  Check,
+  UserCircle
 } from '@phosphor-icons/react';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { fetchCurrentUser, apiFetch } from '@/lib/session';
@@ -66,8 +69,13 @@ export default function PostDetailPage() {
   const [loadState, setLoadState] = useState<'loading' | 'ready' | 'missing' | 'restricted' | 'error'>('loading');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
   const commentInputRef = useRef<HTMLInputElement>(null);
   const commentsEndRef = useRef<HTMLDivElement>(null);
+
+  const EMOJIS = ['👍', '❤️', '🔥', '👏', '😍', '😂', '🙌', '💯', '🎉', '😮', '🙏', '⭐'];
 
   const fetchPost = async (): Promise<'ready' | 'missing' | 'restricted' | 'error'> => {
     try {
@@ -171,6 +179,42 @@ export default function PostDetailPage() {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleShare = async () => {
+    if (!post) return;
+    const url = `${window.location.origin}/dashboard/post/${post.id}`;
+    const text = `Check out ${post.user_name} on Workora — ${post.description || 'amazing work!'}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'Workora', text, url });
+        return;
+      }
+      throw new Error('no-share');
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') return;
+      try {
+        await navigator.clipboard.writeText(url);
+        setShareCopied(true);
+        setTimeout(() => setShareCopied(false), 1600);
+      } catch {
+        window.open(`https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`, '_blank');
+      }
+    }
+  };
+
+  const reportPost = async () => {
+    if (!post) return;
+    try {
+      await apiFetch(`/api/gigs/${post.id}/report`, { method: 'POST' });
+    } catch { /* silent */ }
+    setSheetOpen(false);
+  };
+
+  const replyTo = (username: string) => {
+    setNewComment(`@${username} `);
+    setEmojiOpen(false);
+    commentInputRef.current?.focus();
   };
 
   const handleAddComment = async () => {
@@ -292,7 +336,7 @@ export default function PostDetailPage() {
             <p className="text-xs text-zinc-500">{post.trade}</p>
           </div>
         </div>
-          <button>
+          <button onClick={() => setSheetOpen(true)} aria-label="More options">
             <DotsThree size={24} weight="bold" className="text-zinc-950 dark:text-white" />
           </button>
         </div>
@@ -325,8 +369,12 @@ export default function PostDetailPage() {
               <button onClick={() => commentInputRef.current?.focus()}>
                 <ChatCircleDots size={28} weight="regular" className="text-zinc-950 dark:text-white" />
               </button>
-              <button>
-                <ShareFat size={28} weight="regular" className="text-zinc-950 dark:text-white" />
+              <button onClick={handleShare} aria-label="Share">
+                {shareCopied ? (
+                  <Check size={28} weight="bold" className="text-emerald-500" />
+                ) : (
+                  <ShareFat size={28} weight="regular" className="text-zinc-950 dark:text-white" />
+                )}
               </button>
             </div>
             <button onClick={handleSave}>
@@ -386,11 +434,11 @@ export default function PostDetailPage() {
                   
                   {/* Comment Actions */}
                   <div className="flex items-center gap-4 mt-2">
-                    <button className="text-xs font-semibold text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
+                    <button
+                      onClick={() => replyTo(comment.username)}
+                      className="text-xs font-semibold text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+                    >
                       Reply
-                    </button>
-                    <button className="text-xs font-semibold text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
-                      Like
                     </button>
                   </div>
                 </div>
@@ -411,7 +459,7 @@ export default function PostDetailPage() {
       </div>
 
       {/* Comment Input */}
-      <div className="sticky bottom-0 bg-white dark:bg-black border-t border-zinc-100 dark:border-zinc-900 px-4 py-3">
+      <div className="sticky bottom-[68px] lg:bottom-0 bg-white/95 dark:bg-black/95 backdrop-blur-xl border-t border-zinc-100 dark:border-zinc-900 px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="h-9 w-9 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center text-xs font-bold text-zinc-950 dark:text-white uppercase shrink-0">
             {currentUser?.username?.charAt(0) || 'U'}
@@ -425,9 +473,38 @@ export default function PostDetailPage() {
             className="flex-1 bg-transparent outline-none text-sm text-zinc-950 dark:text-white placeholder:text-zinc-400"
             disabled={submitting}
           />
-          <button className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">
-            <Smiley size={24} />
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => setEmojiOpen((v) => !v)}
+              aria-label="Add emoji"
+              className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+            >
+              <Smiley size={24} />
+            </button>
+            <AnimatePresence>
+              {emojiOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                  className="absolute bottom-12 left-0 z-50 grid w-[216px] grid-cols-6 gap-1 rounded-2xl border border-zinc-100 bg-white p-2.5 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900"
+                >
+                  {EMOJIS.map((emoji) => (
+                    <button
+                      key={emoji}
+                      onClick={() => {
+                        setNewComment((v) => v + emoji);
+                        commentInputRef.current?.focus();
+                      }}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           {newComment.trim() && (
             <button 
               onClick={handleAddComment}
@@ -439,6 +516,57 @@ export default function PostDetailPage() {
           )}
         </div>
       </div>
+
+      {/* ─── Action sheet (⋯) ─── */}
+      <AnimatePresence>
+        {sheetOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSheetOpen(false)}
+              className="fixed inset-0 z-[400] bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', stiffness: 380, damping: 40 }}
+              className="fixed bottom-0 left-0 right-0 z-[410] rounded-t-3xl bg-white border-t border-zinc-100 p-4 pb-8 dark:bg-zinc-950 dark:border-zinc-800 safe-area-bottom"
+            >
+              <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-zinc-200 dark:bg-zinc-800" />
+              <p className="mb-2 px-2 text-xs font-black uppercase tracking-widest text-zinc-400">
+                {post.user_name}
+              </p>
+              {[
+                { icon: LinkSimple, label: 'Copy link', action: handleShare },
+                { icon: UserCircle, label: 'View profile', action: () => router.push(`/profile/${post.user_id || post.worker_id}`) },
+                { icon: WarningCircle, label: 'Report', action: reportPost, danger: true },
+              ].map((item) => (
+                <button
+                  key={item.label}
+                  onClick={() => { item.action(); setSheetOpen(false); }}
+                  className={`flex w-full items-center gap-4 rounded-2xl px-4 py-3.5 text-left transition-colors ${
+                    item.danger
+                      ? 'text-red-500 hover:bg-red-500/10'
+                      : 'text-zinc-900 hover:bg-zinc-100 dark:text-white dark:hover:bg-zinc-900'
+                  }`}
+                >
+                  <item.icon size={20} weight="bold" />
+                  <span className="text-sm font-bold">{item.label}</span>
+                </button>
+              ))}
+              <button
+                onClick={() => setSheetOpen(false)}
+                className="mt-2 w-full rounded-2xl bg-zinc-100 py-3 text-sm font-black text-zinc-500 hover:text-zinc-800 transition-colors dark:bg-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+              >
+                Cancel
+              </button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

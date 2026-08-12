@@ -454,3 +454,36 @@ CREATE INDEX IF NOT EXISTS idx_analytics_page_path ON analytics_events(page_path
 CREATE INDEX IF NOT EXISTS idx_analytics_user_id ON analytics_events(user_id);
 CREATE INDEX IF NOT EXISTS idx_analytics_session_id ON analytics_events(session_id);
 CREATE INDEX IF NOT EXISTS idx_analytics_created_at ON analytics_events(created_at);
+
+-- ═══════════════════════════════════════════════════════════════
+-- 12. Job Posts — Business / Hirer side (v1 hires system)
+-- ═══════════════════════════════════════════════════════════════
+CREATE TABLE IF NOT EXISTS job_posts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    hirer_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    description TEXT,
+    category TEXT,
+    budget_min INTEGER,
+    budget_max INTEGER,
+    currency TEXT DEFAULT 'KSh',
+    location TEXT,
+    status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'closed')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_job_posts_hirer ON job_posts(hirer_id);
+CREATE INDEX IF NOT EXISTS idx_job_posts_status ON job_posts(status);
+CREATE INDEX IF NOT EXISTS idx_job_posts_created ON job_posts(created_at DESC);
+
+-- 13. Job Applications
+CREATE TABLE IF NOT EXISTS job_applications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    job_id UUID REFERENCES job_posts(id) ON DELETE CASCADE,
+    worker_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    message TEXT,
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(job_id, worker_id)
+);
+CREATE INDEX IF NOT EXISTS idx_job_apps_job ON job_applications(job_id);
+CREATE INDEX IF NOT EXISTS idx_job_apps_worker ON job_applications(worker_id);

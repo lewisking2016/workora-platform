@@ -86,7 +86,7 @@ export default function CollectionDetailPage() {
 
   if (!collection) {
     return (
-      <div className="min-h-full bg-zinc-50 px-4 py-10 dark:bg-[#0A0E17]">
+      <div className="min-h-full bg-zinc-50 px-4 py-10 pb-24 dark:bg-[#0A0E17] lg:pb-0">
         <div className="mx-auto max-w-3xl rounded-[18px] border border-zinc-100 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-950">
           <p className="text-sm text-zinc-500 dark:text-zinc-400">Collection not found.</p>
           <button onClick={() => router.push('/dashboard/saved')} className="mt-5 rounded-xl bg-[#0066FF] px-5 py-3 text-sm font-black text-white">
