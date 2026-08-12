@@ -329,6 +329,27 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
     });
   };
 
+  // Start (or reopen) a direct conversation with a professional and jump
+  // straight into it — instead of landing on an empty inbox.
+  const openConversationWith = async (person: Professional) => {
+    if (!person.user_id) return router.push(`/dashboard/messages`);
+    try {
+      const res = await apiFetch('/api/messages/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ other_user_id: person.user_id }),
+      });
+      if (res.ok) {
+        const conv = await res.json();
+        router.push(`/dashboard/messages?conversation=${conv.id}`);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    router.push(`/dashboard/messages`);
+  };
+
   const displayedProfessionals = useMemo(() => {
     const data = [...professionals];
     return data.sort((a, b) => {
@@ -361,7 +382,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
       >
         <div className="flex items-center justify-between p-4">
           <button
-            onClick={() => router.push(`/dashboard/messages`)}
+            onClick={() => router.push(`/profile/${person.user_id}`)}
             className="flex min-w-0 items-center gap-3 text-left"
           >
             <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-900">
@@ -422,7 +443,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
             {people.slice(0, 4).map(person => (
               <button
                 key={person.id}
-                onClick={() => compareAction(person)}
+                onClick={() => router.push(`/profile/${person.user_id}`)}
                 className="rounded-2xl bg-zinc-50 p-4 text-left dark:bg-zinc-900"
               >
                 <p className="text-sm font-semibold">{person.user_name}</p>
@@ -596,7 +617,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
                 </div>
                 <div className="mt-4 flex gap-2">
                   <button
-                    onClick={() => router.push(`/dashboard/messages`)}
+                    onClick={() => openConversationWith(person)}
                     className="flex-1 rounded-xl bg-zinc-950 px-3 py-2 text-sm font-semibold text-white dark:bg-white dark:text-zinc-950"
                   >
                     Message
