@@ -70,6 +70,8 @@ async function profileRoutes(fastify) {
       breakdownRes,
       avgRes,
       earningsRes,
+      followersRes,
+      followingRes,
     ] = await Promise.all([
       pool.query('SELECT * FROM worker_skills WHERE profile_id = $1 ORDER BY created_at DESC', [profileId]),
       pool.query('SELECT * FROM worker_languages WHERE profile_id = $1 ORDER BY created_at DESC', [profileId]),
