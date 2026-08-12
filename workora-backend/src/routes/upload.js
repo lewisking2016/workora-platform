@@ -22,10 +22,17 @@ const PUBLIC_URL = `https://pub-${cleanEnv(process.env.R2_ACCOUNT_ID)}.r2.dev`;
 // application/octet-stream, so allow that when the filename extension is a
 // recognized media extension. Everything else (HTML, executables, scripts,
 // archives) is rejected.
-const MEDIA_EXTENSIONS = /^\.(jpe?g|png|webp|gif|heic|heif|bmp|tiff?|svg|avif|mp4|m4v|mov|webm|mkv|avi|wmv|flv|mpe?g|mpg|mp2t|ts|ogv|ogg|3gpp|3gp|pdf)$/i;
+// SVG is deliberately excluded: R2 serves uploaded objects inline, and an
+// SVG can carry scripts that execute when loaded directly — a stored-XSS
+// vector on a trusted domain.
+const MEDIA_EXTENSIONS = /^\.(jpe?g|png|webp|gif|heic|heif|bmp|tiff?|avif|mp4|m4v|mov|webm|mkv|avi|wmv|flv|mpe?g|mpg|mp2t|ts|ogv|ogg|3gpp|3gp|pdf)$/i;
 
 function isAllowedFile(mimetype, filename) {
   const cleanMime = String(mimetype || '').split(';')[0].trim().toLowerCase();
+  // Explicitly reject anything scriptable or polyglot (SVG, HTML, XML).
+  if (cleanMime === 'image/svg+xml' || cleanMime === 'text/html' || cleanMime === 'application/xhtml+xml' || cleanMime === 'application/xml' || cleanMime === 'text/xml') {
+    return false;
+  }
   if (cleanMime.startsWith('image/') || cleanMime.startsWith('video/')) return true;
   if (cleanMime === 'application/pdf') return true;
   if (cleanMime === 'application/octet-stream' && MEDIA_EXTENSIONS.test(path.extname(filename || '').toLowerCase())) return true;

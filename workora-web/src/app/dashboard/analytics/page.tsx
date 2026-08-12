@@ -15,12 +15,15 @@ import {
   Heart,
   Bookmark,
   Users,
+  UsersThree,
+  ClockCountdown,
   VideoCamera,
   ChartLine,
   MapPin,
   Clock,
   CalendarBlank
 } from '@phosphor-icons/react';
+import Link from 'next/link';
 import { fetchCurrentUser, apiFetch } from '@/lib/session';
 
 interface CurrentUser {
@@ -48,16 +51,25 @@ interface Stats {
   totalJobs: number;
   completedJobs: number;
   activeJobs: number;
+  jobsGrowth: number;
   income: number;
   incomeGrowth: number;
   trustScore: number;
-  profileVisits: number;
   likes: number;
   comments: number;
   saves: number;
   followers: number;
-  avgResponseTime: string;
+  replyTime: string | null;
+  replySamples: number;
   completionRate: number;
+  ratings: number;
+}
+
+interface BusinessStats {
+  jobsPosted: number;
+  openJobs: number;
+  applications: number;
+  pending: number;
 }
 
 interface ChartData {
@@ -162,6 +174,7 @@ export default function AnalyticsPage() {
   const [gigs, setGigs] = useState<GigSummary[]>([]);
   const [profile, setProfile] = useState<{ id: string; location?: string; created_at?: string; full_name?: string; title?: string; trade?: string; avatar_url?: string } | null>(null);
   const [ratingAverage, setRatingAverage] = useState('0.0');
+  const [businessStats, setBusinessStats] = useState<BusinessStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
 
@@ -179,21 +192,36 @@ export default function AnalyticsPage() {
         setProfile(profileData.profile || null);
 
         const profileId = profileData.profile?.id || '';
-        const [gigsRes, ratingsRes, savedRes] = await Promise.all([
+        const [gigsRes, ratingsRes, savedRes, replyRes, jobsRes] = await Promise.all([
           profileId ? apiFetch(`/api/gigs/worker/${profileId}`) : Promise.resolve(null),
           profileId ? apiFetch(`/api/profile/ratings/${profileId}`) : Promise.resolve(null),
           apiFetch(`/api/gigs/saved/${user.id}`),
+          apiFetch('/api/analytics/reply-time'),
+          apiFetch('/api/jobs/mine').catch(() => null),
         ]);
 
         const gigsJson = gigsRes ? await gigsRes.json() : [];
         const ratingsJson = ratingsRes ? await ratingsRes.json() : { ratings: [], average: '0.0', breakdown: [] };
         const savedJson = await savedRes.json();
+        const replyJson = replyRes.ok ? await replyRes.json().catch(() => null) : null;
+        const jobsJson = jobsRes?.ok ? await jobsRes.json().catch(() => null) : null;
 
         const gigsData: GigSummary[] = Array.isArray(gigsJson) ? gigsJson : [];
         const ratingsData = ratingsJson && typeof ratingsJson === 'object' ? ratingsJson : { ratings: [], average: '0.0', breakdown: [] };
         const savedGigs = Array.isArray(savedJson) ? savedJson : [];
         setGigs(gigsData);
         setRatingAverage(String(ratingsData.average || '0.0'));
+
+        if (jobsJson && Array.isArray(jobsJson.jobs)) {
+          setBusinessStats({
+            jobsPosted: jobsJson.jobs.length,
+            openJobs: jobsJson.jobs.filter((j: { status?: string }) => j.status === 'open').length,
+            applications: Array.isArray(jobsJson.applications) ? jobsJson.applications.length : 0,
+            pending: Array.isArray(jobsJson.applications)
+              ? jobsJson.applications.filter((a: { status?: string }) => a.status === 'pending').length
+              : 0,
+          });
+        }
 
         const totalViews = gigsData.reduce((sum, gig) => sum + toNumber(gig.view_count), 0);
         const totalLikes = gigsData.reduce((sum, gig) => sum + toNumber(gig.likes_count), 0);
@@ -242,7 +270,11 @@ export default function AnalyticsPage() {
         const totalJobs = profileData.profile?.total_gigs || gigsData.length;
         const completedJobs = Math.max(0, totalJobs - activeJobs);
         const completionRate = totalJobs > 0 ? Math.round((completedJobs / totalJobs) * 100) : 0;
-        const avgResponseTime = Number(ratingsData.average || 0) >= 4.5 ? 'Under 1 hour' : Number(ratingsData.average || 0) >= 4 ? 'Within 1 day' : 'Needs attention';
+        // Real response time from the messages backend (null = not enough data).
+        const replyTime = replyJson?.label || null;
+        const replySamples = Number(replyJson?.samples || 0);
+        // Real followers from the social graph, not derived from ratings.
+        const followers = Number(profileData.social?.followers || 0);
         const chart = buildChartData(gigsData, timeRange);
 
         setStats({
@@ -253,16 +285,18 @@ export default function AnalyticsPage() {
           totalJobs,
           completedJobs,
           activeJobs,
+          jobsGrowth: calculateGrowth(activeJobs, Math.max(0, totalJobs - activeJobs)),
           income: profileData.profile?.total_earnings || gigsData.reduce((sum, gig) => sum + toNumber(gig.price), 0),
           incomeGrowth: calculateGrowth(recentIncome, previousIncome),
           trustScore: toNumber(profileData.profile?.trust_score) * 20,
-          profileVisits: totalViews,
           likes: totalLikes,
           comments: totalComments,
           saves: savedGigs.length,
-          followers: Array.isArray(ratingsData.ratings) ? ratingsData.ratings.length : 0,
-          avgResponseTime,
+          followers,
+          replyTime,
+          replySamples,
           completionRate,
+          ratings: Array.isArray(ratingsData.ratings) ? ratingsData.ratings.length : 0,
         });
 
         setChartData(chart);
@@ -296,6 +330,9 @@ export default function AnalyticsPage() {
   const memberSince = profile?.created_at
     ? new Date(profile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
     : 'Recently';
+  const isBusiness = !profile;
+  // Reputation label derived from the real trust score — never hardcoded.
+  const trustLabel = !stats ? '…' : stats.trustScore >= 80 ? 'Elite verified reputation' : stats.trustScore >= 60 ? 'Strong reputation' : stats.trustScore > 0 ? 'Building trust' : 'No trust data yet';
 
   return (
     <div className="h-full overflow-y-auto bg-zinc-50 dark:bg-[#0A0E17]">
@@ -315,12 +352,12 @@ export default function AnalyticsPage() {
                 Creator analytics
               </div>
               <h1 className="text-2xl font-black tracking-tighter text-zinc-950 lg:text-3xl dark:text-white">
-                {profile?.full_name || 'Your'} performance
+                {isBusiness ? 'Your business performance' : `${profile?.full_name || 'Your'} performance`}
               </h1>
               <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                {profile?.title || profile?.trade || 'Workora professional'}
-                {profile?.location ? <span className="mx-1.5 text-zinc-300 dark:text-zinc-600">·</span> : null}
-                {profile?.location}
+                {isBusiness ? 'Jobs, applications and hiring activity' : profile?.title || profile?.trade || 'Workora professional'}
+                {!isBusiness && profile?.location ? <span className="mx-1.5 text-zinc-300 dark:text-zinc-600">·</span> : null}
+                {!isBusiness && profile?.location}
               </p>
             </div>
           </div>
@@ -342,39 +379,62 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
+        {isBusiness && (
+          <div className="rounded-2xl border border-[#0066FF]/20 bg-[#0066FF]/5 px-5 py-4 text-sm dark:bg-[#0066FF]/10">
+            <p className="font-bold text-zinc-950 dark:text-white">
+              You don't have a creator profile yet — this view shows your hiring activity.
+            </p>
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+              Post a job, review applications and manage hires from the{' '}
+              <Link href="/dashboard/business" className="font-black text-[#0066FF] underline-offset-2 hover:underline">Business Hub</Link>.
+            </p>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <MetricCard
-            icon={Eye}
-            label="Total Views"
-            value={stats?.totalViews.toLocaleString() || '0'}
-            growth={stats?.viewGrowth || 0}
-            color="from-[#0066FF] to-[#0052CC]"
-            subtitle="Profile and content impressions"
-          />
-          <MetricCard
-            icon={ChatCircleDots}
-            label="Engagement"
-            value={stats?.totalEngagement.toLocaleString() || '0'}
-            growth={stats?.engagementGrowth || 0}
-            color="from-[#7000FF] to-[#5C00CC]"
-            subtitle="Likes, comments and shares"
-          />
-          <MetricCard
-            icon={Briefcase}
-            label="Completed Jobs"
-            value={stats?.completedJobs.toString() || '0'}
-            growth={5}
-            color="from-green-500 to-green-600"
-            subtitle={`${stats?.activeJobs || 0} active projects`}
-          />
-          <MetricCard
-            icon={CurrencyDollar}
-            label="Total Earnings"
-            value={`KSh ${stats?.income.toLocaleString() || '0'}`}
-            growth={stats?.incomeGrowth || 0}
-            color="from-amber-500 to-amber-600"
-            subtitle="Last 30 days"
-          />
+          {isBusiness ? (
+            <>
+              <MetricCard icon={Briefcase} label="Jobs Posted" value={String(businessStats?.jobsPosted || 0)} growth={0} color="from-[#0066FF] to-[#0052CC]" subtitle="Live across the platform" />
+              <MetricCard icon={Clock} label="Open Jobs" value={String(businessStats?.openJobs || 0)} growth={0} color="from-emerald-500 to-emerald-600" subtitle="Accepting applications" />
+              <MetricCard icon={UsersThree} label="Applications" value={String(businessStats?.applications || 0)} growth={0} color="from-[#7000FF] to-[#5C00CC]" subtitle="Received in total" />
+              <MetricCard icon={ClockCountdown} label="Pending Review" value={String(businessStats?.pending || 0)} growth={0} color="from-amber-500 to-amber-600" subtitle="Awaiting your decision" />
+            </>
+          ) : (
+            <>
+              <MetricCard
+                icon={Eye}
+                label="Total Views"
+                value={stats?.totalViews.toLocaleString() || '0'}
+                growth={stats?.viewGrowth || 0}
+                color="from-[#0066FF] to-[#0052CC]"
+                subtitle="Views across your works"
+              />
+              <MetricCard
+                icon={ChatCircleDots}
+                label="Engagement"
+                value={stats?.totalEngagement.toLocaleString() || '0'}
+                growth={stats?.engagementGrowth || 0}
+                color="from-[#7000FF] to-[#5C00CC]"
+                subtitle="Likes and comments"
+              />
+              <MetricCard
+                icon={Briefcase}
+                label="Completed Jobs"
+                value={stats?.completedJobs.toString() || '0'}
+                growth={stats?.jobsGrowth || 0}
+                color="from-green-500 to-green-600"
+                subtitle={`${stats?.activeJobs || 0} active in the last 14 days`}
+              />
+              <MetricCard
+                icon={CurrencyDollar}
+                label="Total Earnings"
+                value={`KSh ${stats?.income.toLocaleString() || '0'}`}
+                growth={stats?.incomeGrowth || 0}
+                color="from-amber-500 to-amber-600"
+                subtitle="Across all published works"
+              />
+            </>
+          )}
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -434,24 +494,29 @@ export default function AnalyticsPage() {
               </span>
               <div className="flex flex-col gap-1 pb-2">
                 <span className="flex items-center gap-1 text-xs font-black uppercase tracking-widest text-emerald-500 dark:text-emerald-300">
-                  <TrendUp size={14} weight="bold" /> Top 1%
+                  <ShieldCheck size={14} weight="fill" /> {trustLabel}
                 </span>
                 <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-white/30">Scale 0-100</span>
               </div>
             </div>
 
-            <div className="relative z-10 my-6 h-px w-full bg-zinc-100 dark:bg-white/10" />
-
-            <div className="relative z-10 flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-zinc-500 dark:text-white/60">Completion Rate</span>
-                <span className="text-sm font-black text-zinc-950 dark:text-white">{stats?.completionRate}%</span>
+            <div className="relative z-10 my-6 h-px w-full bg-zinc-100 dark:bg-white/10" />              <div className="relative z-10 flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-zinc-500 dark:text-white/60">Completion Rate</span>
+                  <span className="text-sm font-black text-zinc-950 dark:text-white">{stats?.completionRate}%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-zinc-500 dark:text-white/60">Response Time</span>
+                  <span className="text-sm font-black text-zinc-950 dark:text-white">
+                    {stats?.replyTime ?? (stats && stats.replySamples === 0 ? '—' : '…')}
+                  </span>
+                </div>
+                {stats && stats.replySamples === 0 && (
+                  <p className="text-[10px] font-medium text-zinc-400 dark:text-white/30">
+                    Based on {stats.replySamples} conversations — reply to messages to unlock this.
+                  </p>
+                )}
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-zinc-500 dark:text-white/60">Response Time</span>
-                <span className="text-sm font-black text-zinc-950 dark:text-white">{stats?.avgResponseTime}</span>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -460,7 +525,7 @@ export default function AnalyticsPage() {
             { icon: Heart, label: 'Total Likes', value: stats?.likes || 0, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-950/20' },
             { icon: ChatCircleDots, label: 'Comments', value: stats?.comments || 0, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/20' },
             { icon: Bookmark, label: 'Saved Works', value: stats?.saves || 0, color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-950/20' },
-            { icon: Users, label: 'Ratings', value: stats?.followers || 0, color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-950/20' },
+            { icon: Users, label: 'Followers', value: stats?.followers || 0, color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-950/20' },
           ].map((item, i) => (
             <motion.div
               key={i}
@@ -515,7 +580,7 @@ export default function AnalyticsPage() {
                 { icon: MapPin, label: 'Service Location', value: profile?.location || 'Not set', detail: 'Pulled from your profile' },
                 { icon: Clock, label: 'Member Since', value: memberSince, detail: `${stats?.totalJobs || 0} gigs published` },
                 { icon: CalendarBlank, label: 'Active Jobs', value: String(stats?.activeJobs || 0), detail: 'Published in the last 14 days' },
-                { icon: Users, label: 'Ratings Received', value: String(stats?.followers || 0), detail: `${ratingAverage}/5 average rating` },
+                { icon: Users, label: 'Ratings Received', value: String(stats?.ratings || 0), detail: `${ratingAverage}/5 average rating` },
               ].map((stat, i) => (
                 <div key={i} className="flex items-start gap-4 rounded-[14px] p-4 transition-all hover:bg-zinc-50 dark:hover:bg-zinc-950">
                   <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">

@@ -14,7 +14,7 @@ import {
   LinkSimple,
   UserCircle
 } from '@phosphor-icons/react';
-import { fetchCurrentUser, apiFetch } from '@/lib/session';
+import { fetchCurrentUser, apiFetch, getSessionId } from '@/lib/session';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { APP_CONFIG } from '@/lib/config';
 import { useRouter } from 'next/navigation';
@@ -176,6 +176,18 @@ export default function WorksPage() {
     return () => { mounted = false; };
   }, []);
 
+  // Record a real view whenever a new reel becomes the active one.
+  useEffect(() => {
+    if (!works.length) return;
+    const work = works[currentIndex];
+    if (!work) return;
+    apiFetch(`/api/gigs/${work.id}/view`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: getSessionId() }),
+    }).catch(() => {});
+  }, [currentIndex, works]);
+
   useEffect(() => {
     const handleScroll = () => {
       if (!containerRef.current) return;
@@ -238,18 +250,21 @@ export default function WorksPage() {
 
           {/* Top Header */}
           <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-auto z-10">
-            <div className="flex items-center gap-2">
+            <button
+              onClick={() => openProfile(work)}
+              className="flex items-center gap-2 active:scale-95 transition-transform"
+            >
               <div className="h-10 w-10 rounded-full bg-zinc-900/60 backdrop-blur-sm flex items-center justify-center text-sm font-bold text-white">
                 {work.user_name?.charAt(0) || '?'}
               </div>
-              <div>
+              <div className="text-left">
                 <div className="flex items-center gap-1.5">
                   <span className="text-white font-semibold text-sm">{work.user_name}</span>
                   {work.verified && <SealCheck size={14} weight="fill" className="text-[#0066FF]" />}
                 </div>
                 <p className="text-white/70 text-xs">{work.trade}</p>
               </div>
-            </div>
+            </button>
             <button
               onClick={() => setMenuFor(work)}
               aria-label="More options"

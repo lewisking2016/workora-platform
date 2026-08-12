@@ -23,6 +23,7 @@ interface Notification {
   actor_trade?: string;
   actor_verified?: boolean;
   gig_id?: string;
+  job_id?: string;
   text: string;
   created_at: string;
   is_read?: boolean;
@@ -134,7 +135,9 @@ export default function NotificationDetailPage() {
   };
 
   const openContent = () => {
-    if (notification.gig_id) {
+    if (notification.job_id) {
+      router.push(`/dashboard/jobs/${notification.job_id}`);
+    } else if (notification.gig_id) {
       router.push(`/dashboard/post/${notification.gig_id}`);
     } else if (notification.actor_id) {
       router.push(`/profile/${notification.actor_id}`);
@@ -179,7 +182,7 @@ export default function NotificationDetailPage() {
             onClick={openContent}
             className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#0066FF] to-[#7000FF] py-3.5 text-sm font-black text-white hover:brightness-110 transition-all"
           >
-            {notification.gig_id ? 'Open post' : notification.actor_id ? 'View profile' : 'Open notifications'}
+            {notification.job_id ? 'Open job' : notification.gig_id ? 'Open post' : notification.actor_id ? 'View profile' : 'Open notifications'}
             <ArrowRight size={16} weight="bold" />
           </button>
         </div>

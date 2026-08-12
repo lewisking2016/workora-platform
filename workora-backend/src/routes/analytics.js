@@ -115,6 +115,59 @@ async function analyticsRoutes(fastify) {
       return reply.status(500).send({ message: 'Failed to store analytics event' });
     }
   });
+
+  // Real response-time: average gap between an inbound message (other → me)
+  // and my next reply in the same conversation, capped at 48h to ignore
+  // abandoned threads.
+  fastify.get('/reply-time', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const userId = request.user?.id;
+    if (!userId) return reply.status(401).send({ message: 'Unauthorized' });
+
+    const res = await pool.query(
+      `
+      WITH pairs AS (
+        SELECT
+          inbound.conversation_id,
+          inbound.created_at AS inbound_at,
+          (SELECT MIN(out.created_at)
+           FROM messages out
+           WHERE out.conversation_id = inbound.conversation_id
+             AND out.sender_id = $1
+             AND out.created_at > inbound.created_at
+             AND out.created_at < inbound.created_at + INTERVAL '48 hours'
+          ) AS reply_at
+        FROM messages inbound
+        WHERE inbound.conversation_id IN (
+          SELECT id FROM conversations
+          WHERE participant_a = $1 OR participant_b = $1
+        )
+          AND inbound.sender_id <> $1
+      )
+      SELECT
+        COUNT(*)::int AS samples,
+        COALESCE(
+          ROUND(AVG(EXTRACT(EPOCH FROM (reply_at - inbound_at)) / 60)::numeric, 0),
+          0
+        )::int AS avg_minutes
+      FROM pairs
+      WHERE reply_at IS NOT NULL
+      `,
+      [userId]
+    );
+
+    const row = res.rows[0] || { samples: 0, avg_minutes: 0 };
+    return {
+      samples: row.samples,
+      avg_minutes: row.avg_minutes,
+      label: row.samples === 0
+        ? null
+        : row.avg_minutes < 60
+          ? 'Under 1 hour'
+          : row.avg_minutes < 1440
+            ? `~${Math.round(row.avg_minutes / 60)}h`
+            : `~${Math.round(row.avg_minutes / 1440)}d`,
+    };
+  });
 }
 
 module.exports = analyticsRoutes;

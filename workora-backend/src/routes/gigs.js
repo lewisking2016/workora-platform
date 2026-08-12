@@ -241,6 +241,39 @@ async function gigRoutes(fastify) {
   });
 
   // 6. GET COMMENTS
+  // Record a real view — deduped per (gig, session) so refreshes and
+  // single-session bots count once. Only fresh sessions bump view_count.
+  fastify.post('/:id/view', async (request, reply) => {
+    let userId = null;
+    try {
+      await request.jwtVerify();
+      userId = request.user?.id || null;
+    } catch { /* views are anonymous-friendly */ }
+
+    const sessionId = String(request.body?.session_id || request.headers['x-session-id'] || '').slice(0, 128);
+    if (!sessionId) {
+      return reply.status(400).send({ message: 'session_id is required' });
+    }
+
+    const insert = await pool.query(
+      `INSERT INTO gig_views (gig_id, user_id, session_id)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (gig_id, session_id) DO NOTHING
+       RETURNING id`,
+      [request.params.id, userId, sessionId]
+    );
+
+    if (insert.rows.length > 0) {
+      await pool.query(
+        `UPDATE gigs SET view_count = view_count + 1 WHERE id = $1`,
+        [request.params.id]
+      );
+      return { viewed: true, first_time: true };
+    }
+
+    return { viewed: true, first_time: false };
+  });
+
   fastify.get('/:id/comments', async (request, reply) => {
     const { id } = request.params;
     const res = await pool.query(`

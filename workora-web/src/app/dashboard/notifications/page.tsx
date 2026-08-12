@@ -9,7 +9,9 @@ import {
   Star,
   SealCheck,
   Bell,
-  Gear
+  Gear,
+  Suitcase,
+  CheckCircle
 } from '@phosphor-icons/react';
 import { fetchCurrentUser, apiFetch } from '@/lib/session';
 import { useRouter } from 'next/navigation';
@@ -22,6 +24,7 @@ interface Notification {
   actor_trade?: string;
   actor_verified?: boolean;
   gig_id?: string;
+  job_id?: string;
   text: string;
   created_at: string;
   is_read?: boolean;
@@ -50,7 +53,9 @@ export default function NotificationsPage() {
   const openNotification = async (notif: Notification) => {
     // Mark as read, then route to the actual content the notification points at.
     await apiFetch(`/api/notifications/${notif.id}/read`, { method: 'PATCH' });
-    if (notif.gig_id) {
+    if (notif.job_id) {
+      router.push(`/dashboard/jobs/${notif.job_id}`);
+    } else if (notif.gig_id) {
       router.push(`/dashboard/post/${notif.gig_id}`);
     } else if (notif.actor_id && (notif.type === 'follow' || notif.type === 'rating')) {
       router.push(`/profile/${notif.actor_id}`);
@@ -103,6 +108,8 @@ export default function NotificationsPage() {
       case 'comment': return <ChatCircleDots size={18} weight="fill" className="text-[#0066FF]" />;
       case 'follow': return <UserCirclePlus size={18} weight="fill" className="text-[#7000FF]" />;
       case 'rating': return <Star size={18} weight="fill" className="text-yellow-500" />;
+      case 'job_application': return <Suitcase size={18} weight="fill" className="text-[#4D9FFF]" />;
+      case 'job_accepted': return <CheckCircle size={18} weight="fill" className="text-emerald-500" />;
       default: return <Bell size={18} weight="fill" className="text-[#0066FF]" />;
     }
   };

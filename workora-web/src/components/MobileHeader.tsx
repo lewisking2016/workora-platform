@@ -64,6 +64,7 @@ export function MobileHeader() {
   const moreItems = [
     { icon: Compass, label: 'Explore', href: '/dashboard/explore', desc: 'Discover professionals near you' },
     { icon: Suitcase, label: 'Browse Jobs', href: '/dashboard/jobs', desc: 'Find work posted by businesses' },
+    { icon: PaperPlaneTilt, label: 'My Applications', href: '/dashboard/my-applications', desc: 'Track your job applications' },
     { icon: Briefcase, label: 'Business Hub', href: '/dashboard/business', desc: 'Post a job · manage hires' },
     { icon: BookmarkSimple, label: 'Saved', href: '/dashboard/saved', desc: 'Your library & collections' },
     { icon: ChartBar, label: 'Analytics', href: '/dashboard/analytics', desc: 'Performance & reach' },

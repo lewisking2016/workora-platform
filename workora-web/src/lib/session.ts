@@ -5,6 +5,23 @@ export interface CurrentUser {
 }
 
 const TOKEN_KEY = 'workora_token';
+const SESSION_KEY = 'workora_session';
+
+/**
+ * Stable per-browser session id used for session-deduplicated analytics
+ * (view counts, page views). One id per browser until it's cleared.
+ */
+export function getSessionId(): string {
+  if (typeof window === 'undefined') return '';
+  let id = window.localStorage.getItem(SESSION_KEY);
+  if (!id) {
+    id = (typeof crypto !== 'undefined' && 'randomUUID' in crypto)
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    window.localStorage.setItem(SESSION_KEY, id);
+  }
+  return id;
+}
 
 function readLegacyUser(): CurrentUser | null {
   if (typeof window === 'undefined') return null;

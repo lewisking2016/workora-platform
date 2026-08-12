@@ -17,7 +17,7 @@ import {
   UserCircle
 } from '@phosphor-icons/react';
 import { VideoPlayer } from '@/components/VideoPlayer';
-import { fetchCurrentUser, apiFetch } from '@/lib/session';
+import { fetchCurrentUser, apiFetch, getSessionId } from '@/lib/session';
 import { APP_CONFIG } from '@/lib/config';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -139,6 +139,12 @@ export default function PostDetailPage() {
       const state = await fetchPost();
       if (state === 'ready') {
         await fetchComments();
+        // Record a real view (backend dedups per session).
+        apiFetch(`/api/gigs/${postId}/view`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_id: getSessionId() }),
+        }).catch(() => {});
       } else {
         setLoading(false);
       }

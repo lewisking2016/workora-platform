@@ -17,7 +17,8 @@ import {
   CaretRight,
   Briefcase,
   Suitcase,
-  GearSix
+  GearSix,
+  PaperPlaneTilt
 } from '@phosphor-icons/react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -50,6 +51,7 @@ export function Sidebar() {
     { icon: BookmarkSimple, label: 'Saved', href: '/dashboard/saved' },
     { icon: ChartBar, label: 'Analytics', href: '/dashboard/analytics' },
     { icon: Briefcase, label: 'Business', href: '/dashboard/business' },
+    { icon: Suitcase, label: 'My Applications', href: '/dashboard/my-applications' },
     { icon: UserCircle, label: 'Profile', href: '/dashboard/profile' },
   ];
 
@@ -130,6 +132,7 @@ export function Sidebar() {
                 >
                   {[
                     { icon: Suitcase, label: 'Browse Jobs', href: '/dashboard/jobs' },
+                    { icon: PaperPlaneTilt, label: 'My Applications', href: '/dashboard/my-applications' },
                     { icon: Briefcase, label: 'Business Hub', href: '/dashboard/business' },
                     { icon: GearSix, label: 'Notification settings', href: '/dashboard/notifications/settings' },
                   ].map((item) => (

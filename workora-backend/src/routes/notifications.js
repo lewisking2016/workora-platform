@@ -16,6 +16,8 @@ async function notificationRoutes(fastify) {
           COALESCE(wp.trade, 'Member') AS actor_trade,
           COALESCE(wp.is_verified, false) AS actor_verified,
           gl.gig_id AS gig_id,
+          NULL::uuid AS job_id,
+          NULL::text AS job_title,
           g.created_at,
           COALESCE(nr.id IS NOT NULL, false) AS is_read
         FROM gig_likes gl
@@ -34,6 +36,8 @@ async function notificationRoutes(fastify) {
           COALESCE(wp.trade, 'Member') AS actor_trade,
           COALESCE(wp.is_verified, false) AS actor_verified,
           gc.gig_id AS gig_id,
+          NULL::uuid AS job_id,
+          NULL::text AS job_title,
           gc.created_at,
           COALESCE(nr.id IS NOT NULL, false) AS is_read
         FROM gig_comments gc
@@ -52,6 +56,8 @@ async function notificationRoutes(fastify) {
           COALESCE(wp.trade, 'Member') AS actor_trade,
           COALESCE(wp.is_verified, false) AS actor_verified,
           r.gig_id AS gig_id,
+          NULL::uuid AS job_id,
+          NULL::text AS job_title,
           r.created_at,
           COALESCE(nr.id IS NOT NULL, false) AS is_read
         FROM ratings r
@@ -69,6 +75,8 @@ async function notificationRoutes(fastify) {
           COALESCE(wp.trade, 'Member') AS actor_trade,
           COALESCE(wp.is_verified, false) AS actor_verified,
           NULL::uuid AS gig_id,
+          NULL::uuid AS job_id,
+          NULL::text AS job_title,
           uf.created_at AS created_at,
           COALESCE(nr.id IS NOT NULL, false) AS is_read
         FROM user_follows uf
@@ -76,6 +84,45 @@ async function notificationRoutes(fastify) {
         LEFT JOIN worker_profiles wp ON wp.user_id = uf.follower_id
         LEFT JOIN notification_reads nr ON nr.user_id = $2 AND nr.notification_type = 'follow' AND nr.source_id = uf.id::text
         WHERE uf.following_user_id = $2
+      ),
+      job_apps_received AS (
+        SELECT
+          ua.id::text AS id,
+          'job_application'::text AS type,
+          ua.worker_id AS actor_id,
+          COALESCE(u.username, 'Member') AS actor_name,
+          COALESCE(wp.trade, 'Member') AS actor_trade,
+          COALESCE(wp.is_verified, false) AS actor_verified,
+          NULL::uuid AS gig_id,
+          j.id AS job_id,
+          j.title AS job_title,
+          ua.created_at AS created_at,
+          COALESCE(nr.id IS NOT NULL, false) AS is_read
+        FROM job_applications ua
+        JOIN job_posts j ON j.id = ua.job_id
+        JOIN users u ON u.id = ua.worker_id
+        LEFT JOIN worker_profiles wp ON wp.user_id = ua.worker_id
+        LEFT JOIN notification_reads nr ON nr.user_id = $2 AND nr.notification_type = 'job_application' AND nr.source_id = ua.id::text
+        WHERE j.hirer_id = $2
+      ),
+      job_apps_accepted AS (
+        SELECT
+          ua.id::text AS id,
+          'job_accepted'::text AS type,
+          j.hirer_id AS actor_id,
+          COALESCE(hu.username, 'Member') AS actor_name,
+          NULL::text AS actor_trade,
+          false AS actor_verified,
+          NULL::uuid AS gig_id,
+          j.id AS job_id,
+          j.title AS job_title,
+          ua.created_at AS created_at,
+          COALESCE(nr.id IS NOT NULL, false) AS is_read
+        FROM job_applications ua
+        JOIN job_posts j ON j.id = ua.job_id
+        LEFT JOIN users hu ON hu.id = j.hirer_id
+        LEFT JOIN notification_reads nr ON nr.user_id = $2 AND nr.notification_type = 'job_accepted' AND nr.source_id = ua.id::text
+        WHERE ua.worker_id = $2 AND ua.status = 'accepted'
       )
       SELECT *
       FROM (
@@ -86,6 +133,10 @@ async function notificationRoutes(fastify) {
         SELECT * FROM rating_rows
         UNION ALL
         SELECT * FROM follows
+        UNION ALL
+        SELECT * FROM job_apps_received
+        UNION ALL
+        SELECT * FROM job_apps_accepted
       ) activity
       ORDER BY created_at DESC
       LIMIT 30
@@ -99,6 +150,8 @@ async function notificationRoutes(fastify) {
       if (row.type === 'comment') text = 'commented on your post';
       if (row.type === 'rating') text = 'rated your work';
       if (row.type === 'follow') text = 'started following you';
+      if (row.type === 'job_application') text = `applied to your job${row.job_title ? `: ${row.job_title}` : ''}`;
+      if (row.type === 'job_accepted') text = `accepted your application${row.job_title ? ` for ${row.job_title}` : ''}`;
 
       return {
         id: row.id,
@@ -108,6 +161,8 @@ async function notificationRoutes(fastify) {
         actor_trade: row.actor_trade,
         actor_verified: row.actor_verified,
         gig_id: row.gig_id,
+        job_id: row.job_id,
+        job_title: row.job_title,
         text,
         created_at: row.created_at,
         is_read: row.is_read,

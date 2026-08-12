@@ -487,3 +487,19 @@ CREATE TABLE IF NOT EXISTS job_applications (
 );
 CREATE INDEX IF NOT EXISTS idx_job_apps_job ON job_applications(job_id);
 CREATE INDEX IF NOT EXISTS idx_job_apps_worker ON job_applications(worker_id);
+
+-- ═══════════════════════════════════════════════════════════════
+-- 14. Gig Views — real, session-deduped view counting
+-- Each (gig, session) pair counts once, so refreshes and bots
+-- with a single session id cannot inflate a video's view count.
+-- ═══════════════════════════════════════════════════════════════
+CREATE TABLE IF NOT EXISTS gig_views (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    gig_id UUID REFERENCES gigs(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    session_id TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(gig_id, session_id)
+);
+CREATE INDEX IF NOT EXISTS idx_gig_views_gig ON gig_views(gig_id);
+CREATE INDEX IF NOT EXISTS idx_gig_views_session ON gig_views(session_id);

@@ -58,6 +58,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} ${ubuntuMono.variable}`} suppressHydrationWarning>
+      {/* Theme init — runs before paint. Defaults to OS preference, overridable
+          via localStorage 'workora_theme'. The dashboard forces dark on top. */}
+      <Script id="theme-init" strategy="beforeInteractive">
+        {`(function () {
+          try {
+            var stored = localStorage.getItem('workora_theme');
+            var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.classList.toggle('dark', dark);
+          } catch (e) {}
+        })();`}
+      </Script>
       <body className="min-h-screen bg-white text-foreground pb-20 lg:pb-0 font-sans" suppressHydrationWarning>
         <div className="mesh-glow" />
         {/* Elegant Top Progress Bar */}
