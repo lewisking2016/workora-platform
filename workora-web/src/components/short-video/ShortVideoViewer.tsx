@@ -25,7 +25,7 @@ import {
   X,
 } from '@phosphor-icons/react';
 import { VideoPlayer } from '@/components/VideoPlayer';
-import { fetchCurrentUser } from '@/lib/session';
+import { apiFetch, fetchCurrentUser } from '@/lib/session';
 import { APP_CONFIG } from '@/lib/config';
 
 type ViewerMode = 'story' | 'reel';
@@ -188,7 +188,7 @@ export default function ShortVideoViewer({ mode, creatorId }: ShortVideoViewerPr
     if (!currentItem || !currentUser) return router.push('/login');
     setBusy(true);
     try {
-      const res = await fetch(`/api/gigs/${currentItem.id}/like`, { method: 'POST' });
+      const res = await apiFetch(`/api/gigs/${currentItem.id}/like`, { method: 'POST' });
       const data = await res.json();
       setItems(prev => prev.map(item => item.id === currentItem.id ? {
         ...item,
@@ -204,7 +204,7 @@ export default function ShortVideoViewer({ mode, creatorId }: ShortVideoViewerPr
     if (!currentItem || !currentUser) return router.push('/login');
     setBusy(true);
     try {
-      const res = await fetch(`/api/gigs/${currentItem.id}/save`, { method: 'POST' });
+      const res = await apiFetch(`/api/gigs/${currentItem.id}/save`, { method: 'POST' });
       const data = await res.json();
       setItems(prev => prev.map(item => item.id === currentItem.id ? { ...item, saved_by_me: data.saved } : item));
       setSaveToast(true);
@@ -216,7 +216,7 @@ export default function ShortVideoViewer({ mode, creatorId }: ShortVideoViewerPr
 
   const loadComments = async () => {
     if (!currentItem) return;
-    const res = await fetch(`/api/gigs/${currentItem.id}/comments`);
+    const res = await apiFetch(`/api/gigs/${currentItem.id}/comments`);
     const data = await res.json();
     setComments(Array.isArray(data) ? data : []);
     setShowComments(true);
@@ -224,7 +224,7 @@ export default function ShortVideoViewer({ mode, creatorId }: ShortVideoViewerPr
 
   const loadLikes = async () => {
     if (!currentItem) return;
-    const res = await fetch(`/api/gigs/${currentItem.id}/likes`);
+    const res = await apiFetch(`/api/gigs/${currentItem.id}/likes`);
     const data = await res.json();
     setLikes(Array.isArray(data) ? data : []);
     setShowLikes(true);
@@ -236,7 +236,7 @@ export default function ShortVideoViewer({ mode, creatorId }: ShortVideoViewerPr
 
     setBusy(true);
     try {
-      await fetch(`/api/gigs/${currentItem.id}/comment`, {
+      await apiFetch(`/api/gigs/${currentItem.id}/comment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: reply }),

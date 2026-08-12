@@ -330,6 +330,9 @@ DO $$ BEGIN
     ALTER TABLE analytics_events ADD COLUMN IF NOT EXISTS section TEXT;
     ALTER TABLE analytics_events ADD COLUMN IF NOT EXISTS element TEXT;
     ALTER TABLE analytics_events ADD COLUMN IF NOT EXISTS referrer TEXT;
+    -- Live gig_reports predates the details/status columns; heal it here.
+    ALTER TABLE gig_reports ADD COLUMN IF NOT EXISTS details TEXT;
+    ALTER TABLE gig_reports ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'open';
 EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 

@@ -3,8 +3,8 @@ import ShortVideoViewer from '@/components/short-video/ShortVideoViewer';
 export default async function StoryViewerPage({
   params,
 }: {
-  params: { creatorId: string };
+  params: Promise<{ creatorId: string }>;
 }) {
-  const { creatorId } = params;
+  const { creatorId } = await params;
   return <ShortVideoViewer mode="story" creatorId={creatorId} />;
 }
