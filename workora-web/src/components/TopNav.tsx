@@ -17,16 +17,14 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 /* ── Wordmark: gradient mark + wordmark text, theme-aware ── */
 function Wordmark({ dark }: { dark: boolean }) {
   return (
-    <Link href="/" className="group relative flex items-center gap-2.5" aria-label="Workora home">
-      <span className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-[11px] bg-gradient-to-br from-[#4D9FFF] to-[#7000FF] shadow-lg shadow-blue-500/30 transition-transform duration-300 group-hover:scale-105">
-        <svg viewBox="0 0 24 24" className="h-5 w-5 text-white" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M4 18V8.5l4 5 4-6 4 6 4-5V18" />
-        </svg>
-        <span className="absolute inset-0 bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.35),transparent_50%)]" />
-      </span>
-      <span className={`text-[22px] font-black tracking-tight transition-colors duration-300 ${dark ? 'text-white' : 'text-zinc-950'}`}>
-        workora
-      </span>
+    <Link href="/" className="group relative flex items-center" aria-label="Workora home">
+      {/* eslint-disable-next-line @next/next/no-img-element -- legacy PNG logo */}
+      <img
+        src={dark ? '/logo/workora_logo_white.png' : '/logo/workora_logo.png'}
+        alt="Workora"
+        className="h-8 w-auto select-none transition-transform duration-300 group-hover:scale-[1.04] md:h-9"
+        draggable={false}
+      />
     </Link>
   );
 }
