@@ -78,12 +78,9 @@ const VIDEO_FILES_BY_TRADE = {
   ]
 };
 
-// Thumbnails from Unsplash for each category
-const THUMBNAIL_BY_TRADE = {
-  'Plumber': 'https://source.unsplash.com/1200x800/?plumbing,pipes',
-  'Electrician': 'https://source.unsplash.com/1200x800/?electrical,wiring',
-  'Mason': 'https://source.unsplash.com/1200x800/?construction,building'
-};
+// Thumbnails are generated posters for the local demo videos above
+// (see workora-web/public/thumbnails/), derived from the chosen video
+const thumbnailFor = (video) => `/thumbnails/${video.replace(/\.mp4$/, '.jpg').split(' ').map((p) => encodeURIComponent(p)).join('%20')}`;
 
 // Realistic titles by trade
 const TITLES_BY_TRADE = {
@@ -343,13 +340,12 @@ async function createGigs(profiles) {
     const tradeVideos = VIDEO_FILES_BY_TRADE[profile.trade] || VIDEO_FILES_BY_TRADE['Mason'];
     const tradeTitles = TITLES_BY_TRADE[profile.trade] || TITLES_BY_TRADE['Mason'];
     const tradeDescriptions = DESCRIPTIONS_BY_TRADE[profile.trade] || DESCRIPTIONS_BY_TRADE['Mason'];
-    const tradeThumbnail = THUMBNAIL_BY_TRADE[profile.trade] || THUMBNAIL_BY_TRADE['Mason'];
 
     for (let i = 0; i < gigCount; i++) {
       const videoUrl = randomItem(tradeVideos);
       const title = randomItem(tradeTitles);
       const description = randomItem(tradeDescriptions);
-      const thumbnailUrl = `${tradeThumbnail}&sig=${randomInt(1, 999)}`;
+      const thumbnailUrl = thumbnailFor(videoUrl);
 
       const result = await client.query(
         `INSERT INTO gigs (worker_id, user_id, title, description, category, video_url, thumbnail_url, view_count)
