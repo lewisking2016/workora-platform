@@ -610,7 +610,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
     );
   };
 
-  const headerTitle = mode === 'search' ? 'Search' : 'Explore';
+  const headerTitle = mode === 'search' ? 'Search' : 'Nodes Explorer';
   const headerSubtitle = mode === 'search'
     ? 'Search by trade, location, trust, availability, or keyword.'
     : 'Browse live professionals and work by what people are doing now.';
@@ -622,10 +622,19 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">
-                <Compass size={14} />
+                <Compass size={14} className="text-[#4F46E5]" />
                 {headerTitle}
               </div>
-              <h1 className="mt-1 text-[28px] font-black tracking-tight sm:text-[34px]">{headerTitle}</h1>
+              <h1 className="mt-1 text-[28px] font-black tracking-tight sm:text-[34px]">
+                {mode === 'explore' ? (
+                  <>
+                    Explore the{' '}
+                    <span className="bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] bg-clip-text text-transparent">nodes</span>
+                  </>
+                ) : (
+                  headerTitle
+                )}
+              </h1>
               <p className="mt-1 max-w-2xl text-sm text-zinc-500 dark:text-zinc-400">{headerSubtitle}</p>
             </div>
 
