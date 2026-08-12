@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { VideoCard } from '@/components/VideoCard';
-import { getBackendBaseUrl } from '@/lib/backend-url';
 
 interface Reel {
   id: string;
@@ -14,45 +13,6 @@ interface Reel {
   view_count?: number;
 }
 
-const MOCK_REELS: Reel[] = [
-  {
-    id: 'mock-1',
-    thumbnail_url: '/landing/wiring-1.jpg',
-    video_url: '',
-    avatar_url: '/logo/workora_logo.png',
-    user_name: 'David Mwangi',
-    title: 'Professional House Wiring in Nairobi',
-    view_count: 1420
-  },
-  {
-    id: 'mock-2',
-    thumbnail_url: '/landing/verified badge.jpeg',
-    video_url: '',
-    avatar_url: '/logo/workora_logo.png',
-    user_name: 'Grace Amina',
-    title: 'High Precision Steel Fabrication',
-    view_count: 980
-  },
-  {
-    id: 'mock-3',
-    thumbnail_url: '/landing/The Video Feedback.png',
-    video_url: '',
-    avatar_url: '/logo/workora_logo.png',
-    user_name: 'Joseph Ochieng',
-    title: 'Cabinetry and Woodwork Installation',
-    view_count: 2310
-  },
-  {
-    id: 'mock-4',
-    thumbnail_url: '/landing/workora 1.png',
-    video_url: '',
-    avatar_url: '/logo/workora_logo.png',
-    user_name: 'Sarah Kamau',
-    title: 'Modern Plumbing and Piping Design',
-    view_count: 3120
-  }
-];
-
 export function ReelsStrip() {
   const [reels, setReels] = useState<Reel[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,20 +21,16 @@ export function ReelsStrip() {
     let mounted = true;
     async function fetchReels() {
       try {
-        const base = getBackendBaseUrl();
-        const res = await fetch(`${base}/gigs/feed?page=1&limit=8`);
+        // Use the same-origin proxy so auth and environment config are consistent.
+        const res = await fetch('/api/gigs/feed?page=1&limit=8');
         if (!res.ok) throw new Error('Failed fetching');
         const data = await res.json();
-        if (mounted) {
-          if (data && data.length > 0) {
-            setReels(data);
-          } else {
-            setReels(MOCK_REELS);
-          }
+        // No demo fallback: empty/error states render as empty.
+        if (mounted && Array.isArray(data)) {
+          setReels(data);
         }
       } catch (e) {
-        console.error('Reels fetch error, falling back to mock reels', e);
-        if (mounted) setReels(MOCK_REELS);
+        console.error('Reels fetch error', e);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -89,11 +45,13 @@ export function ReelsStrip() {
     ))}</div>;
   }
 
-  const displayReels = reels.length > 0 ? reels : MOCK_REELS;
+  if (reels.length === 0) {
+    return null;
+  }
 
   return (
     <>
-      {displayReels.map((r) => (
+      {reels.map((r) => (
         <div key={r.id} className="w-64 shrink-0 hover:scale-[1.02] transition-transform duration-200">
           <VideoCard
             id={r.id}

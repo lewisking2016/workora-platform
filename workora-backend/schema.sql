@@ -280,6 +280,14 @@ CREATE TABLE IF NOT EXISTS auth_login_attempts (
 
 -- Safe column additions (won't error if they already exist)
 DO $$ BEGIN
+    -- Legacy schema_v2 conversations used participant_a/participant_b.
+    -- Add the current participant_1/participant_2 columns and backfill them.
+    ALTER TABLE conversations ADD COLUMN IF NOT EXISTS participant_1 UUID REFERENCES users(id) ON DELETE CASCADE;
+    ALTER TABLE conversations ADD COLUMN IF NOT EXISTS participant_2 UUID REFERENCES users(id) ON DELETE CASCADE;
+    UPDATE conversations
+       SET participant_1 = COALESCE(participant_1, participant_a),
+           participant_2 = COALESCE(participant_2, participant_b)
+     WHERE participant_1 IS NULL AND participant_a IS NOT NULL;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS username TEXT UNIQUE;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS birthday DATE;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS team_type TEXT DEFAULT 'solo';
@@ -301,6 +309,7 @@ DO $$ BEGIN
     ALTER TABLE messages ADD COLUMN IF NOT EXISTS delivery_status TEXT DEFAULT 'sent';
     ALTER TABLE messages ADD COLUMN IF NOT EXISTS edited_at TIMESTAMP WITH TIME ZONE;
     ALTER TABLE messages ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE;
+    -- Legacy schema_v2 messages had no attachment support; table is created separately.
     ALTER TABLE auth_login_attempts ADD COLUMN IF NOT EXISTS failed_count INTEGER DEFAULT 0;
     ALTER TABLE auth_login_attempts ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP WITH TIME ZONE;
     ALTER TABLE auth_login_attempts ADD COLUMN IF NOT EXISTS last_failed_at TIMESTAMP WITH TIME ZONE;
@@ -314,6 +323,13 @@ DO $$ BEGIN
     ALTER TABLE notification_preferences ADD COLUMN IF NOT EXISTS system_enabled BOOLEAN DEFAULT TRUE;
     ALTER TABLE notification_preferences ADD COLUMN IF NOT EXISTS push_enabled BOOLEAN DEFAULT TRUE;
     ALTER TABLE notification_preferences ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
+    -- Legacy analytics_events predates the session/page fields the API writes.
+    ALTER TABLE analytics_events ADD COLUMN IF NOT EXISTS session_id TEXT;
+    ALTER TABLE analytics_events ADD COLUMN IF NOT EXISTS page_path TEXT;
+    ALTER TABLE analytics_events ADD COLUMN IF NOT EXISTS screen_name TEXT;
+    ALTER TABLE analytics_events ADD COLUMN IF NOT EXISTS section TEXT;
+    ALTER TABLE analytics_events ADD COLUMN IF NOT EXISTS element TEXT;
+    ALTER TABLE analytics_events ADD COLUMN IF NOT EXISTS referrer TEXT;
 EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 

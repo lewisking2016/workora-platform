@@ -23,7 +23,7 @@ async function authRoutes(fastify) {
   const { pool } = fastify;
 
   // 1. REGISTER
-  fastify.post('/register', async (request, reply) => {
+  fastify.post('/register', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (request, reply) => {
     let validated;
     try {
       validated = registerSchema.parse(request.body);
@@ -89,7 +89,7 @@ async function authRoutes(fastify) {
   });
 
   // 2. LOGIN
-  fastify.post('/login', async (request, reply) => {
+  fastify.post('/login', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (request, reply) => {
     const identifier = String(request.body?.identifier || request.body?.phone_number || '').trim();
     const password = request.body?.password;
 
@@ -115,7 +115,9 @@ async function authRoutes(fastify) {
     );
     const attempt = attemptsRes.rows[0];
 
-    if (attempt?.locked_until && new Date(attempt.locked_until) > new Date()) {
+    const lockActive = Boolean(attempt?.locked_until && new Date(attempt.locked_until) > new Date());
+
+    if (lockActive) {
       const minutesRemaining = Math.max(
         1,
         Math.ceil((new Date(attempt.locked_until).getTime() - Date.now()) / 60000)
@@ -126,6 +128,10 @@ async function authRoutes(fastify) {
         })
       );
     }
+
+    // If a previous lock has expired, restart the counter instead of
+    // inheriting stale failures — otherwise one bad streak locks the
+    // account forever (every new attempt re-locks it).
 
     const res = await pool.query(
       `
@@ -141,7 +147,11 @@ async function authRoutes(fastify) {
     const user = res.rows[0];
 
     if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-      const nextFailedCount = (attempt?.failed_count || 0) + 1;
+      // Presentation mode: the counter only matters while a lock is active.
+      // Once a lock expires (or for a fresh identifier), restart from zero
+      // so a stale streak can never re-lock the account forever.
+      const baseFailed = lockActive ? (attempt.failed_count || 0) : 0;
+      const nextFailedCount = baseFailed + 1;
       const shouldLock = nextFailedCount >= LOGIN_LOCK_THRESHOLD;
 
       await pool.query(
@@ -159,6 +169,7 @@ async function authRoutes(fastify) {
             failed_count = CASE
               WHEN auth_login_attempts.locked_until IS NOT NULL AND auth_login_attempts.locked_until > NOW()
                 THEN auth_login_attempts.failed_count
+              WHEN auth_login_attempts.failed_count >= $2 THEN auth_login_attempts.failed_count
               ELSE auth_login_attempts.failed_count + 1
             END,
             locked_until = CASE
@@ -172,6 +183,13 @@ async function authRoutes(fastify) {
         `,
         [normalizedIdentifier, LOGIN_LOCK_THRESHOLD, shouldLock]
       );
+
+      // Keep the attempts table small: drop rows with no active lock older than 7 days.
+      await pool.query(
+        `DELETE FROM auth_login_attempts
+          WHERE (locked_until IS NULL OR locked_until <= NOW())
+            AND last_failed_at < NOW() - INTERVAL '7 days'`
+      ).catch(() => undefined);
 
       return reply.status(401).send(buildAuthError('invalid_credentials', 'Invalid credentials'));
     }
@@ -215,21 +233,37 @@ async function authRoutes(fastify) {
   });
 
   // 4. UPDATE TEAM TYPE
-  fastify.patch('/team', async (request, reply) => {
-    const { userId, team_type } = request.body;
+  // Identity comes from the JWT — never from the request body.
+  fastify.patch('/team', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const userId = request.user?.id;
+    if (!userId) return reply.status(401).send({ message: 'Unauthorized' });
+
+    const { team_type } = request.body || {};
+    if (!['solo', 'team'].includes(team_type)) {
+      return reply.status(400).send({ message: 'team_type must be "solo" or "team"' });
+    }
+
     await pool.query('UPDATE users SET team_type = $1 WHERE id = $2', [team_type, userId]);
     return { success: true };
   });
 
   // 5. UPDATE SUBSCRIPTION
-  fastify.patch('/subscription', async (request, reply) => {
-    const { userId, subscription } = request.body;
+  // Identity comes from the JWT — never from the request body.
+  fastify.patch('/subscription', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const userId = request.user?.id;
+    if (!userId) return reply.status(401).send({ message: 'Unauthorized' });
+
+    const { subscription } = request.body || {};
+    if (!['free', 'elite'].includes(subscription)) {
+      return reply.status(400).send({ message: 'subscription must be "free" or "elite"' });
+    }
+
     await pool.query('UPDATE users SET subscription = $1 WHERE id = $2', [subscription, userId]);
     return { success: true };
   });
 
   // 6. PASSWORD RECOVERY REQUEST
-  fastify.post('/forgot', async (request, reply) => {
+  fastify.post('/forgot', { config: { rateLimit: { max: 10, timeWindow: '1 minute' } } }, async (request, reply) => {
     const identifier = String(request.body?.identifier || '').trim();
 
     if (!identifier) {

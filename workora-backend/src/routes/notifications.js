@@ -59,6 +59,23 @@ async function notificationRoutes(fastify) {
         LEFT JOIN users u ON u.id = r.from_user_id
         LEFT JOIN worker_profiles wp ON wp.user_id = r.from_user_id
         LEFT JOIN notification_reads nr ON nr.user_id = $2 AND nr.notification_type = 'rating' AND nr.source_id = r.id::text
+      ),
+      follows AS (
+        SELECT
+          uf.id::text AS id,
+          'follow'::text AS type,
+          uf.follower_id AS actor_id,
+          COALESCE(u.username, 'Member') AS actor_name,
+          COALESCE(wp.trade, 'Member') AS actor_trade,
+          COALESCE(wp.is_verified, false) AS actor_verified,
+          NULL::uuid AS gig_id,
+          uf.created_at AS created_at,
+          COALESCE(nr.id IS NOT NULL, false) AS is_read
+        FROM user_follows uf
+        JOIN users u ON u.id = uf.follower_id
+        LEFT JOIN worker_profiles wp ON wp.user_id = uf.follower_id
+        LEFT JOIN notification_reads nr ON nr.user_id = $2 AND nr.notification_type = 'follow' AND nr.source_id = uf.id::text
+        WHERE uf.following_user_id = $2
       )
       SELECT *
       FROM (
@@ -67,6 +84,8 @@ async function notificationRoutes(fastify) {
         SELECT * FROM comments
         UNION ALL
         SELECT * FROM rating_rows
+        UNION ALL
+        SELECT * FROM follows
       ) activity
       ORDER BY created_at DESC
       LIMIT 30
@@ -79,6 +98,7 @@ async function notificationRoutes(fastify) {
       if (row.type === 'like') text = 'liked your post';
       if (row.type === 'comment') text = 'commented on your post';
       if (row.type === 'rating') text = 'rated your work';
+      if (row.type === 'follow') text = 'started following you';
 
       return {
         id: row.id,

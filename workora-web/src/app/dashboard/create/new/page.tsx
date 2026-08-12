@@ -146,13 +146,13 @@ export default function NewPostPage() {
         setUploadProgress(progress);
         setUploadLabel(progress < 100 ? 'Uploading media...' : 'Finalizing post...');
       });
-      if (!profile?.id) throw new Error('Profile not found');
-
+      // Registered users always have a profile, but never block publishing when
+      // one is missing — the post falls back to the user account.
       const postRes = await fetch('/api/gigs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          worker_id: profile.id,
+          worker_id: profile?.id || null,
           user_id: user.id,
           title: caption.substring(0, 50) || 'New Work',
           description: caption,

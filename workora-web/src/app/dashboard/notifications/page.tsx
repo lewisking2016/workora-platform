@@ -52,6 +52,22 @@ export default function NotificationsPage() {
     router.push(`/dashboard/notifications/${notif.id}`);
   };
 
+  const [followedBack, setFollowedBack] = useState<Set<string>>(new Set());
+
+  const followBack = async (notif: Notification, event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (followedBack.has(notif.id) || !notif.actor_id) return;
+    try {
+      const res = await fetch(`/api/profile/follow/${notif.actor_id}`, { method: 'POST' });
+      const data = await res.json();
+      if (data?.following) {
+        setFollowedBack(prev => new Set(prev).add(notif.id));
+      }
+    } catch (e) {
+      console.error('Follow back failed', e);
+    }
+  };
+
   useEffect(() => {
     let mounted = true;
     const bootstrap = async () => {
@@ -151,8 +167,15 @@ export default function NotificationsPage() {
                   </div>
                   
                   {notif.type === 'follow' && (
-                    <button className="h-8 px-4 bg-[#0066FF] text-white rounded-lg text-xs font-semibold shrink-0">
-                      Follow
+                    <button
+                      onClick={(event) => followBack(notif, event)}
+                      className={`h-8 px-4 rounded-lg text-xs font-semibold shrink-0 transition-colors ${
+                        followedBack.has(notif.id)
+                          ? 'bg-zinc-100 text-zinc-500 dark:bg-zinc-900'
+                          : 'bg-[#0066FF] text-white'
+                      }`}
+                    >
+                      {followedBack.has(notif.id) ? 'Following' : 'Follow'}
                     </button>
                   )}
                   {!notif.is_read && (

@@ -38,6 +38,11 @@ export default function MessagesPage() {
   const searchParams = useSearchParams();
   const initialConversationId = searchParams.get('conversation');
   const bottomRef = useRef<HTMLDivElement>(null);
+  const messagesRef = useRef<Message[]>([]);
+
+  // Keep a ref of the latest messages so the poller can diff without
+  // reading state (and without side effects inside a state updater).
+  useEffect(() => { messagesRef.current = messages; }, [messages]);
 
   useEffect(() => {
     let mounted = true;
@@ -110,6 +115,77 @@ export default function MessagesPage() {
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     } catch (e) { console.error(e); }
   };
+
+  // Merge a fresh server snapshot into local messages without duplicating ids.
+  const mergeMessages = (prev: Message[], next: Message[]) => {
+    const seen = new Set(prev.map(m => m.id));
+    return [...prev, ...next.filter(m => !seen.has(m.id))];
+  };
+
+  // ── Live polling: feel real-time without WebSockets ────────────────
+  useEffect(() => {
+    if (!activeConv || !userId) return;
+
+    let cancelled = false;
+    const lastHeightRef = { current: bottomRef.current?.offsetTop || 0 };
+
+    const pollConversation = async () => {
+      // Skip work while the tab is hidden.
+      if (document.hidden) return;
+      try {
+        const res = await fetch(`/api/messages/${activeConv.id}`);
+        const data = await res.json();
+        if (cancelled || !Array.isArray(data)) return;
+
+        const prev = messagesRef.current;
+        const newIncoming = data.some(
+          m => m.sender_id !== userId && !prev.some(p => p.id === m.id)
+        );
+
+        setMessages(mergeMessages(prev, data));
+
+        // If a new incoming message arrived, mark it read and refresh the list.
+        if (newIncoming) {
+          void fetch(`/api/messages/${activeConv.id}/read`, {
+            method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId }),
+          }).catch(() => undefined);
+          void fetchConversations(userId);
+        }
+
+        // Auto-scroll only when the user was already at the bottom.
+        const el = bottomRef.current;
+        if (el && el.offsetTop > lastHeightRef.current && el.parentElement) {
+          const container = el.parentElement;
+          const nearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 120;
+          if (nearBottom) {
+            el.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+        lastHeightRef.current = bottomRef.current?.offsetTop || lastHeightRef.current;
+      } catch {
+        // Network blips during polling are expected — stay quiet.
+      }
+    };
+
+    const pollConversations = async () => {
+      if (document.hidden) return;
+      await fetchConversations(userId);
+    };
+
+    const messagesTimer = window.setInterval(pollConversation, 4000);
+    const listTimer = window.setInterval(pollConversations, 15000);
+    const onVisible = () => { if (!document.hidden) void pollConversation(); };
+    document.addEventListener('visibilitychange', onVisible);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(messagesTimer);
+      window.clearInterval(listTimer);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeConv?.id, userId]);
 
   const updateConversationState = async (patch: Record<string, boolean>) => {
     if (!activeConv) return;

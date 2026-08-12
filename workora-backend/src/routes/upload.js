@@ -17,14 +17,34 @@ function getS3Client() {
 const BUCKET = 'workora';
 const PUBLIC_URL = `https://pub-${cleanEnv(process.env.R2_ACCOUNT_ID)}.r2.dev`;
 
+// Accept ANY image or video format (so no legitimate upload is ever blocked),
+// plus PDF for identity documents. Some phones/drones label media files as
+// application/octet-stream, so allow that when the filename extension is a
+// recognized media extension. Everything else (HTML, executables, scripts,
+// archives) is rejected.
+const MEDIA_EXTENSIONS = /^\.(jpe?g|png|webp|gif|heic|heif|bmp|tiff?|svg|avif|mp4|m4v|mov|webm|mkv|avi|wmv|flv|mpe?g|mpg|mp2t|ts|ogv|ogg|3gpp|3gp|pdf)$/i;
+
+function isAllowedFile(mimetype, filename) {
+  const cleanMime = String(mimetype || '').split(';')[0].trim().toLowerCase();
+  if (cleanMime.startsWith('image/') || cleanMime.startsWith('video/')) return true;
+  if (cleanMime === 'application/pdf') return true;
+  if (cleanMime === 'application/octet-stream' && MEDIA_EXTENSIONS.test(path.extname(filename || '').toLowerCase())) return true;
+  return false;
+}
+
 async function uploadRoutes(fastify) {
   const { pool } = fastify;
 
   const uploadProfileAsset = async (request, reply, options) => {
     const data = await request.file();
-    if (!data) return reply.status(400).send({ error: 'No file uploaded' });
+    if (!data) return reply.status(400).send({ error: 'No file uploaded' });      if (!isAllowedFile(data.mimetype, data.filename)) {
+        return reply.status(415).send({
+          error: 'File type not allowed',
+          details: 'Only image and video files are accepted.',
+        });
+      }
 
-    const userId = request.user?.id;
+      const userId = request.user?.id;
     if (!userId) return reply.status(400).send({ error: 'user_id is required' });
 
     const ext = path.extname(data.filename) || options.defaultExt;
@@ -96,6 +116,13 @@ async function uploadRoutes(fastify) {
     try {
       const data = await request.file();
       if (!data) return reply.status(400).send({ error: 'No file uploaded' });
+
+      if (!isAllowedFile(data.mimetype, data.filename)) {
+        return reply.status(415).send({
+          error: 'File type not allowed',
+          details: 'Only image and video files are accepted.',
+        });
+      }
 
       const workerId = request.user?.id;
       const mediaType = data.fields.media_type?.value || 'thumbnail'; // 'video' or 'thumbnail'

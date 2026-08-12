@@ -299,13 +299,18 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
     void fetchCategories();
   }, []);
 
+  // Debounce search: typing pauses 300ms before any API call fires, so we
+  // don't hammer the backend (and saved-search table) on every keystroke.
   useEffect(() => {
     persistQuery(query);
-    if (query.trim()) {
-      saveHistory(query.trim());
-      setHistory(loadHistory());
-    }
-    void fetchProfessionals();
+    const timer = window.setTimeout(() => {
+      if (query.trim()) {
+        saveHistory(query.trim());
+        setHistory(loadHistory());
+      }
+      void fetchProfessionals();
+    }, 300);
+    return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, filters.trade, filters.location, filters.availability, filters.minTrust, sort]);
 
