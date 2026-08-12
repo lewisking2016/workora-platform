@@ -2,92 +2,135 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { Globe, List, X } from '@phosphor-icons/react';
-import { AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
+import { Globe, List, X, ArrowRight } from '@phosphor-icons/react';
 import { usePathname } from 'next/navigation';
+
+const NAV_LINKS = [
+  { name: 'Personal', href: '/personal' },
+  { name: 'Business', href: '/business' },
+  { name: 'Platform', href: '/platform' },
+];
+
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+/* ── Wordmark: gradient mark + wordmark text, theme-aware ── */
+function Wordmark({ dark }: { dark: boolean }) {
+  return (
+    <Link href="/" className="group relative flex items-center gap-2.5" aria-label="Workora home">
+      <span className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-[11px] bg-gradient-to-br from-[#4D9FFF] to-[#7000FF] shadow-lg shadow-blue-500/30 transition-transform duration-300 group-hover:scale-105">
+        <svg viewBox="0 0 24 24" className="h-5 w-5 text-white" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 18V8.5l4 5 4-6 4 6 4-5V18" />
+        </svg>
+        <span className="absolute inset-0 bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.35),transparent_50%)]" />
+      </span>
+      <span className={`text-[22px] font-black tracking-tight transition-colors duration-300 ${dark ? 'text-white' : 'text-zinc-950'}`}>
+        workora
+      </span>
+    </Link>
+  );
+}
 
 export function TopNav() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [isSwahili] = useState(() => typeof document !== 'undefined' && document.cookie.includes('googtrans=/en/sw'));
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
+  // Dark variant only over the dark hero homepage
+  const dark = pathname === '/';
+
+  // Scroll state
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => setScrolled(window.scrollY > 24);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => setMounted(true), []);
+
+  // Lock body scroll when the mobile sheet is open
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileOpen]);
+
+  // Scroll progress bar
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 26, mass: 0.4 });
+
   if (['/login', '/join', '/forgot'].includes(pathname) || pathname.startsWith('/dashboard')) return null;
 
+  const navBg = dark
+    ? scrolled
+      ? 'bg-[#07090F]/85 backdrop-blur-xl border-b border-white/10 shadow-[0_8px_40px_-12px_rgba(0,0,0,0.6)]'
+      : 'bg-transparent'
+    : scrolled
+      ? 'bg-white/90 backdrop-blur-xl border-b border-zinc-200/70 shadow-[0_8px_40px_-16px_rgba(15,23,42,0.15)]'
+      : 'bg-white/40 backdrop-blur-sm border-b border-transparent';
+
+  const textBase = dark ? 'text-white/75 hover:text-white' : 'text-zinc-600 hover:text-zinc-950';
+  const activeText = dark ? 'text-white' : 'text-[#0066FF]';
+  const underlineColor = dark ? 'bg-white' : 'bg-[#0066FF]';
+  const ghostBorder = dark ? 'border-white/20 text-white/90 hover:border-white/45 hover:bg-white/[0.06]' : 'border-zinc-300 text-zinc-800 hover:border-zinc-400 hover:bg-zinc-50';
+
   return (
-    <nav
-      data-analytics-section="top_navigation"
-      className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 ease-out ${
-        scrolled 
-          ? 'bg-white/90 backdrop-blur-md border-b border-black/10' 
-          : 'bg-white/50 backdrop-blur-sm'
-      }`}
-    >
-      <div className="mx-auto max-w-screen-2xl px-6 md:px-12 flex items-center justify-between h-20">
-        
-        {/* Left Side: Logo & Links */}
-        <div className="flex items-center gap-16">
-          <Link href="/" className="relative flex items-center justify-center transition-transform hover:opacity-80">
-            <div className="relative h-14 w-48 md:h-16 md:w-56">
-              <Image 
-                src="/logo/workora_logo.png"
-                alt="Workora Logo"
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
-          </Link>
+    <>
+      <nav
+        data-analytics-section="top_navigation"
+        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${navBg}`}
+      >
+        {/* Scroll progress */}
+        <motion.div
+          style={{ scaleX: progress }}
+          className="absolute inset-x-0 top-0 h-[2px] origin-left bg-gradient-to-r from-[#4D9FFF] via-[#7000FF] to-[#4D9FFF]"
+        />
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-10">
-            {[
-              { name: 'Personal', href: '/personal' },
-              { name: 'Business', href: '/business' },
-              { name: 'Platform', href: '/platform' }
-            ].map((tab) => (
-              <Link
-                key={tab.name}
-                href={tab.href}
-                data-analytics-label={tab.name}
-                data-analytics-event="topnav_link_clicked"
-                className="relative group py-2"
-              >
-                <span className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-300 ${
-                  pathname === tab.href ? 'text-[#0066FF]' : 'text-black hover:text-[#0066FF]'
-                }`}>
-                  {tab.name}
-                </span>
-                {pathname === tab.href && (
-                  <motion.div 
-                    layoutId="topNavActiveLine"
-                    className="absolute bottom-0 left-0 right-0 h-[1px] bg-[#0066FF]"
-                  />
-                )}
-              </Link>
-            ))}
+        <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-5 md:px-8 lg:px-12">
+          <Wordmark dark={dark} />
+
+          {/* Desktop links */}
+          <div className="hidden items-center gap-1 lg:flex">
+            {NAV_LINKS.map((tab) => {
+              const active = pathname === tab.href;
+              return (
+                <Link
+                  key={tab.name}
+                  href={tab.href}
+                  data-analytics-label={tab.name}
+                  data-analytics-event="topnav_link_clicked"
+                  className="group relative rounded-full px-4 py-2.5"
+                >
+                  <span className={`relative text-[11px] font-black uppercase tracking-[0.18em] transition-colors duration-300 ${active ? activeText : textBase}`}>
+                    {tab.name}
+                    {/* hover underline */}
+                    <span className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-current opacity-60 transition-transform duration-300 group-hover:scale-x-100" />
+                  </span>
+                  {active && (
+                    <motion.span
+                      layoutId="topnav-active-pill"
+                      className={`absolute inset-0 rounded-full ${dark ? 'bg-white/[0.08] ring-1 ring-white/15' : 'bg-[#0066FF]/[0.07] ring-1 ring-[#0066FF]/15'}`}
+                      transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
           </div>
-        </div>
 
-        {/* Right Side: Utilities & CTA */}
-        <div className="flex items-center gap-8">
-          <div className="hidden md:flex items-center gap-8">
-            <Link 
-              href="/blog" 
-              className="text-[10px] font-black uppercase tracking-[0.2em] text-black hover:text-[#0066FF] transition-colors"
+          {/* Right side */}
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Link
+              href="/blog"
+              className={`hidden text-[11px] font-black uppercase tracking-[0.18em] transition-colors md:block ${textBase}`}
             >
               Insights
             </Link>
+
             <button
               data-analytics-label="Language toggle"
               data-analytics-event="topnav_language_toggle"
@@ -96,114 +139,157 @@ export function TopNav() {
                 document.cookie = `googtrans=${newValue}; path=/`;
                 window.location.reload();
               }}
-              className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-black hover:text-[#0066FF] transition-colors"
+              className={`flex items-center gap-1.5 rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[0.18em] transition-colors ${
+                dark ? 'border-white/15 text-white/80 hover:border-white/40 hover:text-white' : 'border-zinc-200 text-zinc-700 hover:border-zinc-400 hover:text-zinc-950'
+              }`}
+              aria-label="Toggle language"
             >
-              <Globe size={16} weight="thin" /> {isSwahili ? 'SW' : 'EN'}
+              <Globe size={14} weight="bold" />
+              {isSwahili ? 'SW' : 'EN'}
             </button>
-          </div>
 
-          <div className="flex items-center gap-4">
-            <Link 
-              href="/login" 
+            <div className={`hidden h-6 w-px sm:block ${dark ? 'bg-white/15' : 'bg-zinc-200'}`} />
+
+            <Link
+              href="/login"
               data-analytics-label="Log in"
               data-analytics-event="topnav_sign_in"
-              className="hidden sm:flex h-12 px-6 items-center justify-center text-sm font-semibold text-black hover:text-[var(--brand)] transition-colors"
+              className={`hidden text-sm font-bold transition-colors sm:block ${dark ? 'text-white/85 hover:text-white' : 'text-zinc-800 hover:text-[#0066FF]'}`}
             >
               Log in
             </Link>
-            <Link 
-              href="/join" 
+
+            <Link
+              href="/join"
               data-analytics-label="Get Started"
               data-analytics-event="topnav_get_started"
-              className="h-12 px-8 bg-[var(--brand)] text-white font-bold text-sm flex items-center justify-center rounded-lg btn"
+              className="group hidden h-11 items-center gap-2 rounded-full bg-[#0066FF] px-6 text-sm font-bold text-white shadow-lg shadow-blue-500/30 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#1a75ff] hover:shadow-blue-500/45 sm:inline-flex"
             >
               Get started
+              <ArrowRight size={15} weight="bold" className="transition-transform duration-300 group-hover:translate-x-0.5" />
             </Link>
-            
-            {/* Mobile Menu Toggle */}
+
+            {/* Mobile toggle */}
             <button
               data-analytics-label="Open mobile menu"
               data-analytics-event="topnav_mobile_menu_open"
-              onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden h-10 w-10 flex items-center justify-center border border-black/10 text-black hover:bg-zinc-50 transition-colors"
+              onClick={() => setMobileOpen(true)}
+              aria-label="Open menu"
+              className={`flex h-11 w-11 items-center justify-center rounded-full border transition-colors lg:hidden ${
+                dark ? 'border-white/15 text-white hover:bg-white/[0.08]' : 'border-zinc-200 text-zinc-900 hover:bg-zinc-100'
+              }`}
             >
-              <List size={22} weight="thin" />
+              {mobileOpen ? <X size={20} weight="bold" /> : <List size={20} weight="bold" />}
             </button>
           </div>
         </div>
-      </div>
+      </nav>
 
-      {/* Mobile Menu Overlay */}
+      {/* ── Mobile sheet ── */}
       <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0, x: '100%' }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-[200] bg-white flex flex-col px-8 py-8"
-          >
-            <div className="flex items-center justify-between mb-20">
-              <div className="relative h-10 w-32">
-                <Image src="/logo/workora_logo.png" alt="Workora Logo" fill sizes="128px" className="object-contain" priority />
-              </div>
-              <button
-                data-analytics-label="Close mobile menu"
-                data-analytics-event="topnav_mobile_menu_close"
-                onClick={() => setMobileMenuOpen(false)}
-                className="h-10 w-10 flex items-center justify-center border border-black/10 text-black"
-              >
-                <X size={22} weight="thin" />
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-8">
-              {[
-                { name: 'Personal', href: '/personal' },
-                { name: 'Business', href: '/business' },
-                { name: 'Platform', href: '/platform' },
-                { name: 'Insights', href: '/blog' }
-              ].map((tab) => (
-                <Link 
-                  key={tab.name} 
-                  href={tab.href} 
-                  data-analytics-label={tab.name}
-                  data-analytics-event="mobile_nav_link_clicked"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="text-4xl font-black uppercase tracking-tighter hover:text-[#0066FF] transition-colors"
+        {mobileOpen && mounted && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileOpen(false)}
+              className="fixed inset-0 z-[150] bg-black/50 backdrop-blur-sm lg:hidden"
+            />
+            <motion.aside
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 260 }}
+              className={`fixed right-0 top-0 z-[200] flex h-full w-[86%] max-w-sm flex-col border-l p-7 lg:hidden ${
+                dark
+                  ? 'border-white/10 bg-[#0B0E17]/95 text-white backdrop-blur-2xl'
+                  : 'border-zinc-200 bg-white/95 text-zinc-950 backdrop-blur-2xl'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <Wordmark dark={dark} />
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  aria-label="Close menu"
+                  className={`flex h-10 w-10 items-center justify-center rounded-full border ${dark ? 'border-white/15 hover:bg-white/[0.08]' : 'border-zinc-200 hover:bg-zinc-100'}`}
                 >
-                  {tab.name}
-                </Link>
-              ))}
-            </div>
+                  <X size={18} weight="bold" />
+                </button>
+              </div>
 
-            <div className="mt-auto flex flex-col gap-6">
-              <button
-                data-analytics-label="Language toggle"
-                data-analytics-event="mobile_language_toggle"
-                onClick={() => {
-                  const newValue = isSwahili ? '/en/en' : '/en/sw';
-                  document.cookie = `googtrans=${newValue}; path=/`;
-                  window.location.reload();
-                }}
-                className="flex items-center gap-3 text-sm font-black uppercase tracking-[0.2em] text-black"
+              <div className="mt-12 flex flex-col">
+                {[...NAV_LINKS, { name: 'Insights', href: '/blog' }].map((tab, i) => (
+                  <motion.div
+                    key={tab.name}
+                    initial={{ opacity: 0, x: 24 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.08 + i * 0.06, duration: 0.45, ease: EASE }}
+                    className={`border-b last:border-0 ${dark ? 'border-white/10' : 'border-zinc-100'}`}
+                  >
+                    <Link
+                      href={tab.href}
+                      data-analytics-label={tab.name}
+                      data-analytics-event="mobile_nav_link_clicked"
+                      onClick={() => setMobileOpen(false)}
+                      className="group flex items-center justify-between py-5"
+                    >
+                      <span className={`text-3xl font-black tracking-tight transition-colors ${pathname === tab.href ? (dark ? 'text-white' : 'text-[#0066FF]') : `${dark ? 'text-white/60' : 'text-zinc-500'} group-hover:${dark ? 'text-white' : 'text-zinc-950'}`}`}>
+                        {tab.name}
+                      </span>
+                      <ArrowRight
+                        size={20}
+                        className={`transition-all duration-300 group-hover:translate-x-1 ${dark ? 'text-white/30' : 'text-zinc-300'}`}
+                      />
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35, duration: 0.45, ease: EASE }}
+                className="mt-auto space-y-3"
               >
-                <Globe size={24} weight="thin" /> {isSwahili ? 'Swahili' : 'English'}
-              </button>
-              <div className="h-px bg-black/10 w-full" />
-                <Link 
-                  href="/login" 
+                <button
+                  data-analytics-label="Language toggle"
+                  data-analytics-event="mobile_language_toggle"
+                  onClick={() => {
+                    const newValue = isSwahili ? '/en/en' : '/en/sw';
+                    document.cookie = `googtrans=${newValue}; path=/`;
+                    window.location.reload();
+                  }}
+                  className={`flex items-center gap-2.5 text-xs font-black uppercase tracking-[0.2em] ${dark ? 'text-white/70' : 'text-zinc-500'}`}
+                >
+                  <Globe size={18} weight="bold" /> {isSwahili ? 'Swahili' : 'English'}
+                </button>
+
+                <div className={`h-px w-full ${dark ? 'bg-white/10' : 'bg-zinc-200'}`} />
+
+                <Link
+                  href="/login"
                   data-analytics-label="Log in"
                   data-analytics-event="mobile_sign_in"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="h-16 flex items-center justify-center text-base font-bold text-white bg-[var(--brand)] hover:bg-blue-700 transition-colors rounded-lg"
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex h-12 items-center justify-center rounded-xl border text-sm font-bold ${ghostBorder}`}
                 >
                   Log in
                 </Link>
-            </div>
-          </motion.div>
+                <Link
+                  href="/join"
+                  data-analytics-label="Get Started"
+                  data-analytics-event="mobile_get_started"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex h-12 items-center justify-center gap-2 rounded-xl bg-[#0066FF] text-sm font-bold text-white shadow-lg shadow-blue-500/30"
+                >
+                  Get started <ArrowRight size={15} weight="bold" />
+                </Link>
+              </motion.div>
+            </motion.aside>
+          </>
         )}
       </AnimatePresence>
-    </nav>
+    </>
   );
 }
