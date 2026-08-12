@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
-import { Inter, Space_Grotesk } from 'next/font/google';
+import { Inter, Space_Grotesk, Ubuntu_Mono } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/Providers';
 import { MeshBackground } from '@/components/MeshBackground';
@@ -20,6 +20,13 @@ const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
   variable: '--font-space-grotesk',
   display: 'swap',
+});
+
+const ubuntuMono = Ubuntu_Mono({
+  subsets: ['latin'],
+  variable: '--font-ubuntu-mono',
+  display: 'swap',
+  weight: ['400', '700'],
 });
 
 export const metadata: Metadata = {
@@ -50,7 +57,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} ${ubuntuMono.variable}`} suppressHydrationWarning>
       <body className="min-h-screen bg-white text-foreground pb-20 lg:pb-0 font-sans" suppressHydrationWarning>
         <div className="mesh-glow" />
         {/* Elegant Top Progress Bar */}

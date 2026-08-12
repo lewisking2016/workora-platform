@@ -15,7 +15,8 @@ import {
   Hammer, Car, DeviceMobile, TShirt, Broom, Scissors, Gear, Moped,
   ArrowRight, ShieldCheck, Star, CheckCircle, Users, Briefcase,
   Clock, VideoCamera, ChatCircleDots, Heart, MapPin, PlayCircle,
-  TrendUp, SealCheck, Sparkle
+  TrendUp, SealCheck, Sparkle, TerminalWindow, Terminal, Cpu,
+  HardDrive, Gauge, Database, Wrench, CaretRight
 } from '@phosphor-icons/react';
 
 /* ══════════════════════════════════════════════════════════
@@ -513,27 +514,106 @@ export default function Home() {
       </section>
 
       {/* ══════════════════════════════════════════
-          STATS — count-up band
+          STATS — Linux terminal
       ══════════════════════════════════════════ */}
-      <section className="relative overflow-hidden bg-[#0066FF] py-20">
-        <div className="pointer-events-none absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_top_left,rgba(255,255,255,0.25),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(0,0,0,0.3),transparent_50%)]" />
-        <div className="relative mx-auto grid max-w-5xl grid-cols-2 gap-10 px-6 text-center text-white md:grid-cols-4">
-          {stats.map((stat: Stat, i) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.6, ease: EASE }}
-              className="flex flex-col items-center"
-            >
-              <stat.icon size={22} weight="fill" className="mb-3 text-white/60" />
-              <div className="text-4xl font-black tracking-tight sm:text-5xl">
-                <CountUp value={stat.value} suffix={stat.suffix} decimals={stat.decimals ?? 0} />
+      <section className="relative overflow-hidden py-24">
+        {/* subtle scanline backdrop */}
+        <div className="pointer-events-none absolute inset-0 opacity-40" style={{ backgroundImage: 'repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 3px)' }} />
+        <div className="pointer-events-none absolute -top-32 left-1/2 h-[400px] w-[700px] -translate-x-1/2 rounded-full bg-[#0066FF]/20 blur-[120px]" />
+
+        <div className="relative mx-auto max-w-5xl px-6">
+          {/* Terminal window */}
+          <motion.div
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.7, ease: EASE }}
+            className="overflow-hidden rounded-2xl border border-white/12 bg-[#0B0E14] shadow-2xl shadow-black/50"
+          >
+            {/* Title bar */}
+            <div className="flex items-center gap-3 border-b border-white/10 bg-[#11151D] px-5 py-3">
+              <div className="flex items-center gap-2">
+                <span className="h-3 w-3 rounded-full bg-[#FF5F56]" />
+                <span className="h-3 w-3 rounded-full bg-[#FFBD2E]" />
+                <span className="h-3 w-3 rounded-full bg-[#27C93F]" />
               </div>
-              <div className="mt-1.5 text-xs font-bold uppercase tracking-[0.2em] text-blue-100">{stat.label}</div>
-            </motion.div>
-          ))}
+              <div className="ml-2 flex items-center gap-2 text-[11px] font-bold tracking-wider text-white/45">
+                <TerminalWindow size={14} className="text-[#4D9FFF]" />
+                <span className="font-[family-name:var(--font-ubuntu-mono)]">workora@platform: ~/network</span>
+              </div>
+              <div className="ml-auto hidden items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1 sm:flex">
+                <span className="dot-pulse text-[#27C93F]" />
+                <span className="font-[family-name:var(--font-ubuntu-mono)] text-[10px] font-bold uppercase tracking-[0.18em] text-[#27C93F]">online</span>
+              </div>
+            </div>
+
+            {/* Terminal body */}
+            <div className="grid gap-6 p-6 sm:p-8 md:grid-cols-2">
+              <div className="space-y-4">
+                <div className="flex items-start gap-2 font-[family-name:var(--font-ubuntu-mono)] text-sm">
+                  <span className="text-[#27C93F] font-bold">workora@platform</span>
+                  <span className="text-white/40">:</span>
+                  <span className="text-[#4D9FFF] font-bold">~/network</span>
+                  <span className="text-white/40">$</span>
+                  <span className="text-white/80">./verify --all</span>
+                </div>
+
+                {stats.map((stat: Stat, i) => (
+                  <motion.div
+                    key={stat.label}
+                    initial={{ opacity: 0, x: -12 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.25 + i * 0.12, duration: 0.5, ease: EASE }}
+                    className="flex items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.03] px-4 py-3 transition-colors duration-300 hover:border-[#4D9FFF]/40"
+                  >
+                    <stat.icon size={17} weight="bold" className="shrink-0 text-[#4D9FFF]" />
+                    <span className="min-w-[10ch] font-[family-name:var(--font-ubuntu-mono)] text-[11px] uppercase tracking-[0.14em] text-white/50">
+                      {stat.label}
+                    </span>
+                    <span className="ml-auto flex items-baseline gap-0.5 font-[family-name:var(--font-ubuntu-mono)] text-xl font-bold text-[#27C93F]">
+                      <CountUp value={stat.value} suffix={stat.suffix} decimals={stat.decimals ?? 0} />
+                    </span>
+                    <span className="hidden text-white/25 sm:block">ok</span>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Right: system readout */}
+              <div className="flex flex-col justify-between gap-6 rounded-xl border border-white/[0.07] bg-white/[0.03] p-5">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
+                    <Cpu size={14} className="text-[#27C93F]" />
+                    system status
+                  </div>
+                  {[
+                    { icon: HardDrive, label: 'Proof records', value: 'verified' },
+                    { icon: Database, label: 'Trust ledger', value: 'synced' },
+                    { icon: Gauge, label: 'Response time', value: '2h avg' },
+                    { icon: Wrench, label: 'Active trades', value: '8 nodes' },
+                  ].map((row) => (
+                    <div key={row.label} className="flex items-center gap-2.5 font-[family-name:var(--font-ubuntu-mono)] text-xs">
+                      <row.icon size={14} className="shrink-0 text-white/35" />
+                      <span className="text-white/55">{row.label}</span>
+                      <span className="ml-auto flex items-center gap-1.5 text-[#27C93F]">
+                        <CaretRight size={11} weight="bold" />
+                        {row.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* blinking cursor line */}
+                <div className="flex items-center gap-2 font-[family-name:var(--font-ubuntu-mono)] text-xs">
+                  <span className="text-[#27C93F] font-bold">workora@platform</span>
+                  <span className="text-white/40">:</span>
+                  <span className="text-[#4D9FFF] font-bold">~</span>
+                  <span className="text-white/40">$</span>
+                  <span className="h-4 w-2 animate-pulse bg-[#27C93F]" />
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
