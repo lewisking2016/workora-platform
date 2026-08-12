@@ -818,33 +818,38 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
                     </div>
                     <Compass size={24} className="text-[#4F46E5]" />
                   </div>
-                  <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                    {[
-                      { title: 'Featured pros', subtitle: 'Top live profiles by trust score' },
-                      { title: 'Nearby professionals', subtitle: 'Filtered by your location' },
-                      { title: 'Trending professionals', subtitle: 'Recent and highly trusted' },
-                      { title: 'Recommended for you', subtitle: 'Matches from live search data' },
-                    ].map(card => (
-                      <div key={card.title} className="rounded-2xl bg-zinc-50 p-4 dark:bg-zinc-900">
-                        <p className="text-sm font-semibold text-zinc-950 dark:text-white">{card.title}</p>
-                        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{card.subtitle}</p>
-                      </div>
-                    ))}
+                  <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                    <Link href="/dashboard/explore/trending" className="group rounded-2xl bg-zinc-50 p-4 transition-colors hover:bg-[#EEF2FF] dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
+                      <p className="text-sm font-semibold text-zinc-950 group-hover:text-[#4F46E5] dark:text-white dark:group-hover:text-[#A5B4FC]">Trending professionals</p>
+                      <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Top live profiles by trust score</p>
+                    </Link>
+                    <Link href="/dashboard/explore/nearby" className="group rounded-2xl bg-zinc-50 p-4 transition-colors hover:bg-[#EEF2FF] dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
+                      <p className="text-sm font-semibold text-zinc-950 group-hover:text-[#4F46E5] dark:text-white dark:group-hover:text-[#A5B4FC]">Nearby professionals</p>
+                      <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Filtered by your location</p>
+                    </Link>
+                    <Link href="/dashboard/explore/businesses" className="group rounded-2xl bg-zinc-50 p-4 transition-colors hover:bg-[#EEF2FF] dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
+                      <p className="text-sm font-semibold text-zinc-950 group-hover:text-[#4F46E5] dark:text-white dark:group-hover:text-[#A5B4FC]">Featured businesses</p>
+                      <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Live business profiles</p>
+                    </Link>
+                    <Link href="/dashboard/explore/categories/all" className="group rounded-2xl bg-zinc-50 p-4 transition-colors hover:bg-[#EEF2FF] dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
+                      <p className="text-sm font-semibold text-zinc-950 group-hover:text-[#4F46E5] dark:text-white dark:group-hover:text-[#A5B4FC]">Browse by trade</p>
+                      <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Every category on the platform</p>
+                    </Link>
                   </div>
                 </div>
                 <div className="rounded-3xl bg-white p-6 shadow-sm shadow-black/5 dark:bg-zinc-950">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Collections</p>
                   <div className="mt-4 space-y-3">
-                    <Link href="/dashboard/saved" className="flex items-center justify-between rounded-2xl bg-zinc-50 px-4 py-3 text-sm font-medium dark:bg-zinc-900">
-                      <span>Saved collections</span>
+                    <Link href="/dashboard/explore/collections" className="flex items-center justify-between rounded-2xl bg-zinc-50 px-4 py-3 text-sm font-medium transition-colors hover:bg-[#EEF2FF] dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
+                      <span>Browse collections</span>
                       <ArrowRight size={16} />
                     </Link>
-                    <Link href="/dashboard/feed?scope=trending" className="flex items-center justify-between rounded-2xl bg-zinc-50 px-4 py-3 text-sm font-medium dark:bg-zinc-900">
-                      <span>Trending results</span>
+                    <Link href="/dashboard/explore/saved-searches" className="flex items-center justify-between rounded-2xl bg-zinc-50 px-4 py-3 text-sm font-medium transition-colors hover:bg-[#EEF2FF] dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
+                      <span>Saved searches</span>
                       <ArrowRight size={16} />
                     </Link>
-                    <Link href="/dashboard/feed?scope=nearby" className="flex items-center justify-between rounded-2xl bg-zinc-50 px-4 py-3 text-sm font-medium dark:bg-zinc-900">
-                      <span>Nearby results</span>
+                    <Link href="/dashboard/saved" className="flex items-center justify-between rounded-2xl bg-zinc-50 px-4 py-3 text-sm font-medium transition-colors hover:bg-[#EEF2FF] dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
+                      <span>Saved posts</span>
                       <ArrowRight size={16} />
                     </Link>
                   </div>

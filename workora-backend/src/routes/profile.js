@@ -475,7 +475,9 @@ async function profileRoutes(fastify) {
 
     if (category && category !== 'All' && category !== '') {
       params.push(category);
-      sql += ` AND trade = $${params.length}`;
+      // Case-insensitive so URL paths like /categories/electrician match
+      // the canonical 'Electrician' trade casing stored in the DB.
+      sql += ` AND LOWER(trade) = LOWER($${params.length})`;
     }
 
     if (location && location !== 'All' && location !== '') {
