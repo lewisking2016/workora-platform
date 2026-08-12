@@ -12,7 +12,7 @@ import {
   SpinnerGap,
   WarningCircle,
 } from '@phosphor-icons/react';
-import { fetchCurrentUser } from '@/lib/session';
+import { apiFetch, fetchCurrentUser } from '@/lib/session';
 
 type ProfileBundle = {
   user?: { id?: string; username?: string } | null;
@@ -78,7 +78,7 @@ export default function EditProfilePage() {
       }
 
       try {
-        const res = await fetch('/api/profile/me');
+        const res = await apiFetch('/api/profile/me');
         const data = await res.json();
         if (!res.ok) {
           if (res.status === 401) {

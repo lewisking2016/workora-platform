@@ -316,7 +316,7 @@ export default function DashboardFeedPage() {
     if (!requireUser()) return;
     setBusyId(postId);
     try {
-      const res = await fetch(`/api/gigs/${postId}/like`, { method: 'POST' });
+      const res = await apiFetch(`/api/gigs/${postId}/like`, { method: 'POST' });
       const data = await res.json();
       updatePost(postId, (post) => ({
         ...post,
@@ -334,7 +334,7 @@ export default function DashboardFeedPage() {
     if (!requireUser()) return;
     setBusyId(post.id);
     try {
-      const res = await fetch(`/api/gigs/${post.id}/save`, { method: 'POST' });
+      const res = await apiFetch(`/api/gigs/${post.id}/save`, { method: 'POST' });
       const data = await res.json();
       updatePost(post.id, item => ({ ...item, saved_by_me: data.saved }));
     } catch (error) {
@@ -349,7 +349,7 @@ export default function DashboardFeedPage() {
     setReplyTo(null);
     setCommentValue('');
     try {
-      const res = await fetch(`/api/gigs/${post.id}/comments`);
+      const res = await apiFetch(`/api/gigs/${post.id}/comments`);
       const data = await res.json();
       setComments(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -364,7 +364,7 @@ export default function DashboardFeedPage() {
 
     try {
       const payload = replyTo ? `@${replyTo.username} ${commentValue}` : commentValue;
-      const res = await fetch(`/api/gigs/${activeComments.id}/comment`, {
+      const res = await apiFetch(`/api/gigs/${activeComments.id}/comment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: payload }),
@@ -396,7 +396,7 @@ export default function DashboardFeedPage() {
     if (!requireUser()) return;
     setBusyId(post.id);
     try {
-      const res = await fetch(`/api/profile/follow/${post.creator_user_id || post.user_id}`, { method: 'POST' });
+      const res = await apiFetch(`/api/profile/follow/${post.creator_user_id || post.user_id}`, { method: 'POST' });
       const data = await res.json();
       updatePost(post.id, item => ({ ...item, following_by_me: data.following }));
     } catch (error) {
@@ -410,7 +410,7 @@ export default function DashboardFeedPage() {
     if (!requireUser()) return;
     setBusyId(post.id);
     try {
-      await fetch(`/api/profile/mute/${post.creator_user_id || post.user_id}`, { method: 'POST' });
+      await apiFetch(`/api/profile/mute/${post.creator_user_id || post.user_id}`, { method: 'POST' });
       setPosts(prev => prev.filter(item => item.id !== post.id));
       setMenuPost(null);
     } catch (error) {
@@ -424,7 +424,7 @@ export default function DashboardFeedPage() {
     if (!requireUser()) return;
     setBusyId(post.id);
     try {
-      await fetch(`/api/profile/block/${post.creator_user_id || post.user_id}`, { method: 'POST' });
+      await apiFetch(`/api/profile/block/${post.creator_user_id || post.user_id}`, { method: 'POST' });
       setPosts(prev => prev.filter(item => item.id !== post.id));
       setMenuPost(null);
     } catch (error) {
@@ -438,7 +438,7 @@ export default function DashboardFeedPage() {
     if (!requireUser()) return;
     setBusyId(post.id);
     try {
-      await fetch(`/api/gigs/${post.id}/hide`, {
+      await apiFetch(`/api/gigs/${post.id}/hide`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reason: 'not interested' }),
@@ -456,7 +456,7 @@ export default function DashboardFeedPage() {
     if (!reportPost || !requireUser()) return;
     setBusyId(reportPost.id);
     try {
-      await fetch(`/api/gigs/${reportPost.id}/report`, {
+      await apiFetch(`/api/gigs/${reportPost.id}/report`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reason: reportReason, details: reportDetails }),
@@ -499,7 +499,7 @@ export default function DashboardFeedPage() {
   const startConversation = async (otherUserId: string) => {
     if (!requireUser()) return;
     try {
-      await fetch('/api/messages/conversations', {
+      await apiFetch('/api/messages/conversations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: currentUser?.id, other_user_id: otherUserId }),

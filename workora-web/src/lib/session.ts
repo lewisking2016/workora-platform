@@ -54,7 +54,10 @@ export async function fetchCurrentUser(): Promise<CurrentUser | null> {
     });
 
     if (!res.ok) {
-      if (res.status === 401 || res.status === 403) {
+      // 401/403 = bad credentials, 404 = the account row was deleted/reseeded.
+      // Either way the stored token is useless — clear it so the user isn't
+      // stuck in a broken logged-in state where every action fails.
+      if (res.status === 401 || res.status === 403 || res.status === 404) {
         clearLegacySession();
         return null;
       }

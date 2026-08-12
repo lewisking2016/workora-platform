@@ -14,7 +14,7 @@ import {
   Sparkle,
   Check
 } from '@phosphor-icons/react';
-import { fetchCurrentUser } from '@/lib/session';
+import { fetchCurrentUser, apiFetch } from '@/lib/session';
 
 interface Filter {
   name: string;
@@ -98,7 +98,7 @@ export default function NewPostPage() {
     const user = await fetchCurrentUser();
     if (!user) throw new Error('Not logged in');
 
-    const profileRes = await fetch('/api/profile/me');
+    const profileRes = await apiFetch('/api/profile/me');
     const profileData = await profileRes.json().catch(() => ({}));
     const formData = new FormData();
     formData.append('file', mediaFile as File);
@@ -148,7 +148,7 @@ export default function NewPostPage() {
       });
       // Registered users always have a profile, but never block publishing when
       // one is missing — the post falls back to the user account.
-      const postRes = await fetch('/api/gigs', {
+      const postRes = await apiFetch('/api/gigs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -183,7 +183,7 @@ export default function NewPostPage() {
         setUploadProgress(progress);
         setUploadLabel(progress < 100 ? 'Uploading draft media...' : 'Saving draft...');
       });
-      const draftRes = await fetch('/api/profile/drafts', {
+      const draftRes = await apiFetch('/api/profile/drafts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

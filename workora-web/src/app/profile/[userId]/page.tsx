@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { ProfileTrustSurface } from '@/components/profile/ProfileTrustSurface';
 import { ProfileStateScreen } from '@/components/system/StatusScreens';
 import { BookmarkSimple } from '@phosphor-icons/react';
+import { apiFetch } from '@/lib/session';
 
 type ProfileState =
   | 'ready'
@@ -96,7 +97,7 @@ export default function PublicProfilePage() {
     if (!bundle.profile?.id) return;
     setSavingProfile(true);
     try {
-      await fetch('/api/profile/saved/profiles', {
+      await apiFetch('/api/profile/saved/profiles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile_id: bundle.profile.id }),

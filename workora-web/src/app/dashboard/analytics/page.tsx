@@ -21,7 +21,7 @@ import {
   Clock,
   CalendarBlank
 } from '@phosphor-icons/react';
-import { fetchCurrentUser } from '@/lib/session';
+import { fetchCurrentUser, apiFetch } from '@/lib/session';
 
 interface CurrentUser {
   id: string;
@@ -174,15 +174,15 @@ export default function AnalyticsPage() {
       }
 
       try {
-        const profileRes = await fetch('/api/profile/me');
+        const profileRes = await apiFetch('/api/profile/me');
         const profileData = await profileRes.json();
         setProfile(profileData.profile || null);
 
         const profileId = profileData.profile?.id || '';
         const [gigsRes, ratingsRes, savedRes] = await Promise.all([
-          profileId ? fetch(`/api/gigs/worker/${profileId}`) : Promise.resolve(null),
-          profileId ? fetch(`/api/profile/ratings/${profileId}`) : Promise.resolve(null),
-          fetch(`/api/gigs/saved/${user.id}`),
+          profileId ? apiFetch(`/api/gigs/worker/${profileId}`) : Promise.resolve(null),
+          profileId ? apiFetch(`/api/profile/ratings/${profileId}`) : Promise.resolve(null),
+          apiFetch(`/api/gigs/saved/${user.id}`),
         ]);
 
         const gigsJson = gigsRes ? await gigsRes.json() : [];

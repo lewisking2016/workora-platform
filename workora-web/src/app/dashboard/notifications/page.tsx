@@ -11,7 +11,7 @@ import {
   Bell,
   Gear
 } from '@phosphor-icons/react';
-import { fetchCurrentUser } from '@/lib/session';
+import { fetchCurrentUser, apiFetch } from '@/lib/session';
 import { useRouter } from 'next/navigation';
 
 interface Notification {
@@ -34,7 +34,7 @@ export default function NotificationsPage() {
 
   const fetchNotifications = async () => {
     try {
-      const res = await fetch('/api/notifications');
+      const res = await apiFetch('/api/notifications');
       const data = await res.json();
 
       if (Array.isArray(data)) {
@@ -48,7 +48,7 @@ export default function NotificationsPage() {
   };
 
   const openNotification = async (notif: Notification) => {
-    await fetch(`/api/notifications/${notif.id}/read`, { method: 'PATCH' });
+    await apiFetch(`/api/notifications/${notif.id}/read`, { method: 'PATCH' });
     router.push(`/dashboard/notifications/${notif.id}`);
   };
 
@@ -58,7 +58,7 @@ export default function NotificationsPage() {
     event.stopPropagation();
     if (followedBack.has(notif.id) || !notif.actor_id) return;
     try {
-      const res = await fetch(`/api/profile/follow/${notif.actor_id}`, { method: 'POST' });
+      const res = await apiFetch(`/api/profile/follow/${notif.actor_id}`, { method: 'POST' });
       const data = await res.json();
       if (data?.following) {
         setFollowedBack(prev => new Set(prev).add(notif.id));

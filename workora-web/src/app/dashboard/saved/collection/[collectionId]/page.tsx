@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, BookmarkSimple, FolderSimple, Play, UserCircle } from '@phosphor-icons/react';
-import { fetchCurrentUser } from '@/lib/session';
+import { fetchCurrentUser, apiFetch } from '@/lib/session';
 import { SafeMediaThumb } from '@/components/SafeMediaThumb';
 import { APP_CONFIG } from '@/lib/config';
 
@@ -54,7 +54,7 @@ export default function CollectionDetailPage() {
       }
 
       try {
-        const res = await fetch(`/api/profile/collections/${collectionId}`);
+        const res = await apiFetch(`/api/profile/collections/${collectionId}`);
         if (!res.ok) throw new Error('Collection not found');
         const data = await res.json();
         setCollection(data);
@@ -72,7 +72,7 @@ export default function CollectionDetailPage() {
     if (!collectionId) return;
     setSaving(true);
     try {
-      await fetch(`/api/profile/collections/${collectionId}/save`, { method: 'POST' });
+      await apiFetch(`/api/profile/collections/${collectionId}/save`, { method: 'POST' });
     } finally {
       setSaving(false);
     }

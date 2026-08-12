@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { SpinnerGap, WarningCircle } from '@phosphor-icons/react';
-import { fetchCurrentUser } from '@/lib/session';
+import { apiFetch, fetchCurrentUser } from '@/lib/session';
 import { ProfileTrustSurface } from '@/components/profile/ProfileTrustSurface';
 
 type ProfileBundle = React.ComponentProps<typeof ProfileTrustSurface>['bundle'];
@@ -29,7 +29,7 @@ export default function ProfilePage() {
       }
 
       try {
-        const res = await fetch('/api/profile/me');
+        const res = await apiFetch('/api/profile/me');
         const data = await res.json();
         if (!res.ok) {
           if (res.status === 401) {

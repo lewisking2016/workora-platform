@@ -77,7 +77,7 @@ export default function WorksPage() {
   const handleLike = async (work: Work) => {
     if (!currentUser) return;
     try {
-      const res = await fetch(`/api/gigs/${work.id}/like`, {
+      const res = await apiFetch(`/api/gigs/${work.id}/like`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: currentUser.id })
@@ -96,7 +96,7 @@ export default function WorksPage() {
   const handleSave = async (work: Work) => {
     if (!currentUser) return;
     try {
-      const res = await fetch(`/api/gigs/${work.id}/save`, {
+      const res = await apiFetch(`/api/gigs/${work.id}/save`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -113,7 +113,7 @@ export default function WorksPage() {
       return;
     }
     try {
-      const res = await fetch('/api/messages/conversations', {
+      const res = await apiFetch('/api/messages/conversations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: currentUser.id, other_user_id: otherUserId })

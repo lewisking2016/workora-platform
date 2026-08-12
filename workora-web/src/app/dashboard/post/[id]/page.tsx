@@ -14,7 +14,7 @@ import {
   WarningCircle
 } from '@phosphor-icons/react';
 import { VideoPlayer } from '@/components/VideoPlayer';
-import { fetchCurrentUser } from '@/lib/session';
+import { fetchCurrentUser, apiFetch } from '@/lib/session';
 import { APP_CONFIG } from '@/lib/config';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -71,7 +71,7 @@ export default function PostDetailPage() {
 
   const fetchPost = async (): Promise<'ready' | 'missing' | 'restricted' | 'error'> => {
     try {
-      const res = await fetch(`/api/gigs/${postId}`);
+      const res = await apiFetch(`/api/gigs/${postId}`);
       if (res.status === 404) {
         setLoadState('missing');
         setPost(null);
@@ -106,7 +106,7 @@ export default function PostDetailPage() {
 
   const fetchComments = async () => {
     try {
-      const res = await fetch(`/api/gigs/${postId}/comments`);
+      const res = await apiFetch(`/api/gigs/${postId}/comments`);
       const data = await res.json();
       if (Array.isArray(data)) {
         setComments(data);
@@ -143,7 +143,7 @@ export default function PostDetailPage() {
   const handleLike = async () => {
     if (!currentUser || !post) return;
     try {
-      const res = await fetch(`/api/gigs/${post.id}/like`, {
+      const res = await apiFetch(`/api/gigs/${post.id}/like`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: currentUser.id })
@@ -162,7 +162,7 @@ export default function PostDetailPage() {
   const handleSave = async () => {
     if (!currentUser || !post) return;
     try {
-      const res = await fetch(`/api/gigs/${post.id}/save`, {
+      const res = await apiFetch(`/api/gigs/${post.id}/save`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -178,7 +178,7 @@ export default function PostDetailPage() {
     
     setSubmitting(true);
     try {
-      const res = await fetch(`/api/gigs/${post.id}/comment`, {
+      const res = await apiFetch(`/api/gigs/${post.id}/comment`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: currentUser.id, text: newComment })

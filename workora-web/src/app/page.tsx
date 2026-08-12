@@ -131,7 +131,7 @@ const testimonials = [
 const feedItems = [
   { video: '/videos/electrical2.mp4', name: 'Brian O.', trade: 'Electrician · Nakuru', likes: 248, loc: 'Nakuru' },
   { video: '/videos/plumbing1.mp4', name: 'Grace W.', trade: 'Plumber · Nairobi', likes: 186, loc: 'Kilimani' },
-  { video: '/videos/construction3.mp4', name: 'Samuel T.', trade: 'Mason · Nairobi', likes: 312, loc: 'Westlands' },
+  { video: '/videos/construction%203.mp4', name: 'Samuel T.', trade: 'Mason · Nairobi', likes: 312, loc: 'Westlands' },
 ];
 
 /* ══════════════════════════════════════════════════════════

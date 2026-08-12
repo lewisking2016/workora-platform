@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { BookmarkSimple, ClockCounterClockwise, PencilSimple, Sparkle } from '@phosphor-icons/react';
-import { fetchCurrentUser } from '@/lib/session';
+import { fetchCurrentUser, apiFetch } from '@/lib/session';
 import { SafeMediaThumb } from '@/components/SafeMediaThumb';
 import { APP_CONFIG } from '@/lib/config';
 
@@ -37,7 +37,7 @@ export default function DraftsPage() {
       }
 
       try {
-        const res = await fetch('/api/profile/drafts');
+        const res = await apiFetch('/api/profile/drafts');
         const data = await res.json();
         setDrafts(Array.isArray(data) ? data : []);
       } catch (err) {

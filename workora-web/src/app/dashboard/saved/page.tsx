@@ -12,7 +12,7 @@ import {
   UserCircle,
   Layout,
 } from '@phosphor-icons/react';
-import { fetchCurrentUser } from '@/lib/session';
+import { fetchCurrentUser, apiFetch } from '@/lib/session';
 import { useRouter } from 'next/navigation';
 import { APP_CONFIG } from '@/lib/config';
 import { SafeMediaThumb } from '@/components/SafeMediaThumb';
@@ -91,10 +91,10 @@ export default function SavedPage() {
         }
 
         const [savedRes, collectionsRes, savedProfilesRes, savedSearchesRes] = await Promise.all([
-          fetch(`/api/gigs/saved/${user.id}`),
-          fetch('/api/profile/collections?kind=saved'),
-          fetch('/api/profile/saved/profiles'),
-          fetch('/api/profile/saved/searches'),
+          apiFetch(`/api/gigs/saved/${user.id}`),
+          apiFetch('/api/profile/collections?kind=saved'),
+          apiFetch('/api/profile/saved/profiles'),
+          apiFetch('/api/profile/saved/searches'),
         ]);
 
         const savedData = await savedRes.json();
@@ -129,7 +129,7 @@ export default function SavedPage() {
 
     setCollectionSaving(true);
     try {
-      const res = await fetch('/api/profile/collections', {
+      const res = await apiFetch('/api/profile/collections', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -147,7 +147,7 @@ export default function SavedPage() {
       setCollectionDescription('');
       setCollectionKind('custom');
       setCollectionPublic(false);
-      const next = await fetch('/api/profile/collections');
+      const next = await apiFetch('/api/profile/collections');
       const nextData = await next.json();
       setCollections(Array.isArray(nextData) ? nextData : []);
       setTab('collections');

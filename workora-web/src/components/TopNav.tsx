@@ -12,6 +12,23 @@ const NAV_LINKS = [
   { name: 'Platform', href: '/platform' },
 ];
 
+// Pages with a dark hero — the nav must render light text/logo over them.
+const DARK_HERO_ROUTES = new Set([
+  '/',
+  '/personal',
+  '/business',
+  '/platform',
+  '/blog',
+  '/trust',
+  '/safety',
+  '/about',
+  '/careers',
+  '/contact',
+  '/help',
+  '/terms',
+  '/privacy',
+]);
+
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 /* ── Wordmark: gradient mark + wordmark text, theme-aware ── */
@@ -36,8 +53,8 @@ export function TopNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  // Dark variant only over the dark hero homepage
-  const dark = pathname === '/';
+  // Dark variant over any page with a dark hero
+  const dark = DARK_HERO_ROUTES.has(pathname);
 
   // Scroll state
   useEffect(() => {

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { PaperPlaneTilt, MagnifyingGlass, Check, Checks, ArrowLeft, PushPin, CalendarBlank, BellSlash } from '@phosphor-icons/react';
 import { useSearchParams } from 'next/navigation';
-import { fetchCurrentUser } from '@/lib/session';
+import { fetchCurrentUser, apiFetch } from '@/lib/session';
 
 interface Conversation {
   id: string;
@@ -76,7 +76,7 @@ export default function MessagesPage() {
 
   const fetchConversations = async (uid: string) => {
     try {
-      const res = await fetch(`/api/messages/conversations/${uid}`);
+      const res = await apiFetch(`/api/messages/conversations/${uid}`);
       const data = await res.json();
       const nextConversations = Array.isArray(data) ? data : [];
       setConversations(nextConversations);
@@ -88,11 +88,11 @@ export default function MessagesPage() {
   const openConversation = async (conv: Conversation, uid = userId) => {
     setActiveConv(conv);
     try {
-      const res = await fetch(`/api/messages/${conv.id}`);
+      const res = await apiFetch(`/api/messages/${conv.id}`);
       const data = await res.json();
       setMessages(Array.isArray(data) ? data : []);
       // Mark as read
-      await fetch(`/api/messages/${conv.id}/read`, {
+      await apiFetch(`/api/messages/${conv.id}/read`, {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: uid }),
       });
@@ -104,7 +104,7 @@ export default function MessagesPage() {
   const sendMessage = async () => {
     if (!newMsg.trim() || !activeConv) return;
     try {
-      const res = await fetch(`/api/messages/${activeConv.id}/send`, {
+      const res = await apiFetch(`/api/messages/${activeConv.id}/send`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sender_id: userId, text: newMsg }),
       });
@@ -133,7 +133,7 @@ export default function MessagesPage() {
       // Skip work while the tab is hidden.
       if (document.hidden) return;
       try {
-        const res = await fetch(`/api/messages/${activeConv.id}`);
+        const res = await apiFetch(`/api/messages/${activeConv.id}`);
         const data = await res.json();
         if (cancelled || !Array.isArray(data)) return;
 
@@ -146,7 +146,7 @@ export default function MessagesPage() {
 
         // If a new incoming message arrived, mark it read and refresh the list.
         if (newIncoming) {
-          void fetch(`/api/messages/${activeConv.id}/read`, {
+          void apiFetch(`/api/messages/${activeConv.id}/read`, {
             method: 'PATCH', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_id: userId }),
           }).catch(() => undefined);
@@ -190,7 +190,7 @@ export default function MessagesPage() {
   const updateConversationState = async (patch: Record<string, boolean>) => {
     if (!activeConv) return;
     try {
-      const res = await fetch(`/api/messages/conversations/${activeConv.id}/state`, {
+      const res = await apiFetch(`/api/messages/conversations/${activeConv.id}/state`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(patch),

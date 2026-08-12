@@ -213,7 +213,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
       const data = await res.json();
       setProfessionals(Array.isArray(data) ? data : []);
       if (query.trim().length >= 3) {
-        void fetch('/api/profile/saved/searches', {
+        void apiFetch('/api/profile/saved/searches', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

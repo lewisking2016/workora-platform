@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, ClockCounterClockwise, Trash, PaperPlaneTilt } from '@phosphor-icons/react';
-import { fetchCurrentUser } from '@/lib/session';
+import { fetchCurrentUser, apiFetch } from '@/lib/session';
 import { SafeMediaThumb } from '@/components/SafeMediaThumb';
 
 interface Draft {
@@ -36,7 +36,7 @@ export default function DraftDetailPage() {
       }
 
       try {
-        const res = await fetch(`/api/profile/drafts/${draftId}`);
+        const res = await apiFetch(`/api/profile/drafts/${draftId}`);
         if (!res.ok) throw new Error('Draft not found');
         const data = await res.json();
         setDraft(data);
@@ -58,12 +58,12 @@ export default function DraftDetailPage() {
       return;
     }
 
-    const profileRes = await fetch('/api/profile/me');
+    const profileRes = await apiFetch('/api/profile/me');
     const profileData = await profileRes.json().catch(() => ({}));
     const profileId = profileData?.profile?.id;
     if (!profileId) return;
 
-    await fetch('/api/gigs', {
+    await apiFetch('/api/gigs', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -77,13 +77,13 @@ export default function DraftDetailPage() {
       }),
     });
 
-    await fetch(`/api/profile/drafts/${draft.id}`, { method: 'DELETE' });
+    await apiFetch(`/api/profile/drafts/${draft.id}`, { method: 'DELETE' });
     router.push('/dashboard/create/published-success');
   };
 
   const removeDraft = async () => {
     if (!draft) return;
-    await fetch(`/api/profile/drafts/${draft.id}`, { method: 'DELETE' });
+    await apiFetch(`/api/profile/drafts/${draft.id}`, { method: 'DELETE' });
     router.push('/dashboard/create/drafts');
   };
 
