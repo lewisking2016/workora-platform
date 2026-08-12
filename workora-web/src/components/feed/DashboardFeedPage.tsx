@@ -242,7 +242,7 @@ export default function DashboardFeedPage() {
 
   const fetchSuggested = async () => {
     try {
-      if (typeof window !== 'undefined' && !window.matchMedia('(min-width: 1280px)').matches) {
+      if (typeof window !== 'undefined' && !window.matchMedia('(min-width: 1024px)').matches) {
         return;
       }
 
@@ -515,10 +515,10 @@ export default function DashboardFeedPage() {
   return (
     <div className="min-h-full bg-[#f6f7fb] text-zinc-950 dark:bg-black dark:text-white">
       <div className="sticky top-0 z-40 border-b border-zinc-200/70 bg-white/95 backdrop-blur-xl dark:border-zinc-900 dark:bg-black/90">
-        <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 py-3 sm:px-6">
+        <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 pt-3 pb-2 sm:px-6">
           <div>
             <h1 className="text-[22px] font-black tracking-tight sm:text-2xl">Feed</h1>
-            <p className="text-[13px] text-zinc-500 dark:text-zinc-400">
+            <p className="hidden text-[13px] text-zinc-500 dark:text-zinc-400 sm:block">
               Live work from the people you follow and discover.
             </p>
           </div>
@@ -619,19 +619,20 @@ export default function DashboardFeedPage() {
                 <article key={post.id} className="overflow-hidden rounded-2xl bg-white shadow-sm shadow-black/5 dark:bg-zinc-950">
                   <div className="flex items-center justify-between px-4 py-4">
                     <div className="flex items-center gap-3 min-w-0">
-                      <button
-                        onClick={() => startConversation(post.creator_user_id || post.user_id)}
-                        className="h-11 w-11 shrink-0 rounded-full bg-gradient-to-tr from-[#0057FF] via-[#4F46E5] to-[#8B5CF6] p-[2px]"
+                      <Link
+                        href={`/profile/${post.creator_user_id || post.user_id}`}
+                        className="h-11 w-11 shrink-0 rounded-full bg-gradient-to-tr from-[#0057FF] via-[#4F46E5] to-[#8B5CF6] p-[2px] transition-transform hover:scale-105"
+                        aria-label={`View ${post.user_name}'s profile`}
                       >
                         <div className="flex h-full w-full items-center justify-center rounded-full bg-white text-sm font-black text-zinc-950 dark:bg-black dark:text-white">
                           {post.user_name.charAt(0)}
                         </div>
-                      </button>
+                      </Link>
                       <div className="min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <p className="truncate text-sm font-semibold">{post.user_name}</p>
+                        <Link href={`/profile/${post.creator_user_id || post.user_id}`} className="flex items-center gap-1.5">
+                          <p className="truncate text-sm font-semibold hover:text-[#0057FF] dark:hover:text-[#4D9FFF] transition-colors">{post.user_name}</p>
                           {post.verified && <SealCheck size={14} weight="fill" className="text-[#4F46E5]" />}
-                        </div>
+                        </Link>
                         <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">{post.trade}</p>
                       </div>
                     </div>
@@ -771,13 +772,13 @@ export default function DashboardFeedPage() {
                 Profile
               </Link>
             </div>
-            <div className="mt-4 flex items-center gap-3 rounded-xl bg-zinc-50 p-3 dark:bg-zinc-900/70">
+            <div className="mt-4 flex items-center gap-3 rounded-xl bg-gradient-to-br from-[#0057FF]/[0.08] to-[#8B5CF6]/[0.08] p-3 dark:from-[#0057FF]/[0.12] dark:to-[#8B5CF6]/[0.12]">
               <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-tr from-[#0057FF] via-[#4F46E5] to-[#8B5CF6] text-sm font-black text-white">
                 {currentUser?.username?.charAt(0) || 'U'}
               </div>
               <div>
-                <p className="text-sm font-semibold">Live feed connected</p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">All updates come from the backend.</p>
+                <p className="text-sm font-semibold">Welcome back 👋</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">Post your work, follow creators, and grow your reputation.</p>
               </div>
             </div>
           </div>
@@ -785,18 +786,20 @@ export default function DashboardFeedPage() {
           <div className="rounded-2xl bg-white p-4 shadow-sm shadow-black/5 dark:bg-zinc-950">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-sm font-black uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">Suggested creators</h3>
-              <button className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">See all</button>
+              <Link href="/dashboard/search" className="text-xs font-semibold text-[#0057FF] hover:underline dark:text-[#4D9FFF]">
+                See all
+              </Link>
             </div>
             <div className="space-y-4">
               {suggestedPros.length > 0 ? suggestedPros.map(pro => (
                 <div key={pro.id} className="flex items-center justify-between gap-3">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-sm font-black text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
+                  <Link href={`/profile/${pro.user_id}`} className="group flex min-w-0 items-center gap-3">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-sm font-black text-zinc-500 transition-transform group-hover:scale-105 dark:bg-zinc-900 dark:text-zinc-400">
                       {pro.name.charAt(0)}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <p className="truncate text-sm font-semibold">{pro.name}</p>
+                        <p className="truncate text-sm font-semibold group-hover:text-[#0057FF] dark:group-hover:text-[#4D9FFF] transition-colors">{pro.name}</p>
                         {pro.is_verified && <SealCheck size={14} weight="fill" className="text-[#4F46E5]" />}
                       </div>
                       <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
@@ -807,10 +810,10 @@ export default function DashboardFeedPage() {
                         <span>{pro.trade}</span>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                   <button
                     onClick={() => startConversation(pro.user_id)}
-                    className="rounded-xl bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
+                    className="rounded-xl bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-200 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
                   >
                     Connect
                   </button>
@@ -823,11 +826,17 @@ export default function DashboardFeedPage() {
 
           <div className="rounded-2xl bg-gradient-to-br from-[#0057FF] via-[#4F46E5] to-[#8B5CF6] p-[1px]">
             <div className="rounded-2xl bg-white p-4 dark:bg-zinc-950">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">Phase 6</p>
-              <h3 className="mt-1 text-lg font-black">Feed and content states</h3>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">Grow your reputation</p>
+              <h3 className="mt-1 text-lg font-black">Share proof of work</h3>
               <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-                Tabs, stories, comments, share, report, mute, block, hide, follow, and empty states are now wired to live backend calls.
+                Post photos or videos of a recent job. Every view, like, and comment builds your trust score.
               </p>
+              <button
+                onClick={() => router.push('/dashboard/create/new')}
+                className="mt-4 w-full rounded-xl bg-gradient-to-r from-[#0057FF] to-[#7000FF] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              >
+                Share your work
+              </button>
             </div>
           </div>
         </aside>
@@ -872,8 +881,7 @@ export default function DashboardFeedPage() {
                       </div>
                       <p className="mt-1 text-sm leading-6 text-zinc-700 dark:text-zinc-300">{comment.text}</p>
                       <div className="mt-2 flex items-center gap-3 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
-                        <button onClick={() => setReplyTo({ username: comment.username })}>Reply</button>
-                        <button>Like</button>
+                        <button onClick={() => setReplyTo({ username: comment.username })} className="hover:text-[#0057FF] dark:hover:text-[#4D9FFF] transition-colors">Reply</button>
                       </div>
                     </div>
                   </div>
