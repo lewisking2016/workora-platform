@@ -48,15 +48,17 @@ export function VideoPlayer({
   const attemptPlay = useCallback(() => {
     const v = videoRef.current;
     if (!v || !src) return;
-    // Browsers require muted for autoplay without a user gesture
-    v.muted = true;
+    // Respect the user's mute choice (defaults to muted so autoplay is
+    // allowed by the browser); once they unmute with a gesture, keep
+    // subsequent autoplays unmuted instead of forcing silence.
+    v.muted = isMuted;
     v.play()
       .then(() => setIsPlaying(true))
       .catch(() => {
         // Autoplay blocked — leave paused; user can tap to play
         setIsPlaying(false);
       });
-  }, [src]);
+  }, [src, isMuted]);
 
   const attemptPause = useCallback(() => {
     const v = videoRef.current;

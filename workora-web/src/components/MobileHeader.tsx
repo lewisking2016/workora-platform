@@ -33,7 +33,6 @@ export function MobileHeader() {
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const isImmersive = IMMERSIVE_PREFIXES.some((p) => pathname?.startsWith(p));
-  if (isImmersive) return null;
 
   const refreshUnread = useCallback(async () => {
     try {
@@ -53,6 +52,8 @@ export function MobileHeader() {
     const t = setInterval(refreshUnread, 45000);
     return () => clearInterval(t);
   }, [refreshUnread]);
+
+  if (isImmersive) return null;
 
   const signOut = () => {
     clearLegacySession();

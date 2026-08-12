@@ -13,7 +13,11 @@ async function profileRoutes(fastify) {
     const profileId = profile?.id || null;
     const accountStatus = String(profile?.account_status || 'active');
     const profileVisibility = String(profile?.profile_visibility || 'public');
-    const verificationStatus = String(profile?.verification_status || profile?.identity_status || 'pending');
+    const rawVerification = String(profile?.verification_status || profile?.identity_status || 'pending');
+    const verificationStatus =
+      profile?.is_verified || rawVerification === 'verified' || rawVerification === 'complete'
+        ? 'verified'
+        : rawVerification;
     const isEmptyProfile =
       profile &&
       !profile.bio &&
