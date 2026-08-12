@@ -211,7 +211,7 @@ function TradeBars({ items, accent }: { items: { trade: string; count: number }[
         <div key={item.trade} className="group">
           <div className="mb-1.5 flex items-center justify-between">
             <span className="text-sm font-bold text-zinc-800">{item.trade}</span>
-            <span className="text-xs font-black text-zinc-400">{item.count} <span className="font-semibold text-zinc-300">members</span></span>
+            <span className="text-xs font-black text-zinc-400">{item.count} <span className="font-semibold text-zinc-400 dark:text-zinc-500">members</span></span>
           </div>
           <div className="h-2.5 overflow-hidden rounded-full bg-zinc-100">
             <motion.div

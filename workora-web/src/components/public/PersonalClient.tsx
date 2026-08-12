@@ -164,7 +164,7 @@ export function PersonalClient({ data }: { data: PublicSurfaceData }) {
                 transition={{ delay: i * 0.1, duration: 0.55, ease: EASE }}
                 className="group relative rounded-3xl border border-zinc-100 bg-white p-7 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-emerald-500/[0.08]"
               >
-                <span className="absolute right-6 top-5 text-5xl font-black text-zinc-50 select-none leading-none transition-colors duration-300 group-hover:text-emerald-50">
+                <span className="absolute right-6 top-5 text-5xl font-black text-zinc-200 select-none leading-none transition-colors duration-300 group-hover:text-emerald-300">
                   {step.number}
                 </span>
                 <div className="relative">

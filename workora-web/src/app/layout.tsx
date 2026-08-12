@@ -69,7 +69,7 @@ export default function RootLayout({
           } catch (e) {}
         })();`}
       </Script>
-      <body className="min-h-screen bg-white text-foreground pb-20 lg:pb-0 font-sans" suppressHydrationWarning>
+      <body className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 pb-20 lg:pb-0 font-sans" suppressHydrationWarning>
         <div className="mesh-glow" />
         {/* Elegant Top Progress Bar */}
         <div className="fixed top-0 left-0 right-0 h-[2px] z-[9999] overflow-hidden">

@@ -53,7 +53,8 @@ export function TopNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  // Dark variant over any page with a dark hero
+  // Dark variant over any page with a dark hero (these heroes are always
+  // dark regardless of theme, so white nav text is correct in both modes)
   const dark = DARK_HERO_ROUTES.has(pathname);
 
   // Scroll state

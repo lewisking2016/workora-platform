@@ -14,6 +14,23 @@
   --text-primary: #0a0f1e;
   --text-muted:   #64748b;
   --radius:       16px;
+  --background:   #ffffff;
+  --foreground:   #18181b;
+}
+
+/* Dark theme tokens — flip with the .dark class so headings, muted text and
+   other var(--text-*) consumers stay readable in both modes. */
+.dark {
+  --text-primary: #f4f4f5;
+  --text-muted:   #a1a1aa;
+  --background:   #09090b;
+  --foreground:   #f4f4f5;
+}
+
+/* Flip inherited body text on dark surfaces too. */
+.dark body {
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 /* ─────────────────────────────────────────────
@@ -53,6 +70,9 @@
   h4 { font-size: clamp(1.1rem, 2vw,   1.25rem); }
 
   p  { @apply text-zinc-500 leading-relaxed; }
+
+  /* Bare paragraphs stay readable on dark surfaces (utilities still win). */
+  .dark p { color: #a1a1aa; }
 
   a  { color: inherit; text-decoration: none; }
 }

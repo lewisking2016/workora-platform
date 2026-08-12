@@ -281,7 +281,7 @@ export default function LoginPage() {
              <Link href="/join" className="h-12 w-full border border-zinc-200 dark:border-zinc-700 rounded-full flex items-center justify-center text-xs font-black text-zinc-950 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors shadow-sm">
                Create new account
              </Link>
-             <div className="flex items-center justify-center gap-2 text-zinc-300 font-black text-[10px] uppercase tracking-[0.2em]">
+             <div className="flex items-center justify-center gap-2 text-zinc-500 dark:text-zinc-400 font-black text-[10px] uppercase tracking-[0.2em]">
                <ShieldCheck size={16} weight="fill" /> Secured by ImeanTech Trust
              </div>
           </div>
