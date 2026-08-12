@@ -53,6 +53,8 @@ async function profileRoutes(fastify) {
         user: userRes.rows[0] || null,
         profile: null,
         profile_state: 'not_found',
+        social: { followers: 0, following: 0 },
+        reliability: { score: 0, ratingAverage: 0, worksCount: 0, engagement: 0 },
         ...emptyLists,
       };
     }
@@ -116,7 +118,29 @@ async function profileRoutes(fastify) {
         // Older DBs may not have gigs.price yet
         rows: [{ total_earnings: 0 }],
       })),
+      pool.query('SELECT COUNT(*)::int AS count FROM user_follows WHERE following_user_id = $1', [userId]),
+      pool.query('SELECT COUNT(*)::int AS count FROM user_follows WHERE follower_id = $1', [userId]),
     ]);
+
+    // ── Reliability: honest score from real signals, never fabricated ──
+    const ratingAvg = Number(avgRes.rows[0]?.average || 0);
+    const worksCount = portfolioRes.rows.length;
+    const completeness =
+      [profile.bio, profile.avatar_url, profile.cover_url, profile.service_areas, profile.pricing_from]
+        .filter(Boolean).length / 5;
+    const engagement = portfolioRes.rows.reduce(
+      (sum, g) => sum + Number(g.view_count || 0) + Number(g.likes_count || 0) + Number(g.comments_count || 0),
+      0
+    );
+    const reliabilityScore = Math.min(
+      100,
+      Math.round(
+        ratingAvg * 14 +                        // ratings quality → up to 70
+        completeness * 15 +                     // profile completeness → up to 15
+        Math.min(1, worksCount / 6) * 10 +      // proof-of-work volume → up to 10
+        Math.min(1, engagement / 300) * 5       // audience trust → up to 5
+      )
+    );
 
     return {
       user: userRes.rows[0] || null,
@@ -127,6 +151,16 @@ async function profileRoutes(fastify) {
           }
         : null,
       profile_state: profileState,
+      social: {
+        followers: Number(followersRes.rows[0]?.count || 0),
+        following: Number(followingRes.rows[0]?.count || 0),
+      },
+      reliability: {
+        score: reliabilityScore,
+        ratingAverage: Number(ratingAvg.toFixed(1)),
+        worksCount,
+        engagement,
+      },
       skills: skillsRes.rows,
       languages: langsRes.rows,
       experience: expRes.rows,

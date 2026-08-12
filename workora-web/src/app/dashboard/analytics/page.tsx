@@ -160,7 +160,7 @@ export default function AnalyticsPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [gigs, setGigs] = useState<GigSummary[]>([]);
-  const [profile, setProfile] = useState<{ id: string; location?: string; created_at?: string } | null>(null);
+  const [profile, setProfile] = useState<{ id: string; location?: string; created_at?: string; full_name?: string; title?: string; trade?: string; avatar_url?: string } | null>(null);
   const [ratingAverage, setRatingAverage] = useState('0.0');
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
@@ -301,14 +301,28 @@ export default function AnalyticsPage() {
     <div className="h-full overflow-y-auto bg-zinc-50 dark:bg-[#0A0E17]">
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-[5%] py-8 pb-32 lg:px-8">
         <div className="flex flex-col gap-6 rounded-[16px] border border-zinc-100 bg-white p-6 lg:flex-row lg:items-end lg:justify-between lg:p-8 dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="flex max-w-2xl flex-col gap-3">
-            <div className="inline-flex w-fit items-center gap-2 rounded-full bg-zinc-100 px-3 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-              Performance Dashboard
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[#4D9FFF] to-[#7000FF] text-lg font-black text-white shadow-lg">
+              {profile?.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
+              ) : (
+                String(profile?.full_name || 'Y').charAt(0).toUpperCase()
+              )}
             </div>
-            <h1 className="text-3xl font-black tracking-tighter text-zinc-950 lg:text-4xl dark:text-white">Business Analytics</h1>
-            <p className="max-w-xl text-sm font-medium leading-6 text-zinc-500 dark:text-zinc-400">
-              A cleaner view of your reach, engagement, job flow, and earnings across the last 30 days.
-            </p>
+            <div className="flex max-w-md flex-col gap-1.5">
+              <div className="inline-flex w-fit items-center gap-2 rounded-full bg-zinc-100 px-3 py-1 text-[10px] font-black uppercase tracking-[0.28em] text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                Creator analytics
+              </div>
+              <h1 className="text-2xl font-black tracking-tighter text-zinc-950 lg:text-3xl dark:text-white">
+                {profile?.full_name || 'Your'} performance
+              </h1>
+              <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                {profile?.title || profile?.trade || 'Workora professional'}
+                {profile?.location ? <span className="mx-1.5 text-zinc-300 dark:text-zinc-600">·</span> : null}
+                {profile?.location}
+              </p>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-100 p-1.5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
