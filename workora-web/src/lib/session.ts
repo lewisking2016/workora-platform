@@ -120,3 +120,47 @@ export async function apiFetch(input: string, init: RequestInit = {}) {
     cache: init.cache || 'no-store',
   });
 }
+
+/**
+ * Authenticated multipart upload with progress support. Uses XHR so callers
+ * get upload progress (plain fetch can't report it); the Bearer token is
+ * attached the same way apiFetch does it, which plain XHR/fetch uploads were
+ * missing (401 on every upload on the live site).
+ */
+export function authedUpload(
+  url: string,
+  formData: FormData,
+  onProgress?: (progress: number) => void,
+  abortRef?: { current: XMLHttpRequest | null },
+): Promise<{ ok: boolean; status: number; data: unknown }> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    if (abortRef) abortRef.current = xhr;
+    const token = getStoredToken();
+    xhr.open('POST', url);
+    if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+    xhr.responseType = 'json';
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable && onProgress) {
+        onProgress(Math.round((event.loaded / event.total) * 100));
+      }
+    };
+
+    xhr.onload = () => {
+      if (abortRef) abortRef.current = null;
+      const payload = xhr.response || {};
+      resolve({ ok: xhr.status >= 200 && xhr.status < 300, status: xhr.status, data: payload });
+    };
+    xhr.onerror = () => {
+      if (abortRef) abortRef.current = null;
+      reject(new Error('Upload failed'));
+    };
+    xhr.onabort = () => {
+      if (abortRef) abortRef.current = null;
+      reject(new Error('Upload cancelled'));
+    };
+
+    xhr.send(formData);
+  });
+}

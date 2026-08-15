@@ -18,7 +18,7 @@ export function ProfileHero({
   trade,
   location,
   imageUrl,
-  isVerified = true,
+  isVerified = false,
   rating = "0.0",
 }: ProfileHeroProps) {
   const showImage = isValidAvatarUrl(imageUrl);

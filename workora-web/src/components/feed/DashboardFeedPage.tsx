@@ -499,15 +499,20 @@ export default function DashboardFeedPage() {
   const startConversation = async (otherUserId: string) => {
     if (!requireUser()) return;
     try {
-      await apiFetch('/api/messages/conversations', {
+      const res = await apiFetch('/api/messages/conversations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: currentUser?.id, other_user_id: otherUserId }),
       });
-      router.push('/dashboard/messages');
+      if (res.ok) {
+        const conv = await res.json();
+        router.push(`/dashboard/messages?conversation=${conv.id}`);
+        return;
+      }
     } catch (error) {
       console.error(error);
     }
+    router.push('/dashboard/messages');
   };
 
   const currentScopeCopy = scopeCopy[scope];

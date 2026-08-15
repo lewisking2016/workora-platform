@@ -136,7 +136,9 @@ export default function JoinPage() {
         data.token ? String(data.token) : undefined
       );
 
-      setStep(3); 
+      // Professionals pick a team setup next; clients (hirers) skip straight
+      // to the welcome screen — the team question is about how pros work.
+      setStep(formData.role === 'pro' ? 3 : 4);
     } catch (err: unknown) {
       router.push('/auth/error/network_error');
     } finally {
@@ -324,8 +326,21 @@ export default function JoinPage() {
             </motion.div>
           )}
 
-          {/* Step 4: Kickstart Modal */}
-          {step === 4 && (
+          {/* Step 4: Welcome / Kickstart Modal */}
+          {step === 4 && formData.role === 'client' && (
+            <motion.div key="step4-client" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-zinc-950/20 backdrop-blur-sm text-center">
+               <div className="bg-white dark:bg-zinc-900 rounded-[40px] w-full max-w-[520px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] p-6 md:p-12 overflow-hidden relative">
+                  <div className="text-center mb-10">
+                     <h2 className="text-3xl font-black tracking-tighter text-zinc-950 dark:text-white">You&apos;re in, {formData.username || 'friend'}!</h2>
+                     <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm mt-3 max-w-md mx-auto leading-relaxed">Welcome to Workora. Search trusted professionals, review their proof of work, and hire with confidence.</p>
+                  </div>
+                  <button onClick={() => setStep(5)} className="h-14 w-full px-10 bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-full font-black text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-xl shadow-blue-500/20">Explore the network</button>
+               </div>
+            </motion.div>
+          )}
+
+          {/* Step 4b: Pro Kickstart Modal (pros only) */}
+          {step === 4 && formData.role !== 'client' && (
             <motion.div key="step4" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-zinc-950/20 backdrop-blur-sm text-center">
                <div className="bg-white dark:bg-zinc-900 rounded-[40px] w-full max-w-[700px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] p-6 md:p-12 overflow-hidden relative">
                   <div className="text-center mb-10">
@@ -370,7 +385,11 @@ export default function JoinPage() {
               </div>
               <div className="flex flex-col gap-3">
                 <h1 className="text-2xl font-black tracking-tighter text-zinc-950 dark:text-white">You&apos;re in the Network!</h1>
-                <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm">Your {teamType === 'team' ? 'team' : 'pro'} passport is ready, @{formData.username}.</p>
+                <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm">
+                  {formData.role === 'client'
+                    ? `Your account is ready, @${formData.username}. Start browsing trusted professionals.`
+                    : `Your ${teamType === 'team' ? 'team' : 'pro'} passport is ready, @${formData.username}.`}
+                </p>
               </div>
               <Link href="/dashboard" className="h-14 w-full bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-full font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-500/20 flex items-center justify-center">Go to my Dashboard</Link>
             </motion.div>

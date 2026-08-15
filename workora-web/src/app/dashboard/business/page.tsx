@@ -21,6 +21,7 @@ import {
   ArrowRight
 } from '@phosphor-icons/react';
 import { apiFetch, fetchCurrentUser } from '@/lib/session';
+import { openConversationWith } from '@/lib/conversations';
 
 interface Job {
   id: string;
@@ -73,6 +74,7 @@ export default function BusinessHubPage() {
   const [loading, setLoading] = useState(true);
   const [posting, setPosting] = useState(false);
   const [posted, setPosted] = useState(false);
+  const [postError, setPostError] = useState('');
   const [form, setForm] = useState({
     title: '',
     category: '',
@@ -117,6 +119,7 @@ export default function BusinessHubPage() {
   const postJob = async () => {
     if (!form.title.trim() || posting) return;
     setPosting(true);
+    setPostError('');
     try {
       const res = await apiFetch('/api/jobs', {
         method: 'POST',
@@ -131,8 +134,8 @@ export default function BusinessHubPage() {
         }),
       });
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        console.error('Post job failed', data);
+        const data = await res.json().catch(() => ({})) as { error?: string; message?: string };
+        setPostError(data?.error || data?.message || 'Could not post the job. Please try again.');
         return;
       }
       setForm({ title: '', category: '', budget_min: '', budget_max: '', location: '', description: '' });
@@ -142,6 +145,7 @@ export default function BusinessHubPage() {
       setTab('jobs');
     } catch (e) {
       console.error(e);
+      setPostError('Network error — could not post the job. Check your connection and try again.');
     } finally {
       setPosting(false);
     }
@@ -440,6 +444,12 @@ export default function BusinessHubPage() {
                 {posting ? 'Posting…' : 'Post job'}
               </button>
 
+              {postError ? (
+                <div className="flex items-center gap-2 rounded-xl bg-red-500/10 px-4 py-3 text-sm font-bold text-red-400">
+                  <X size={16} weight="bold" /> {postError}
+                </div>
+              ) : null}
+
               <AnimatePresence>
                 {posted && (
                   <motion.div
@@ -596,7 +606,7 @@ export default function BusinessHubPage() {
                     <div className="mt-3 flex items-center gap-2 border-t border-white/[0.06] pt-3 text-xs font-black">
                       <PaperPlaneTilt size={14} className="text-[#4D9FFF]" />
                       <button
-                        onClick={() => router.push('/dashboard/messages')}
+                        onClick={() => void openConversationWith(app.worker_id, router)}
                         className="text-[#4D9FFF] hover:text-white transition-colors"
                       >
                         Start a conversation

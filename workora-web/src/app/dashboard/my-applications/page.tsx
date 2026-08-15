@@ -16,6 +16,7 @@ import {
   Suitcase
 } from '@phosphor-icons/react';
 import { apiFetch, fetchCurrentUser } from '@/lib/session';
+import { openConversationWith } from '@/lib/conversations';
 
 interface Application {
   application_id: string;
@@ -177,7 +178,7 @@ export default function MyApplicationsPage() {
                     </button>
                     {app.application_status === 'accepted' && (
                       <button
-                        onClick={() => router.push('/dashboard/messages')}
+                        onClick={() => void openConversationWith(app.hirer_id, router)}
                         className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#0066FF] to-[#7000FF] py-3 text-xs font-black text-white hover:brightness-110 transition-all"
                       >
                         <PaperPlaneTilt size={14} weight="bold" /> Message hirer

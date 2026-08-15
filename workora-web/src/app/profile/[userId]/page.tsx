@@ -86,8 +86,14 @@ export default function PublicProfilePage() {
   if (effectiveState === 'private') return <ProfileStateScreen state="private" />;
   if (effectiveState === 'restricted') return <ProfileStateScreen state="restricted" />;
   if (effectiveState === 'suspended') return <ProfileStateScreen state="suspended" />;
-  if (effectiveState === 'verification_pending') return <ProfileStateScreen state="verification_pending" />;
-  if (effectiveState === 'empty') return <ProfileStateScreen state="empty" />;
+  // Verification-pending and empty profiles are still visible: hirers can
+  // browse the work and message the pro, with a notice instead of a wall.
+  if (effectiveState === 'verification_pending' && !bundle?.profile) {
+    return <ProfileStateScreen state="verification_pending" />;
+  }
+  if (effectiveState === 'empty' && !bundle?.profile) {
+    return <ProfileStateScreen state="empty" />;
+  }
 
   if (!bundle) {
     return <ProfileStateScreen state="not_found" />;
@@ -129,6 +135,17 @@ export default function PublicProfilePage() {
             </button>
           </div>
         </div>
+
+        {effectiveState === 'verification_pending' ? (
+          <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-200">
+            This pro is verifying their identity — their profile is live, and trust details may fill in as more proof is added.
+          </div>
+        ) : null}
+        {effectiveState === 'empty' ? (
+          <div className="mb-5 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
+            This pro hasn&apos;t added profile details yet — reach out directly to learn more.
+          </div>
+        ) : null}
 
         <ProfileTrustSurface mode="public" bundle={bundle} />
       </div>

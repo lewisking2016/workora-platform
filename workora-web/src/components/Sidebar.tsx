@@ -30,15 +30,24 @@ export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [username, setUsername] = useState('');
+  const [role, setRole] = useState('');
   const [moreOpen, setMoreOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
     fetchCurrentUser().then((user) => {
-      if (mounted && user) setUsername(user.username || '');
+      if (mounted && user) {
+        setUsername(user.username || '');
+        setRole(user.role || '');
+      }
     });
     return () => { mounted = false; };
   }, []);
+
+  // Only professionals get the "Pro" label; verification is never claimed
+  // here because this surface doesn't carry the verified state.
+  const isPro = ['worker', 'pro'].includes(role.toLowerCase());
+  const badgeLabel = isPro ? 'Pro' : 'Member';
 
   const menuItems = [
     { icon: House, label: 'Home', href: '/dashboard/feed' },
@@ -179,7 +188,7 @@ export function Sidebar() {
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-[13px] font-black truncate">{username || 'Member'}</p>
-              <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider">Pro · Verified</p>
+              <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider">{badgeLabel}</p>
             </div>
             <SignOut size={16} className="text-white/30 group-hover:text-white/70 transition-colors" />
           </Link>

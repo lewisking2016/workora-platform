@@ -227,6 +227,11 @@ async function gigRoutes(fastify) {
     const user_id = resolveActorId(request);
 
     try {
+      const gig = await pool.query('SELECT id FROM gigs WHERE id = $1', [id]);
+      if (gig.rows.length === 0) {
+        return reply.status(404).send({ message: 'Gig not found' });
+      }
+
       const existing = await pool.query('SELECT * FROM gig_likes WHERE gig_id = $1 AND user_id = $2', [id, user_id]);
       if (existing.rows.length > 0) {
         await pool.query('DELETE FROM gig_likes WHERE gig_id = $1 AND user_id = $2', [id, user_id]);
@@ -311,6 +316,12 @@ async function gigRoutes(fastify) {
     const { id } = request.params;
     const { text } = request.body;
     const user_id = resolveActorId(request);
+
+    const gig = await pool.query('SELECT id FROM gigs WHERE id = $1', [id]);
+    if (gig.rows.length === 0) {
+      return reply.status(404).send({ message: 'Gig not found' });
+    }
+
     const res = await pool.query(
       'INSERT INTO gig_comments (gig_id, user_id, text) VALUES ($1, $2, $3) RETURNING *',
       [id, user_id, text]
@@ -386,6 +397,11 @@ async function gigRoutes(fastify) {
   fastify.post('/:id/save', { preHandler: fastify.authenticate }, async (request, reply) => {
     const { id } = request.params;
     const userId = resolveActorId(request);
+
+    const gig = await pool.query('SELECT id FROM gigs WHERE id = $1', [id]);
+    if (gig.rows.length === 0) {
+      return reply.status(404).send({ message: 'Gig not found' });
+    }
 
     const existing = await pool.query(
       'SELECT id FROM saved_gigs WHERE gig_id = $1 AND user_id = $2',

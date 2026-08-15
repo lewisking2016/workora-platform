@@ -14,7 +14,7 @@ import {
   Sparkle,
   Check
 } from '@phosphor-icons/react';
-import { fetchCurrentUser, apiFetch } from '@/lib/session';
+import { fetchCurrentUser, apiFetch, authedUpload } from '@/lib/session';
 
 interface Filter {
   name: string;
@@ -105,34 +105,14 @@ export default function NewPostPage() {
     formData.append('user_id', user.id);
     formData.append('media_type', mediaType);
 
-    const response = await new Promise<{ url: string }>((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      uploadRef.current = xhr;
+    const result = await authedUpload('/api/upload/gig', formData, onProgress, uploadRef);
+    if (!result.ok) {
+      const payload = (result.data || {}) as { error?: string };
+      throw new Error(payload?.error || 'Upload failed');
+    }
 
-      xhr.open('POST', '/api/upload/gig');
-      xhr.responseType = 'json';
-
-      xhr.upload.onprogress = (event) => {
-        if (!event.lengthComputable) return;
-        const progress = Math.round((event.loaded / event.total) * 100);
-        onProgress?.(progress);
-      };
-
-      xhr.onload = () => {
-        const payload = xhr.response || {};
-        if (xhr.status < 200 || xhr.status >= 300) {
-          reject(new Error(payload?.error || 'Upload failed'));
-          return;
-        }
-        resolve({ url: payload.url });
-      };
-
-      xhr.onerror = () => reject(new Error('Upload failed'));
-      xhr.onabort = () => reject(new Error('Upload cancelled'));
-      xhr.send(formData);
-    });
-
-    return { ...response, user, profile: profileData?.profile || null };
+    const payload = result.data as { url?: string };
+    return { ...payload, user, profile: profileData?.profile || null };
   };
 
   const handlePost = async () => {

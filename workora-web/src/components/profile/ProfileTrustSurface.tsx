@@ -3,6 +3,7 @@
 import React, { useState, useTransition } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import {
   ArrowRight,
   Briefcase,
@@ -27,6 +28,8 @@ import {
   WarningCircle,
 } from '@phosphor-icons/react';
 import { APP_CONFIG } from '@/lib/config';
+import { apiFetch } from '@/lib/session';
+import { openConversationWith } from '@/lib/conversations';
 
 type ProfileBundle = {
   user?: { id?: string | null; username?: string | null; role?: string | null } | null;
@@ -124,6 +127,7 @@ const formatDate = (value?: string | null) => {
 const safeList = <T,>(value?: T[] | null) => (Array.isArray(value) ? value : []);
 
 export function ProfileTrustSurface({ mode, bundle }: ProfileTrustSurfaceProps) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [followState, setFollowState] = useState<'idle' | 'following'>('idle');
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -168,7 +172,7 @@ export function ProfileTrustSurface({ mode, bundle }: ProfileTrustSurfaceProps) 
   const toggleFollow = async () => {
     if (!user.id) return;
     startTransition(async () => {
-      const res = await fetch(`/api/profile/follow/${user.id}`, { method: 'POST' });
+      const res = await apiFetch(`/api/profile/follow/${user.id}`, { method: 'POST' });
       if (!res.ok) {
         setStatusMessage('Could not update follow state');
         return;
@@ -184,7 +188,7 @@ export function ProfileTrustSurface({ mode, bundle }: ProfileTrustSurfaceProps) 
     const reason = window.prompt(`Why are you ${kind}ing this profile?`, 'other');
     if (!reason) return;
     const details = window.prompt('Add a little more detail', '') || '';
-    const res = await fetch(`/api/profile/${kind}/${user.id}`, {
+    const res = await apiFetch(`/api/profile/${kind}/${user.id}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ reason, details }),
@@ -280,10 +284,13 @@ export function ProfileTrustSurface({ mode, bundle }: ProfileTrustSurfaceProps) 
                     <Heart size={16} weight={followState === 'following' ? 'fill' : 'regular'} />
                     {followState === 'following' ? 'Following' : 'Follow'}
                   </button>
-                  <Link href="/dashboard/messages" className="inline-flex h-11 items-center gap-2 rounded-xl bg-zinc-100 px-4 text-sm font-semibold text-zinc-950 dark:bg-zinc-900 dark:text-white">
+                  <button
+                    onClick={() => void openConversationWith(user.id, router)}
+                    className="inline-flex h-11 items-center gap-2 rounded-xl bg-zinc-100 px-4 text-sm font-semibold text-zinc-950 dark:bg-zinc-900 dark:text-white"
+                  >
                     <ChatCircleText size={16} />
                     Message
-                  </Link>
+                  </button>
                 </>
               )}
               <button onClick={shareProfile} className="inline-flex h-11 items-center gap-2 rounded-xl bg-zinc-100 px-4 text-sm font-semibold text-zinc-950 dark:bg-zinc-900 dark:text-white">
@@ -507,10 +514,13 @@ export function ProfileTrustSurface({ mode, bundle }: ProfileTrustSurfaceProps) 
               <ChatCircleText size={18} className="text-[#4F46E5]" />
             </div>
             <div className="mt-4 space-y-2">
-              <Link href="/dashboard/messages" className="flex items-center justify-between rounded-xl bg-zinc-50 px-4 py-3 text-sm font-semibold text-zinc-950 dark:bg-zinc-900 dark:text-white">
+              <button
+                onClick={() => void openConversationWith(user.id, router)}
+                className="flex items-center justify-between rounded-xl bg-zinc-50 px-4 py-3 text-sm font-semibold text-zinc-950 dark:bg-zinc-900 dark:text-white"
+              >
                 Send message
                 <ArrowRight size={16} />
-              </Link>
+              </button>
               <button onClick={shareProfile} className="flex w-full items-center justify-between rounded-xl bg-zinc-50 px-4 py-3 text-sm font-semibold text-zinc-950 dark:bg-zinc-900 dark:text-white">
                 Share profile
                 <Share size={16} />

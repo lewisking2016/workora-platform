@@ -12,7 +12,7 @@ import {
   SpinnerGap,
   WarningCircle,
 } from '@phosphor-icons/react';
-import { apiFetch, fetchCurrentUser } from '@/lib/session';
+import { apiFetch, fetchCurrentUser, authedUpload } from '@/lib/session';
 
 type ProfileBundle = {
   user?: { id?: string; username?: string } | null;
@@ -134,15 +134,13 @@ export default function EditProfilePage() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const res = await fetch(`/api/upload/${kind}`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json().catch(() => ({}));
+      const res = await authedUpload(`/api/upload/${kind}`, formData);
       if (!res.ok) {
+        const data = (res.data || {}) as { error?: string; message?: string };
         throw new Error(data?.error || data?.message || 'Upload failed');
       }
+      const data = (res.data as { url?: string }) || {};
+      const uploadedUrl = data.url || '';
 
       setBundle(prev => {
         if (!prev) return prev;
@@ -158,8 +156,8 @@ export default function EditProfilePage() {
 
       setForm(prev => ({
         ...prev,
-        cover_url: kind === 'cover' ? data.url : prev.cover_url,
-        identity_document_url: kind === 'identity' ? data.url : prev.identity_document_url,
+        cover_url: kind === 'cover' ? uploadedUrl : prev.cover_url,
+        identity_document_url: kind === 'identity' ? uploadedUrl : prev.identity_document_url,
         identity_status: kind === 'identity' ? 'pending' : prev.identity_status,
       }));
 
@@ -178,9 +176,9 @@ export default function EditProfilePage() {
     setError('');
 
     try {
-      const res = await fetch(`/api/profile/update/${bundle.user.id}`, {
+      const res = await apiFetch(`/api/profile/update/${bundle.user.id}`, {
         method: 'PATCH',
-        headers: { 'content-type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           display_name: form.display_name || null,
           title: form.title || null,
@@ -475,7 +473,7 @@ export default function EditProfilePage() {
               <div className="flex items-start gap-3">
                 <Calendar size={18} className="mt-0.5 text-[#4F46E5]" />
                 <p>
-                  Upload endpoints are live on the backend. Once the file picker is wired in, avatar, cover, and identity documents can be pushed directly into the profile record.
+                  Uploads go straight to your profile record — pick a file and it uploads immediately, then press Save changes to publish.
                 </p>
               </div>
             </div>

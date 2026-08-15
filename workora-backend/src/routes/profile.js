@@ -473,8 +473,23 @@ async function profileRoutes(fastify) {
     const params = [];
 
     if (q) {
-      params.push(`%${q}%`);
-      sql += ` AND (full_name ILIKE $${params.length} OR bio ILIKE $${params.length} OR trade ILIKE $${params.length})`;
+      // Multi-keyword: every token must match somewhere (name, username, bio,
+      // trade, or location), so "plumber nairobi" finds plumbers in Nairobi
+      // instead of returning zero results.
+      const tokens = String(q).split(/[\s,]+/).map(t => t.trim()).filter(Boolean);
+      const tokenClauses = tokens.map(token => {
+        params.push(`%${token}%`);
+        return `(
+          full_name ILIKE $${params.length}
+          OR u.username ILIKE $${params.length}
+          OR COALESCE(bio, '') ILIKE $${params.length}
+          OR trade ILIKE $${params.length}
+          OR COALESCE(p.location, 'Kenya') ILIKE $${params.length}
+        )`;
+      });
+      if (tokenClauses.length > 0) {
+        sql += ` AND ${tokenClauses.join(' AND ')}`;
+      }
     }
 
     if (category && category !== 'All' && category !== '') {
