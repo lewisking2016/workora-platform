@@ -1,3 +1,16 @@
+// In-memory pub/sub for SSE message broadcasting
+// Maps userId -> Set of response objects
+const sseClients = new Map();
+
+function broadcastToUser(userId, event, data) {
+  const clients = sseClients.get(userId);
+  if (!clients) return;
+  const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+  for (const res of clients) {
+    try { res.raw.write(payload); } catch { clients.delete(res); }
+  }
+}
+
 async function messageRoutes(fastify) {
   const { pool } = fastify;
   const resolveActorId = (request) => request.user?.id;
@@ -218,6 +231,15 @@ async function messageRoutes(fastify) {
       [messageText || '[media message]', conversation.id]
     );
 
+    // Broadcast new message to recipient via SSE (if they're connected)
+    const recipientId = conversation.participant_1 === userId
+      ? conversation.participant_2
+      : conversation.participant_1;
+    broadcastToUser(recipientId, 'message', {
+      conversation_id: conversation.id,
+      message,
+    });
+
     return message;
   });
 
@@ -325,6 +347,41 @@ async function messageRoutes(fastify) {
 
     return { success: true };
   });
+
+  // ── SSE: real-time message stream ──────────────────────────────
+  // GET /messages/stream  — connects an authenticated user to a
+  // server-sent-event stream.  Events:  message, typing, read
+  fastify.get('/stream', { preHandler: fastify.authenticate }, async (request, reply) => {
+    const userId = resolveActorId(request);
+    if (!userId) return reply.status(401).send({ message: 'Unauthorized' });
+
+    reply.raw.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive',
+      'X-Accel-Buffering': 'no', // nginx proxy must not buffer
+    });
+    reply.raw.write(':ok\n\n'); // initial comment keeps connection alive
+
+    const client = { raw: reply.raw, userId };
+    if (!sseClients.has(userId)) sseClients.set(userId, new Set());
+    sseClients.get(userId).add(client);
+
+    request.log.info({ userId }, 'SSE client connected');
+
+    // Heartbeat every 30s so proxies don't kill the connection
+    const heartbeat = setInterval(() => {
+      try { reply.raw.write(':heartbeat\n\n'); } catch { /* disconnected */ }
+    }, 30000);
+
+    request.raw.on('close', () => {
+      clearInterval(heartbeat);
+      sseClients.get(userId)?.delete(client);
+      if (sseClients.get(userId)?.size === 0) sseClients.delete(userId);
+      request.log.info({ userId }, 'SSE client disconnected');
+    });
+  });
 }
 
 module.exports = messageRoutes;
+module.exports.broadcastToUser = broadcastToUser;

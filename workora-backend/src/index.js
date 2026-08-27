@@ -9,14 +9,30 @@ const cleanEnv = (val) => val ? val.replace(/^["'](.+)["']$/, '$1') : val;
 
 // Security: fail fast in production when JWT_SECRET is missing — never fall back to a hardcoded secret.
 const jwtSecret = cleanEnv(process.env.JWT_SECRET);
+const databaseUrl = cleanEnv(process.env.DATABASE_URL);
+const nodeEnv = process.env.NODE_ENV || 'development';
+
 if (!jwtSecret) {
-  if (process.env.NODE_ENV === 'production') {
+  if (nodeEnv === 'production') {
     console.error('[FATAL] JWT_SECRET is required in production. Refusing to start.');
     process.exit(1);
   }
   console.warn('[WARN] JWT_SECRET not set — using a development-only secret. Set JWT_SECRET in production.');
 }
 const resolvedJwtSecret = jwtSecret || 'workora-dev-secret-2026';
+
+if (!databaseUrl) {
+  console.error('[FATAL] DATABASE_URL is required. Refusing to start.');
+  process.exit(1);
+}
+
+// Warn about insecure production config
+if (nodeEnv === 'production') {
+  if (resolvedJwtSecret === 'workora-dev-secret-2026') {
+    console.error('[FATAL] Using default JWT_SECRET in production. Refusing to start.');
+    process.exit(1);
+  }
+}
 
 // CORS: allow explicit origins only (defaults to local dev + the public web app).
 // Mobile (Flutter) requests carry no Origin header, so they are unaffected by CORS.
@@ -180,6 +196,7 @@ fastify.register(require('./routes/upload'), { prefix: '/upload' });
 fastify.register(require('./routes/messages'), { prefix: '/messages' });
 fastify.register(require('./routes/analytics'), { prefix: '/analytics' });
 fastify.register(require('./routes/jobs'), { prefix: '/jobs' });
+fastify.register(require('./routes/payments'), { prefix: '/payments' });
 
 // System Settings
 fastify.get('/settings', async (request, reply) => {

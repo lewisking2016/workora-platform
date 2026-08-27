@@ -1,4 +1,5 @@
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { Upload } = require('@aws-sdk/lib-storage');
 const path = require('path');
 
 const cleanEnv = (val) => val ? val.replace(/^["'](.+)["']$/, '$1') : val;
@@ -56,15 +57,22 @@ async function uploadRoutes(fastify) {
 
     const ext = path.extname(data.filename) || options.defaultExt;
     const key = `${options.folder}/${userId}/${Date.now()}${ext}`;
-    const buffer = await data.toBuffer();
 
     const s3 = getS3Client();
-    await s3.send(new PutObjectCommand({
-      Bucket: BUCKET,
-      Key: key,
-      Body: buffer,
-      ContentType: data.mimetype,
-    }));
+    // Stream upload instead of buffering entire file in memory
+    const upload = new Upload({
+      client: s3,
+      params: {
+        Bucket: BUCKET,
+        Key: key,
+        Body: data.file,
+        ContentType: data.mimetype,
+      },
+      queueSize: 4,
+      partSize: 10 * 1024 * 1024, // 10MB parts
+      leavePartsOnError: false,
+    });
+    await upload.done();
 
     const publicUrl = `${PUBLIC_URL}/${key}`;
     await pool.query(options.updateSql, [publicUrl, userId]);
@@ -137,15 +145,22 @@ async function uploadRoutes(fastify) {
 
       const ext = path.extname(data.filename) || (mediaType === 'video' ? '.mp4' : '.jpg');
       const key = `gigs/${workerId}/${mediaType}_${Date.now()}${ext}`;
-      const buffer = await data.toBuffer();
 
       const s3 = getS3Client();
-      await s3.send(new PutObjectCommand({
-        Bucket: BUCKET,
-        Key: key,
-        Body: buffer,
-        ContentType: data.mimetype,
-      }));
+      // Stream upload instead of buffering entire file in memory
+      const upload = new Upload({
+        client: s3,
+        params: {
+          Bucket: BUCKET,
+          Key: key,
+          Body: data.file,
+          ContentType: data.mimetype,
+        },
+        queueSize: 4,
+        partSize: 10 * 1024 * 1024, // 10MB parts
+        leavePartsOnError: false,
+      });
+      await upload.done();
 
       const publicUrl = `${PUBLIC_URL}/${key}`;
       return { success: true, url: publicUrl, type: mediaType };

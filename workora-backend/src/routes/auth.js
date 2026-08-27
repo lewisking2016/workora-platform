@@ -12,8 +12,8 @@ const registerSchema = z.object({
   role: z.enum(['worker', 'hirer']).default('worker'),
 });
 
-const LOGIN_LOCK_THRESHOLD = 1000; // Presentation mode – effectively disabled
-const LOGIN_LOCK_MINUTES = 1;
+const LOGIN_LOCK_THRESHOLD = 5; // Lock after 5 failed attempts
+const LOGIN_LOCK_MINUTES = 15; // Lock for 15 minutes
 
 function buildAuthError(code, message, extras = {}) {
   return { code, message, ...extras };

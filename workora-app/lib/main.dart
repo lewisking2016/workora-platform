@@ -1,121 +1,206 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import 'workora/constants.dart';
+import 'workora/api/api_client.dart';
+import 'workora/storage/token_store.dart';
+import 'workora/repositories/auth_repository.dart';
+import 'workora/state/app_state.dart';
+import 'workora/models/auth_models.dart';
+
+import 'screens/login_screen.dart';
+import 'screens/register_screen.dart';
+import 'screens/feed_screen.dart';
+import 'screens/explore_screen.dart';
+import 'screens/messages_screen.dart';
+import 'screens/profile_screen.dart';
+import 'screens/create_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const WorkoraApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class WorkoraApp extends StatefulWidget {
+  const WorkoraApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<WorkoraApp> createState() => _WorkoraAppState();
+}
+
+class _WorkoraAppState extends State<WorkoraApp> {
+  final _tokenStore = TokenStore();
+  final _appState = AppState();
+  late final ApiClient _api;
+  late final AuthRepository _authRepo;
+
+  bool _isLoading = true;
+  bool _isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _api = ApiClient(getToken: _tokenStore.readToken);
+    _authRepo = AuthRepository(api: _api);
+    _checkAuth();
+  }
+
+  Future<void> _checkAuth() async {
+    final token = await _tokenStore.readToken();
+    if (token != null && token.isNotEmpty) {
+      try {
+        final json = await _api.getJson<Map<String, dynamic>>('/auth/me');
+        final userJson = json['user'] as Map<String, dynamic>?;
+        if (userJson != null) {
+          _appState.setUser(AuthUser.fromJson(userJson));
+          setState(() {
+            _isLoggedIn = true;
+            _isLoading = false;
+          });
+          return;
+        }
+      } catch (_) {
+        await _tokenStore.clear();
+      }
+    }
+    setState(() {
+      _isLoggedIn = false;
+      _isLoading = false;
+    });
+  }
+
+  void _onLoginSuccess(AuthResponse response) {
+    _tokenStore.saveToken(response.token);
+    _appState.setUser(response.user);
+    setState(() => _isLoggedIn = true);
+  }
+
+  void _onLogout() {
+    _tokenStore.clear();
+    _appState.setUser(null);
+    setState(() => _isLoggedIn = false);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Workora',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF6C5CE7),
+          brightness: Brightness.dark,
+        ),
+        scaffoldBackgroundColor: const Color(0xFF0A0A0F),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF0A0A0F),
+          elevation: 0,
+          centerTitle: false,
+        ),
+        useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: _isLoading
+          ? const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(color: Color(0xFF6C5CE7)),
+              ),
+            )
+          : _isLoggedIn
+              ? MainShell(appState: _appState, onLogout: _onLogout, api: _api)
+              : LoginScreen(
+                  authRepo: _authRepo,
+                  onLoginSuccess: _onLoginSuccess,
+                  onGoToRegister: () {},
+                ),
+      routes: {
+        '/login': (ctx) => LoginScreen(
+              authRepo: _authRepo,
+              onLoginSuccess: _onLoginSuccess,
+              onGoToRegister: () {},
+            ),
+        '/register': (ctx) => RegisterScreen(
+              authRepo: _authRepo,
+              onRegisterSuccess: _onLoginSuccess,
+            ),
+      },
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class MainShell extends StatefulWidget {
+  final AppState appState;
+  final VoidCallback onLogout;
+  final ApiClient api;
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+  const MainShell({
+    super.key,
+    required this.appState,
+    required this.onLogout,
+    required this.api,
+  });
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MainShell> createState() => _MainShellState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _MainShellState extends State<MainShell> {
+  int _currentIndex = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  late final List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      FeedScreen(api: widget.api),
+      ExploreScreen(api: widget.api),
+      CreateScreen(api: widget.api),
+      MessagesScreen(api: widget.api),
+      ProfileScreen(
+        api: widget.api,
+        appState: widget.appState,
+        onLogout: widget.onLogout,
+      ),
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+      body: _pages[_currentIndex],
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (i) => setState(() => _currentIndex = i),
+        backgroundColor: const Color(0xFF12121A),
+        indicatorColor: const Color(0xFF6C5CE7).withOpacity(0.3),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home, color: Color(0xFF6C5CE7)),
+            label: 'Feed',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.explore_outlined),
+            selectedIcon: Icon(Icons.explore, color: Color(0xFF6C5CE7)),
+            label: 'Explore',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.add_circle_outline, size: 32),
+            selectedIcon: Icon(Icons.add_circle, color: Color(0xFF6C5CE7), size: 32),
+            label: 'Create',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.chat_bubble_outline),
+            selectedIcon: Icon(Icons.chat_bubble, color: Color(0xFF6C5CE7)),
+            label: 'Messages',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person, color: Color(0xFF6C5CE7)),
+            label: 'Profile',
+          ),
+        ],
       ),
     );
   }

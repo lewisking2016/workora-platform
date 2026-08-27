@@ -505,4 +505,74 @@ CREATE TABLE IF NOT EXISTS gig_views (
     UNIQUE(gig_id, session_id)
 );
 CREATE INDEX IF NOT EXISTS idx_gig_views_gig ON gig_views(gig_id);
+
+-- ═══════════════════════════════════════════════════════════════
+-- 15. Escrow Payments — M-Pesa integration for job payments
+-- ═══════════════════════════════════════════════════════════════
+CREATE TABLE IF NOT EXISTS escrow_payments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    job_id UUID REFERENCES job_posts(id) ON DELETE CASCADE,
+    payer_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    amount DECIMAL(10,2) NOT NULL,
+    currency TEXT DEFAULT 'KES',
+    phone TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'released', 'failed')),
+    stk_request_id TEXT,
+    mpesa_receipt TEXT,
+    failure_reason TEXT,
+    paid_at TIMESTAMP WITH TIME ZONE,
+    released_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_escrow_job ON escrow_payments(job_id);
+CREATE INDEX IF NOT EXISTS idx_escrow_payer ON escrow_payments(payer_id);
+CREATE INDEX IF NOT EXISTS idx_escrow_stk ON escrow_payments(stk_request_id);
+CREATE INDEX IF NOT EXISTS idx_escrow_status ON escrow_payments(status);
+
+-- ═══════════════════════════════════════════════════════════════
+-- PERFORMANCE INDEXES — added for feed, explore, search, messaging
+-- ═══════════════════════════════════════════════════════════════
+
+-- Feed sorting: ORDER BY created_at DESC (most common feed query)
+CREATE INDEX IF NOT EXISTS idx_gigs_created_at ON gigs(created_at DESC);
+
+-- Explore sorting: ORDER BY view_count DESC, then created_at
+CREATE INDEX IF NOT EXISTS idx_gigs_explore ON gigs(view_count DESC, created_at DESC);
+
+-- Feed filtering by trade (ILIKE / contains search)
+CREATE INDEX IF NOT EXISTS idx_gigs_category ON gigs(category);
+
+-- Gig likes: the new JOIN-based feed query uses GROUP BY gig_id
+CREATE INDEX IF NOT EXISTS idx_gig_likes_gig ON gig_likes(gig_id);
+CREATE INDEX IF NOT EXISTS idx_gig_likes_user ON gig_likes(user_id);
+CREATE INDEX IF NOT EXISTS idx_gig_likes_gig_user ON gig_likes(gig_id, user_id);
+
+-- Gig comments: the new JOIN-based feed query uses GROUP BY gig_id
+CREATE INDEX IF NOT EXISTS idx_gig_comments_gig ON gig_comments(gig_id);
+
+-- Saved gigs: feed checks saved_by_me per gig
+CREATE INDEX IF NOT EXISTS idx_saved_gigs_gig_user ON saved_gigs(gig_id, user_id);
+
+-- Messages: unread count queries and thread loading
+CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id);
+CREATE INDEX IF NOT EXISTS idx_messages_read_at ON messages(read_at);
+CREATE INDEX IF NOT EXISTS idx_messages_conv_created ON messages(conversation_id, created_at DESC);
+
+-- Conversations: participant lookup for conversation list
+CREATE INDEX IF NOT EXISTS idx_conv_p1 ON conversations(participant_1);
+CREATE INDEX IF NOT EXISTS idx_conv_p2 ON conversations(participant_2);
+
+-- Notifications: user inbox queries
+CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_created ON notifications(user_id, created_at DESC);
+
+-- Worker profiles: search and lookup
+CREATE INDEX IF NOT EXISTS idx_worker_user ON worker_profiles(user_id);
+CREATE INDEX IF NOT EXISTS idx_worker_trust ON worker_profiles(trust_score DESC);
+CREATE INDEX IF NOT EXISTS idx_worker_location ON worker_profiles(location);
+
+-- Profile search: trigram index for ILIKE-based search (requires pg_trgm extension)
+-- CREATE EXTENSION IF NOT EXISTS pg_trgm;
+-- CREATE INDEX IF NOT EXISTS idx_worker_trade_trgm ON worker_profiles USING gin(trade gin_trgm_ops);
+-- CREATE INDEX IF NOT EXISTS idx_worker_name_trgm ON worker_profiles USING gin(full_name gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS idx_gig_views_session ON gig_views(session_id);
