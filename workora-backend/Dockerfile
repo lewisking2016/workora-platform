@@ -3,8 +3,8 @@ FROM node:20-slim
 WORKDIR /app
 
 COPY package*.json ./
-# npm ci installs exactly what package-lock.json pins — deterministic builds.
-RUN npm ci --omit=dev
+# Install production deps only. Use npm install for monorepo compatibility.
+RUN npm install --omit=dev --ignore-scripts && npm cache clean --force
 
 COPY . .
 
