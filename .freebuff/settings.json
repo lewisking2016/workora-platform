@@ -1,0 +1,23 @@
+{
+  "preloadedSkills": [
+    "find-skills",
+    "frontend-design",
+    "executing-plans",
+    "brainstorming",
+    "extract-design-system",
+    "agent-reach",
+    "image-to-code",
+    "accessibility",
+    "agent-browser",
+    "open-pr",
+    "test",
+    "brainstorm",
+    "overhaul",
+    "simplify",
+    "merge-pr",
+    "review",
+    "improve-codebase-architecture",
+    "learn",
+    "performance"
+  ]
+}

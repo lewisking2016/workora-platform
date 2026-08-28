@@ -22,7 +22,7 @@ export default function ErrorPage({
   return (
     <div className="min-h-[70vh] px-6 py-16">
       <div className="mx-auto flex max-w-2xl flex-col items-center rounded-[28px] border border-zinc-200 bg-white p-8 text-center shadow-[0_30px_80px_-30px_rgba(15,23,42,0.18)] dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#0066FF] to-[#7000FF] text-white">
+        <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#0066FF] text-white">
           <WarningCircle size={36} weight="bold" />
         </div>
         <p className="text-xs font-black uppercase tracking-[0.35em] text-[#0066FF] dark:text-[#00D1FF]">Application error</p>

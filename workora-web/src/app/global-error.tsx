@@ -23,7 +23,7 @@ export default function GlobalError({
     <html lang="en">
       <body className="min-h-screen bg-zinc-950 px-6 py-16 text-white">
         <div className="mx-auto flex max-w-2xl flex-col items-center rounded-[28px] border border-white/10 bg-white/5 p-8 text-center shadow-[0_30px_80px_-30px_rgba(0,0,0,0.65)] backdrop-blur">
-          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#0066FF] to-[#7000FF] text-white">
+          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#0066FF] text-white">
             <WarningCircle size={36} weight="bold" />
           </div>
           <p className="text-xs font-black uppercase tracking-[0.35em] text-[#00D1FF]">Global error</p>

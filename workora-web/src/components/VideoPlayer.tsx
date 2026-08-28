@@ -218,7 +218,7 @@ export function VideoPlayer({
       {/* Error state */}
       {hasError && (
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-zinc-950/80 p-6 text-center text-white">
-          <WarningCircle size={28} weight="fill" className="text-[#4F46E5]" />
+          <WarningCircle size={28} weight="fill" className="text-[#0066FF]" />
           <div className="space-y-1">
             <p className="text-sm font-semibold">Video unavailable</p>
             <p className="text-xs text-white/70">We couldn&apos;t load this media right now.</p>

@@ -205,7 +205,7 @@ export function ProfileTrustSurface({ mode, bundle }: ProfileTrustSurfaceProps) 
           {profile.cover_url ? (
             <Image src={profile.cover_url} alt={displayName} fill className="object-cover" />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#0F172A] via-[#1D4ED8] to-[#6D28D9]" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#0F172A] to-[#1E3A5F]" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 text-white">
@@ -243,7 +243,7 @@ export function ProfileTrustSurface({ mode, bundle }: ProfileTrustSurfaceProps) 
               <div className="pb-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-sm font-semibold text-zinc-500 dark:text-zinc-400">@{user.username || displayName}</p>
-                  {profile.is_verified ? <ShieldCheck size={18} weight="fill" className="text-[#4F46E5]" /> : null}
+                  {profile.is_verified ? <ShieldCheck size={18} weight="fill" className="text-[#0066FF]" /> : null}
                   <span className="rounded-full bg-zinc-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
                     {availability}
                   </span>
@@ -322,7 +322,7 @@ export function ProfileTrustSurface({ mode, bundle }: ProfileTrustSurfaceProps) 
 
       <section className="grid gap-4 md:grid-cols-4">
         {[
-          { label: 'Trust score', value: trustScore.toFixed(1), icon: ShieldCheck, color: 'text-[#4F46E5]' },
+          { label: 'Trust score', value: trustScore.toFixed(1), icon: ShieldCheck, color: 'text-[#0066FF]' },
           { label: 'Jobs', value: String(totalJobs), icon: Briefcase, color: 'text-emerald-500' },
           { label: 'Reviews', value: String(ratings.length), icon: Star, color: 'text-amber-500' },
           { label: 'Earnings', value: formatCurrency(totalEarnings), icon: Crown, color: 'text-fuchsia-500' },
@@ -349,7 +349,7 @@ export function ProfileTrustSurface({ mode, bundle }: ProfileTrustSurfaceProps) 
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">About</p>
                 <h2 className="mt-1 text-xl font-black text-zinc-950 dark:text-white">Work style and focus</h2>
               </div>
-              <FileText size={18} className="text-[#4F46E5]" />
+              <FileText size={18} className="text-[#0066FF]" />
             </div>
             <p className="mt-4 max-w-3xl text-sm leading-7 text-zinc-600 dark:text-zinc-400">
               {profile.bio || 'No bio has been added yet.'}
@@ -372,7 +372,7 @@ export function ProfileTrustSurface({ mode, bundle }: ProfileTrustSurfaceProps) 
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">Portfolio</p>
                 <h2 className="mt-1 text-xl font-black text-zinc-950 dark:text-white">Recent proof of work</h2>
               </div>
-              <Link href={isOwner ? '/dashboard/create' : `/dashboard/messages`} className="inline-flex items-center gap-2 text-sm font-semibold text-[#4F46E5]">
+              <Link href={isOwner ? '/dashboard/create' : `/dashboard/messages`} className="inline-flex items-center gap-2 text-sm font-semibold text-[#0066FF]">
                 Upload <ArrowRight size={16} />
               </Link>
             </div>
@@ -469,7 +469,7 @@ export function ProfileTrustSurface({ mode, bundle }: ProfileTrustSurfaceProps) 
               <div key={section.title} className="rounded-xl bg-white p-5 shadow-sm shadow-black/5 dark:bg-zinc-950">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">{section.title}</p>
-                  <section.icon size={18} className="text-[#4F46E5]" />
+                  <section.icon size={18} className="text-[#0066FF]" />
                 </div>
                 <div className="mt-4 space-y-2">
                   {section.items.length > 0 ? section.items.slice(0, 4).map(item => (
@@ -491,7 +491,7 @@ export function ProfileTrustSurface({ mode, bundle }: ProfileTrustSurfaceProps) 
           <div className="rounded-xl bg-white p-5 shadow-sm shadow-black/5 dark:bg-zinc-950">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">Trust details</p>
-              <ShieldCheck size={18} className="text-[#4F46E5]" />
+              <ShieldCheck size={18} className="text-[#0066FF]" />
             </div>
             <div className="mt-4 space-y-3">
               {[
@@ -511,7 +511,7 @@ export function ProfileTrustSurface({ mode, bundle }: ProfileTrustSurfaceProps) 
           <div className="rounded-xl bg-white p-5 shadow-sm shadow-black/5 dark:bg-zinc-950">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">Contact actions</p>
-              <ChatCircleText size={18} className="text-[#4F46E5]" />
+              <ChatCircleText size={18} className="text-[#0066FF]" />
             </div>
             <div className="mt-4 space-y-2">
               <button
@@ -554,7 +554,7 @@ export function ProfileTrustSurface({ mode, bundle }: ProfileTrustSurfaceProps) 
           <div className="rounded-xl bg-white p-5 shadow-sm shadow-black/5 dark:bg-zinc-950">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">Trust history</p>
-              <Sparkle size={18} className="text-[#4F46E5]" />
+              <Sparkle size={18} className="text-[#0066FF]" />
             </div>
             <div className="mt-4 space-y-2">
               <div className="rounded-xl bg-zinc-50 px-4 py-3 text-sm text-zinc-600 dark:bg-zinc-900 dark:text-zinc-300">

@@ -182,8 +182,8 @@ export default function JoinPage() {
                     <span className="text-[10px] text-zinc-400 font-bold">I want to hire elite pros.</span>
                   </div>
                 </button>
-                <button onClick={() => { setFormData({ ...formData, role: 'pro' }); nextStep(); }} className="flex items-center gap-6 p-8 rounded-[32px] border-2 border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-[#7000FF] transition-all group shadow-sm hover:shadow-xl">
-                  <div className="h-14 w-14 rounded-2xl bg-white dark:bg-zinc-800 flex items-center justify-center text-[#7000FF] shadow-sm group-hover:scale-110 transition-transform"><Briefcase size={32} weight="duotone" /></div>
+                <button onClick={() => { setFormData({ ...formData, role: 'pro' }); nextStep(); }} className="flex items-center gap-6 p-8 rounded-[32px] border-2 border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-[#0066FF] transition-all group shadow-sm hover:shadow-xl">
+                  <div className="h-14 w-14 rounded-2xl bg-white dark:bg-zinc-800 flex items-center justify-center text-[#0066FF] shadow-sm group-hover:scale-110 transition-transform"><Briefcase size={32} weight="duotone" /></div>
                   <div className="flex flex-col text-left">
                     <span className="font-black text-sm uppercase tracking-widest text-zinc-950 dark:text-white">Business Account</span>
                     <span className="text-[10px] text-zinc-400 font-bold">I have the skills to join.</span>
@@ -293,7 +293,7 @@ export default function JoinPage() {
 
                 {error && <p className="text-red-500 text-[10px] font-bold text-center uppercase tracking-widest">{error}</p>}
 
-                <motion.button disabled={!isFormValid || loading} onClick={handleRegister} animate={isFormValid ? { boxShadow: ["0 10px 20px -5px rgba(0, 102, 255, 0.3)", "0 10px 40px 0px rgba(0, 102, 255, 0.6)", "0 10px 20px -5px rgba(0, 102, 255, 0.3)"] } : {}} transition={{ repeat: Infinity, duration: 2 }} className="h-14 w-full bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-full font-black text-sm uppercase tracking-widest mt-4 flex items-center justify-center gap-3 shadow-lg">
+                <motion.button disabled={!isFormValid || loading} onClick={handleRegister} animate={isFormValid ? { boxShadow: ["0 10px 20px -5px rgba(0, 102, 255, 0.3)", "0 10px 40px 0px rgba(0, 102, 255, 0.6)", "0 10px 20px -5px rgba(0, 102, 255, 0.3)"] } : {}} transition={{ repeat: Infinity, duration: 2 }} className="h-14 w-full bg-[#0066FF] text-white rounded-full font-black text-sm uppercase tracking-widest mt-4 flex items-center justify-center gap-3 shadow-lg">
                   {loading ? <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : "Create Account"}
                 </motion.button>
               </div>
@@ -315,8 +315,8 @@ export default function JoinPage() {
                     <p className="text-[10px] text-zinc-400 font-bold">I work independently</p>
                   </div>
                 </button>
-                <button onClick={() => { setTeamType('team'); setStep(4); }} className="p-8 rounded-[32px] border-2 border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-[#7000FF] transition-all group flex flex-col items-center gap-4 shadow-sm hover:shadow-xl">
-                  <div className="h-16 w-16 rounded-2xl bg-white dark:bg-zinc-800 flex items-center justify-center text-[#7000FF] shadow-sm group-hover:scale-110 transition-transform"><Users size={32} weight="duotone" /></div>
+                <button onClick={() => { setTeamType('team'); setStep(4); }} className="p-8 rounded-[32px] border-2 border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-[#0066FF] transition-all group flex flex-col items-center gap-4 shadow-sm hover:shadow-xl">
+                  <div className="h-16 w-16 rounded-2xl bg-white dark:bg-zinc-800 flex items-center justify-center text-[#0066FF] shadow-sm group-hover:scale-110 transition-transform"><Users size={32} weight="duotone" /></div>
                   <div className="text-center">
                     <p className="font-black text-sm text-zinc-950 dark:text-white">Yes</p>
                     <p className="text-[10px] text-zinc-400 font-bold">I&apos;m part of a team</p>
@@ -334,7 +334,7 @@ export default function JoinPage() {
                      <h2 className="text-3xl font-black tracking-tighter text-zinc-950 dark:text-white">You&apos;re in, {formData.username || 'friend'}!</h2>
                      <p className="text-zinc-500 dark:text-zinc-400 font-bold text-sm mt-3 max-w-md mx-auto leading-relaxed">Welcome to Workora. Search trusted professionals, review their proof of work, and hire with confidence.</p>
                   </div>
-                  <button onClick={() => setStep(5)} className="h-14 w-full px-10 bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-full font-black text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-xl shadow-blue-500/20">Explore the network</button>
+                  <button onClick={() => setStep(5)} className="h-14 w-full px-10 bg-[#0066FF] text-white rounded-full font-black text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-xl shadow-blue-500/20">Explore the network</button>
                </div>
             </motion.div>
           )}
@@ -371,7 +371,7 @@ export default function JoinPage() {
 
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                      <button onClick={() => setStep(5)} className="h-14 w-full sm:w-auto px-10 bg-zinc-100 dark:bg-zinc-800 text-zinc-950 dark:text-white rounded-full font-black text-xs uppercase tracking-widest hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">Continue with free tier</button>
-                     <button className="h-14 w-full sm:w-auto px-10 bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-full font-black text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-xl shadow-blue-500/20">Join now</button>
+                     <button className="h-14 w-full sm:w-auto px-10 bg-[#0066FF] text-white rounded-full font-black text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-xl shadow-blue-500/20">Join now</button>
                   </div>
                </div>
             </motion.div>
@@ -380,7 +380,7 @@ export default function JoinPage() {
           {/* Step 5: Final Success */}
           {step === 5 && (
             <motion.div key="step5" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center text-center gap-8 w-full">
-              <div className="h-24 w-24 rounded-full bg-gradient-to-br from-[#0066FF]/10 to-[#7000FF]/10 flex items-center justify-center">
+              <div className="h-24 w-24 rounded-full bg-gradient-to-br from-[#0066FF]/10 to-[#0052CC]/10 flex items-center justify-center">
                  <CheckCircle size={56} weight="fill" className="text-[#0066FF]" />
               </div>
               <div className="flex flex-col gap-3">
@@ -391,7 +391,7 @@ export default function JoinPage() {
                     : `Your ${teamType === 'team' ? 'team' : 'pro'} passport is ready, @${formData.username}.`}
                 </p>
               </div>
-              <Link href="/dashboard" className="h-14 w-full bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-full font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-500/20 flex items-center justify-center">Go to my Dashboard</Link>
+              <Link href="/dashboard" className="h-14 w-full bg-[#0066FF] text-white rounded-full font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-500/20 flex items-center justify-center">Go to my Dashboard</Link>
             </motion.div>
           )}
 

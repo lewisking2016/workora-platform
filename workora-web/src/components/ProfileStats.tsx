@@ -32,7 +32,7 @@ export function ProfileStats({ income = "KSh 0", jobs = 0, trust = "0%", rating 
     <div className="grid w-full grid-cols-4 divide-x divide-zinc-200 rounded-xl bg-zinc-50 py-6 shadow-sm dark:divide-zinc-800 dark:bg-zinc-900">
       <StatItem icon={CurrencyCircleDollar} label="Income" value={income} color="text-green-500" />
       <StatItem icon={Briefcase} label="Jobs" value={jobs.toString()} color="text-[#0066FF]" />
-      <StatItem icon={Clock} label="Trust" value={trust} color="text-[#7000FF]" />
+      <StatItem icon={Clock} label="Trust" value={trust} color="text-[#0066FF]" />
       <StatItem icon={Star} label="Rating" value={rating} color="text-yellow-500" />
     </div>
   );

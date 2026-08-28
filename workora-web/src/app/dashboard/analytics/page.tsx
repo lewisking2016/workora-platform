@@ -339,7 +339,7 @@ export default function AnalyticsPage() {
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-[5%] py-8 pb-32 lg:px-8">
         <div className="flex flex-col gap-6 rounded-[16px] border border-zinc-100 bg-white p-6 lg:flex-row lg:items-end lg:justify-between lg:p-8 dark:border-zinc-800 dark:bg-zinc-900">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[#4D9FFF] to-[#7000FF] text-lg font-black text-white shadow-lg">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#0066FF] text-lg font-black text-white shadow-lg">
               {profile?.avatar_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={profile.avatar_url} alt="" className="h-full w-full object-cover" />
@@ -394,9 +394,9 @@ export default function AnalyticsPage() {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {isBusiness ? (
             <>
-              <MetricCard icon={Briefcase} label="Jobs Posted" value={String(businessStats?.jobsPosted || 0)} growth={0} color="from-[#0066FF] to-[#0052CC]" subtitle="Live across the platform" />
+              <MetricCard icon={Briefcase} label="Jobs Posted" value={String(businessStats?.jobsPosted || 0)} growth={0} color="bg-[#0066FF]" subtitle="Live across the platform" />
               <MetricCard icon={Clock} label="Open Jobs" value={String(businessStats?.openJobs || 0)} growth={0} color="from-emerald-500 to-emerald-600" subtitle="Accepting applications" />
-              <MetricCard icon={UsersThree} label="Applications" value={String(businessStats?.applications || 0)} growth={0} color="from-[#7000FF] to-[#5C00CC]" subtitle="Received in total" />
+              <MetricCard icon={UsersThree} label="Applications" value={String(businessStats?.applications || 0)} growth={0} color="from-[#0066FF] to-[#004AAD]" subtitle="Received in total" />
               <MetricCard icon={ClockCountdown} label="Pending Review" value={String(businessStats?.pending || 0)} growth={0} color="from-amber-500 to-amber-600" subtitle="Awaiting your decision" />
             </>
           ) : (
@@ -406,7 +406,7 @@ export default function AnalyticsPage() {
                 label="Total Views"
                 value={stats?.totalViews.toLocaleString() || '0'}
                 growth={stats?.viewGrowth || 0}
-                color="from-[#0066FF] to-[#0052CC]"
+                color="bg-[#0066FF]"
                 subtitle="Views across your works"
               />
               <MetricCard
@@ -414,7 +414,7 @@ export default function AnalyticsPage() {
                 label="Engagement"
                 value={stats?.totalEngagement.toLocaleString() || '0'}
                 growth={stats?.engagementGrowth || 0}
-                color="from-[#7000FF] to-[#5C00CC]"
+                color="from-[#0066FF] to-[#004AAD]"
                 subtitle="Likes and comments"
               />
               <MetricCard
@@ -450,7 +450,7 @@ export default function AnalyticsPage() {
                   <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400">Views</span>
                 </div>
                 <div className="ml-4 flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-[#7000FF]" />
+                  <div className="h-3 w-3 rounded-full bg-[#0066FF]" />
                   <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400">Engagement</span>
                 </div>
               </div>
@@ -462,13 +462,13 @@ export default function AnalyticsPage() {
                   <div className="flex h-full w-full items-end gap-1">
                     <div className="relative flex-1">
                       <div
-                        className="w-full cursor-pointer rounded-t-xl bg-gradient-to-t from-[#0066FF] to-[#0052CC] transition-all hover:brightness-110"
+                        className="w-full cursor-pointer rounded-t-xl bg-[#0066FF] transition-all hover:brightness-110"
                         style={{ height: `${Math.max(10, (d.views / maxViews) * 100)}%` }}
                       />
                     </div>
                     <div className="relative flex-1">
                       <div
-                        className="w-full cursor-pointer rounded-t-xl bg-gradient-to-t from-[#7000FF] to-[#5C00CC] transition-all hover:brightness-110"
+                        className="w-full cursor-pointer rounded-t-xl bg-gradient-to-t from-[#0066FF] to-[#004AAD] transition-all hover:brightness-110"
                         style={{ height: `${Math.max(10, (d.engagement / maxEngagement) * 100)}%` }}
                       />
                     </div>
@@ -572,7 +572,7 @@ export default function AnalyticsPage() {
           <div className="rounded-[16px] border border-zinc-100 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-black tracking-tight text-zinc-950 dark:text-white">Business Insights</h3>
-              <ChartLine size={24} weight="duotone" className="text-[#7000FF]" />
+              <ChartLine size={24} weight="duotone" className="text-[#0066FF]" />
             </div>
 
             <div className="mt-6 flex flex-col gap-4">

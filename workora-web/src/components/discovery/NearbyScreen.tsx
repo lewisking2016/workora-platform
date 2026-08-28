@@ -43,9 +43,9 @@ export default function NearbyScreen() {
           <ArrowLeft size={18} />
         </Link>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#4F46E5]">Nodes explorer</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0066FF]">Nodes explorer</p>
           <h1 className="text-2xl font-black flex items-center gap-2">
-            <MapPin size={22} weight="fill" className="text-[#4F46E5]" /> Nearby
+            <MapPin size={22} weight="fill" className="text-[#0066FF]" /> Nearby
           </h1>
         </div>
       </div>
@@ -53,7 +53,7 @@ export default function NearbyScreen() {
       {locations.length > 0 && (
         <div className="mb-8 flex flex-wrap gap-2">
           {locations.map(location => (
-            <span key={location} className="rounded-full bg-[#EEF2FF] px-3 py-1.5 text-xs font-semibold text-[#4F46E5] dark:bg-[#1B1F3A] dark:text-[#A5B4FC]">
+            <span key={location} className="rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-[#0066FF] dark:bg-blue-950 dark:text-[#4D9FFF]">
               {location}
             </span>
           ))}

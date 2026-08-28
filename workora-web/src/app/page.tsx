@@ -168,7 +168,7 @@ export default function Home() {
 
         {/* Ambient glow */}
         <div className="pointer-events-none absolute -left-40 top-1/4 h-[480px] w-[480px] rounded-full bg-[#0066FF]/20 blur-[140px]" />
-        <div className="pointer-events-none absolute -right-32 bottom-10 h-[420px] w-[420px] rounded-full bg-[#7000FF]/15 blur-[140px]" />
+        <div className="pointer-events-none absolute -right-32 bottom-10 h-[420px] w-[420px] rounded-full bg-[#0066FF]/15 blur-[140px]" />
 
         <motion.div
           style={{ y: heroContentY, opacity: heroContentOpacity }}
@@ -191,7 +191,7 @@ export default function Home() {
               <br />
               professional
               <br />
-              <span className="bg-gradient-to-r from-[#4D9FFF] via-[#8B5CF6] to-[#4D9FFF] bg-[length:200%_auto] bg-clip-text text-transparent [animation:sweepGrad_6s_linear_infinite]">
+              <span className="text-[#0066FF]">
                 you can trust.
               </span>
             </motion.h1>
@@ -255,7 +255,7 @@ export default function Home() {
                       className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/80"
                     >
                       <div className="flex items-center gap-2.5 px-3 py-2.5">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#4D9FFF] to-[#7000FF] text-[11px] font-black text-white">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0066FF] text-[11px] font-black text-white">
                           {item.name.charAt(0)}
                         </div>
                         <div className="flex-1 leading-tight">
@@ -314,7 +314,7 @@ export default function Home() {
               transition={{ repeat: Infinity, duration: 5, ease: 'easeInOut', delay: 0.8 }}
               className="absolute -right-14 bottom-28 flex items-center gap-2.5 rounded-2xl border border-white/15 bg-white/[0.08] px-4 py-3 backdrop-blur-xl"
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500">
                 <TrendUp size={18} weight="fill" className="text-white" />
               </div>
               <div className="leading-tight">
@@ -368,7 +368,7 @@ export default function Home() {
           PROOF OF WORK — signature section
       ══════════════════════════════════════════ */}
       <section className="relative overflow-hidden py-28">
-        <div className="pointer-events-none absolute right-0 top-0 h-[400px] w-[400px] rounded-full bg-[#7000FF]/10 blur-[130px]" />
+        <div className="pointer-events-none absolute right-0 top-0 h-[400px] w-[400px] rounded-full bg-[#0066FF]/10 blur-[130px]" />
         <div className="mx-auto grid max-w-6xl items-center gap-16 px-6 lg:grid-cols-2">
           <motion.div
             variants={stagger}
@@ -642,7 +642,7 @@ export default function Home() {
               </div>
               <p className="mt-3.5 text-sm leading-relaxed text-white/75">&ldquo;{t.quote}&rdquo;</p>
               <div className="mt-5 flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#4D9FFF] to-[#7000FF] text-xs font-black text-white">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0066FF] text-xs font-black text-white">
                   {t.name.charAt(0)}
                 </div>
                 <div>
@@ -680,7 +680,7 @@ export default function Home() {
             <h2 className="text-4xl font-black leading-tight tracking-tight text-white sm:text-6xl">
               Ready to find your
               <br />
-              <span className="bg-gradient-to-r from-[#4D9FFF] via-[#8B5CF6] to-[#4D9FFF] bg-[length:200%_auto] bg-clip-text text-transparent [animation:sweepGrad_6s_linear_infinite]">
+              <span className="text-[#0066FF]">
                 perfect professional?
               </span>
             </h2>

@@ -128,7 +128,7 @@ export default function NotificationDetailPage() {
     switch (type) {
       case 'like': return <Heart size={22} weight="fill" className="text-red-500" />;
       case 'comment': return <ChatCircleDots size={22} weight="fill" className="text-[#0066FF]" />;
-      case 'follow': return <UserCirclePlus size={22} weight="fill" className="text-[#7000FF]" />;
+      case 'follow': return <UserCirclePlus size={22} weight="fill" className="text-[#0066FF]" />;
       case 'rating': return <Star size={22} weight="fill" className="text-yellow-500" />;
       default: return <Bell size={22} weight="fill" className="text-[#0066FF]" />;
     }
@@ -180,7 +180,7 @@ export default function NotificationDetailPage() {
 
           <button
             onClick={openContent}
-            className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#0066FF] to-[#7000FF] py-3.5 text-sm font-black text-white hover:brightness-110 transition-all"
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0066FF] py-3.5 text-sm font-black text-white hover:brightness-110 transition-all"
           >
             {notification.job_id ? 'Open job' : notification.gig_id ? 'Open post' : notification.actor_id ? 'View profile' : 'Open notifications'}
             <ArrowRight size={16} weight="bold" />

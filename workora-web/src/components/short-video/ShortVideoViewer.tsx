@@ -297,7 +297,7 @@ export default function ShortVideoViewer({ mode, creatorId }: ShortVideoViewerPr
       <div className="min-h-full bg-black text-white flex items-center justify-center px-4">
         <div className="w-full max-w-md rounded-[24px] bg-zinc-950 p-8 text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5">
-            <WarningCircle size={28} weight="fill" className="text-[#4F46E5]" />
+            <WarningCircle size={28} weight="fill" className="text-[#0066FF]" />
           </div>
           <h1 className="text-2xl font-black">{copy.title}</h1>
           <p className="mt-2 text-sm text-white/70">{copy.body}</p>
@@ -325,7 +325,7 @@ export default function ShortVideoViewer({ mode, creatorId }: ShortVideoViewerPr
       <div className="min-h-full bg-black text-white flex items-center justify-center px-4">
         <div className="w-full max-w-md rounded-[24px] bg-zinc-950 p-8 text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5">
-            <Check size={28} weight="bold" className="text-[#4F46E5]" />
+            <Check size={28} weight="bold" className="text-[#0066FF]" />
           </div>
           <h1 className="text-2xl font-black">Story complete</h1>
           <p className="mt-2 text-sm text-white/70">You reached the end of this creator&apos;s recent stories.</p>
@@ -428,7 +428,7 @@ export default function ShortVideoViewer({ mode, creatorId }: ShortVideoViewerPr
                 disabled={busy}
                 className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 backdrop-blur-xl"
               >
-                <Heart size={22} weight={currentItem.liked_by_me ? 'fill' : 'regular'} className={currentItem.liked_by_me ? 'text-[#4F46E5]' : 'text-white'} />
+                <Heart size={22} weight={currentItem.liked_by_me ? 'fill' : 'regular'} className={currentItem.liked_by_me ? 'text-[#0066FF]' : 'text-white'} />
               </button>
               <button onClick={loadComments} className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 backdrop-blur-xl">
                 <ChatCircleDots size={22} className="text-white" />
@@ -440,7 +440,7 @@ export default function ShortVideoViewer({ mode, creatorId }: ShortVideoViewerPr
                 <LinkIcon size={22} className="text-white" />
               </button>
               <button onClick={toggleSave} className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 backdrop-blur-xl">
-                <BookmarkSimple size={22} weight={currentItem.saved_by_me ? 'fill' : 'regular'} className={currentItem.saved_by_me ? 'text-[#4F46E5]' : 'text-white'} />
+                <BookmarkSimple size={22} weight={currentItem.saved_by_me ? 'fill' : 'regular'} className={currentItem.saved_by_me ? 'text-[#0066FF]' : 'text-white'} />
               </button>
               <button onClick={() => setMuted(value => !value)} className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 backdrop-blur-xl">
                 {muted ? <SpeakerSlash size={22} className="text-white" /> : <SpeakerHigh size={22} className="text-white" />}
@@ -527,7 +527,7 @@ export default function ShortVideoViewer({ mode, creatorId }: ShortVideoViewerPr
                       <p className="text-sm font-semibold">{like.username}</p>
                       <p className="text-xs text-zinc-500 dark:text-zinc-400">{like.trade}</p>
                     </div>
-                    {like.verified && <Check size={16} weight="bold" className="text-[#4F46E5]" />}
+                    {like.verified && <Check size={16} weight="bold" className="text-[#0066FF]" />}
                   </div>
                 )) : (
                   <p className="py-10 text-center text-sm text-zinc-500 dark:text-zinc-400">No likes yet.</p>

@@ -112,7 +112,7 @@ export default function JobDetailPage() {
           <h1 className="text-lg font-black text-white">Job not found</h1>
           <button
             onClick={() => router.push('/dashboard/jobs')}
-            className="mt-5 w-full rounded-xl bg-gradient-to-r from-[#0066FF] to-[#7000FF] py-3 text-sm font-black text-white"
+            className="mt-5 w-full rounded-xl bg-[#0066FF] py-3 text-sm font-black text-white"
           >
             Browse jobs
           </button>
@@ -201,7 +201,7 @@ export default function JobDetailPage() {
             {job.is_owner ? (
               <button
                 onClick={() => router.push('/dashboard/business')}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#0066FF] to-[#7000FF] py-4 text-sm font-black text-white hover:brightness-110 transition-all"
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0066FF] py-4 text-sm font-black text-white hover:brightness-110 transition-all"
               >
                 <Briefcase size={16} weight="bold" /> Manage in Business Hub
               </button>
@@ -212,7 +212,7 @@ export default function JobDetailPage() {
             ) : canApply ? (
               <button
                 onClick={() => setApplying(true)}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#0066FF] to-[#7000FF] py-4 text-sm font-black text-white hover:brightness-110 transition-all"
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0066FF] py-4 text-sm font-black text-white hover:brightness-110 transition-all"
               >
                 <PaperPlaneTilt size={16} weight="bold" /> Apply for this job
               </button>
@@ -257,7 +257,7 @@ export default function JobDetailPage() {
               <button
                 onClick={submitApplication}
                 disabled={submitting}
-                className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#0066FF] to-[#7000FF] py-3.5 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-50"
+                className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#0066FF] py-3.5 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-50"
               >
                 {submitting ? <SpinnerGap size={16} className="animate-spin" weight="bold" /> : <PaperPlaneTilt size={16} weight="bold" />}
                 {submitting ? 'Applying…' : 'Submit application'}

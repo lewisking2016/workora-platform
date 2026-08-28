@@ -90,10 +90,10 @@ export function ProfessionalCard({
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <p className="truncate text-sm font-semibold text-zinc-950 group-hover:text-[#4F46E5] dark:text-white dark:group-hover:text-[#A5B4FC]">
+              <p className="truncate text-sm font-semibold text-zinc-950 group-hover:text-[#0066FF] dark:text-white dark:group-hover:text-[#4D9FFF]">
                 {person.user_name}
               </p>
-              {person.is_verified && <SealCheck size={14} weight="fill" className="text-[#4F46E5]" />}
+              {person.is_verified && <SealCheck size={14} weight="fill" className="text-[#0066FF]" />}
             </div>
             <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">{person.trade}</p>
           </div>
@@ -102,7 +102,7 @@ export function ProfessionalCard({
           <button
             onClick={() => onCompare(person)}
             className={`rounded-xl px-3 py-2 text-xs font-semibold ${
-              selected ? 'bg-[#EEF2FF] text-[#4F46E5] dark:bg-[#1B1F3A] dark:text-[#A5B4FC]' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300'
+              selected ? 'bg-blue-50 text-[#0066FF] dark:bg-blue-950 dark:text-[#4D9FFF]' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300'
             }`}
           >
             Compare
@@ -229,13 +229,13 @@ export function SectionLink({ href, title, subtitle }: { href: string; title: st
   return (
     <Link
       href={href}
-      className="group flex items-center justify-between rounded-2xl bg-zinc-50 px-4 py-3 text-left transition-colors hover:bg-[#EEF2FF] dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]"
+      className="group flex items-center justify-between rounded-2xl bg-zinc-50 px-4 py-3 text-left transition-colors hover:bg-blue-50 dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]"
     >
       <div>
         <p className="text-sm font-semibold text-zinc-950 dark:text-white">{title}</p>
         {subtitle ? <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{subtitle}</p> : null}
       </div>
-      <ArrowRight size={16} className="text-zinc-400 transition-transform group-hover:translate-x-0.5 group-hover:text-[#4F46E5]" />
+      <ArrowRight size={16} className="text-zinc-400 transition-transform group-hover:translate-x-0.5 group-hover:text-[#0066FF]" />
     </Link>
   );
 }

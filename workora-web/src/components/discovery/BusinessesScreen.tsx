@@ -37,9 +37,9 @@ export default function BusinessesScreen() {
           <ArrowLeft size={18} />
         </Link>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#4F46E5]">Nodes explorer</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0066FF]">Nodes explorer</p>
           <h1 className="text-2xl font-black flex items-center gap-2">
-            <Briefcase size={22} weight="fill" className="text-[#4F46E5]" /> Businesses
+            <Briefcase size={22} weight="fill" className="text-[#0066FF]" /> Businesses
           </h1>
         </div>
       </div>
@@ -60,7 +60,7 @@ export default function BusinessesScreen() {
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Directory</p>
             <h2 className="mt-1 text-xl font-black">Live business profiles</h2>
           </div>
-          <span className="rounded-full bg-[#EEF2FF] px-3 py-1 text-xs font-semibold text-[#4F46E5] dark:bg-[#1B1F3A] dark:text-[#A5B4FC]">
+          <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-[#0066FF] dark:bg-blue-950 dark:text-[#4D9FFF]">
             {businesses.length} businesses
           </span>
         </div>

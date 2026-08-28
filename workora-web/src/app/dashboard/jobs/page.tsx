@@ -18,6 +18,7 @@ import {
 } from '@phosphor-icons/react';
 import { apiFetch, fetchCurrentUser } from '@/lib/session';
 import { useToast } from '@/components/Toast';
+import { ScrollReveal } from '@/components/ScrollReveal';
 
 interface Job {
   id: string;
@@ -148,7 +149,7 @@ export default function BrowseJobsPage() {
             </div>
             <button
               onClick={() => router.push('/dashboard/business')}
-              className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#0066FF] to-[#7000FF] px-5 py-3 text-xs font-black text-white hover:brightness-110 transition-all"
+              className="flex items-center gap-2 rounded-2xl bg-[#0066FF] px-5 py-3 text-xs font-black text-white hover:brightness-110 transition-all"
             >
               <Briefcase size={16} weight="bold" /> Post a job
             </button>
@@ -162,7 +163,7 @@ export default function BrowseJobsPage() {
                 onClick={() => setCategory(c)}
                 className={`shrink-0 rounded-full px-4 py-2 text-xs font-black transition-all ${
                   category === c
-                    ? 'bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white shadow-[0_4px_16px_rgba(0,102,255,0.35)]'
+                    ? 'bg-[#0066FF] text-white shadow-[0_4px_16px_rgba(0,102,255,0.35)]'
                     : 'bg-white/[0.05] text-white/50 hover:bg-white/[0.1] hover:text-white'
                 }`}
               >
@@ -241,7 +242,7 @@ export default function BrowseJobsPage() {
                   ) : (
                     <button
                       onClick={() => setApplying(job)}
-                      className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#0066FF] to-[#7000FF] py-3 text-xs font-black text-white hover:brightness-110 transition-all"
+                      className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#0066FF] py-3 text-xs font-black text-white hover:brightness-110 transition-all"
                     >
                       <PaperPlaneTilt size={14} weight="bold" /> Apply
                     </button>
@@ -275,7 +276,7 @@ export default function BrowseJobsPage() {
             >
               <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-white/15" />
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0066FF] to-[#7000FF]">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#0066FF]">
                   <Suitcase size={20} weight="bold" />
                 </div>
                 <div className="min-w-0">
@@ -302,7 +303,7 @@ export default function BrowseJobsPage() {
                 <button
                   onClick={submitApplication}
                   disabled={submitting}
-                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#0066FF] to-[#7000FF] py-3.5 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-50"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#0066FF] py-3.5 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-50"
                 >
                   {submitting ? <SpinnerGap size={16} className="animate-spin" weight="bold" /> : <PaperPlaneTilt size={16} weight="bold" />}
                   {submitting ? 'Applying…' : 'Apply now'}

@@ -103,7 +103,7 @@ export function TopNav() {
         {/* Scroll progress */}
         <motion.div
           style={{ scaleX: progress }}
-          className="absolute inset-x-0 top-0 h-[2px] origin-left bg-gradient-to-r from-[#4D9FFF] via-[#7000FF] to-[#4D9FFF]"
+          className="absolute inset-x-0 top-0 h-[2px] origin-left bg-[#0066FF]"
         />
 
         <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-5 md:px-8 lg:px-12">

@@ -253,11 +253,11 @@ export default function BusinessDashboard() {
             {/* Right Sidebar */}
             <div className="space-y-6">
               <div className={`rounded-2xl border overflow-hidden ${card}`}>
-                <div className="h-20 bg-gradient-to-r from-[#0066FF] to-[#7000FF]" />
+                <div className="h-20 bg-[#0066FF]" />
                 <div className="px-5 pb-5">
                   <div className="relative -mt-10 mb-3">
                     <div className={`h-16 w-16 rounded-full border-4 shadow-lg flex items-center justify-center ${isDark ? 'bg-zinc-900 border-zinc-900' : 'bg-white border-white'}`}>
-                      <div className="h-14 w-14 rounded-full bg-gradient-to-br from-[#0066FF] to-[#7000FF] flex items-center justify-center text-xl font-black text-white uppercase">{username.charAt(0)}</div>
+                      <div className="h-14 w-14 rounded-full bg-[#0066FF] flex items-center justify-center text-xl font-black text-white uppercase">{username.charAt(0)}</div>
                     </div>
                   </div>
                   <h3 className="text-sm font-black flex items-center gap-1">{profile?.full_name || username} {profile?.is_verified && <Check size={14} weight="bold" className="text-[#0066FF]" />}</h3>
@@ -283,7 +283,7 @@ export default function BusinessDashboard() {
                 <p className={`text-[10px] mt-2 font-bold ${muted}`}>
                   Boost visibility using your live pricing from <span className="font-black">{profile?.pricing_from ? `KSh ${profile.pricing_from}` : 'profile pricing'}</span>
                 </p>
-                <button onClick={() => setTab('profile')} className="mt-3 h-8 w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg font-black text-[9px] uppercase tracking-widest">
+                <button onClick={() => setTab('profile')} className="mt-3 h-8 w-full bg-gradient-to-r from-amber-500 text-white rounded-lg font-black text-[9px] uppercase tracking-widest">
                   Update Pricing
                 </button>
               </div>
@@ -308,10 +308,10 @@ export default function BusinessDashboard() {
             <div className={`rounded-2xl border p-6 ${card}`}>
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-black">Profile Information</h3>
-                {!editing ? <button onClick={() => setEditing(true)} className="h-9 px-5 bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:brightness-110 transition-all">Edit</button>
+                {!editing ? <button onClick={() => setEditing(true)} className="h-9 px-5 bg-[#0066FF] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:brightness-110 transition-all">Edit</button>
                   : <div className="flex gap-2">
                     <button onClick={() => setEditing(false)} className={`h-9 px-5 rounded-xl text-[10px] font-black uppercase border ${isDark ? 'border-zinc-700' : 'border-zinc-200'}`}>Cancel</button>
-                    <button onClick={saveProfile} className="h-9 px-5 bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-xl text-[10px] font-black uppercase hover:brightness-110 transition-all">Save</button>
+                    <button onClick={saveProfile} className="h-9 px-5 bg-[#0066FF] text-white rounded-xl text-[10px] font-black uppercase hover:brightness-110 transition-all">Save</button>
                   </div>}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -351,7 +351,7 @@ export default function BusinessDashboard() {
                 <input value={newSkill} onChange={e => setNewSkill(e.target.value)} placeholder="Add a skill..."
                   className={`flex-1 h-10 rounded-xl border px-4 text-sm font-bold outline-none ${isDark ? 'bg-zinc-800 border-zinc-700 text-white' : 'bg-zinc-50 border-zinc-200'}`}
                   onKeyDown={e => e.key === 'Enter' && addSkill()} />
-                <button onClick={addSkill} className="h-10 w-10 bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-xl flex items-center justify-center hover:brightness-110 transition-all"><Plus size={18} weight="bold" /></button>
+                <button onClick={addSkill} className="h-10 w-10 bg-[#0066FF] text-white rounded-xl flex items-center justify-center hover:brightness-110 transition-all"><Plus size={18} weight="bold" /></button>
               </div>
             </div>
           </div>

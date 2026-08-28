@@ -44,9 +44,9 @@ export default function CollectionsScreen() {
           <ArrowLeft size={18} />
         </Link>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#4F46E5]">Nodes explorer</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0066FF]">Nodes explorer</p>
           <h1 className="text-2xl font-black flex items-center gap-2">
-            <FolderOpen size={22} weight="fill" className="text-[#4F46E5]" /> Collections
+            <FolderOpen size={22} weight="fill" className="text-[#0066FF]" /> Collections
           </h1>
         </div>
       </div>

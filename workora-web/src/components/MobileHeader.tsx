@@ -165,7 +165,7 @@ export function MobileHeader() {
                       onClick={() => setSheetOpen(false)}
                       className="group flex items-center gap-4 rounded-2xl px-3 py-3.5 transition-colors hover:bg-white/[0.05]"
                     >
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0066FF]/20 to-[#7000FF]/20 text-[#4D9FFF]">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0066FF]/20 to-[#0052CC]/20 text-[#4D9FFF]">
                         <item.icon size={20} weight="bold" />
                       </div>
                       <div className="min-w-0 flex-1">

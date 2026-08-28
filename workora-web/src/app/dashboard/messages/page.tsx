@@ -237,7 +237,7 @@ export default function MessagesPage() {
           {filtered.length > 0 ? filtered.map(conv => (
             <button key={conv.id} onClick={() => openConversation(conv)}
               className={`w-full flex items-center gap-3 p-4 border-b border-zinc-50 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors text-left ${activeConv?.id === conv.id ? 'bg-zinc-50 dark:bg-zinc-900' : ''}`}>
-              <div className="h-12 w-12 rounded-full bg-gradient-to-br from-[#0066FF] to-[#7000FF] flex items-center justify-center text-white text-sm font-black uppercase shrink-0">
+              <div className="h-12 w-12 rounded-full bg-[#0066FF] flex items-center justify-center text-white text-sm font-black uppercase shrink-0">
                 {conv.other_username?.charAt(0) || '?'}
               </div>
               <div className="flex-1 min-w-0">
@@ -269,7 +269,7 @@ export default function MessagesPage() {
               <button onClick={() => setActiveConv(null)} className="lg:hidden h-9 w-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-950 dark:text-white">
                 <ArrowLeft size={18} weight="bold" />
               </button>
-              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#0066FF] to-[#7000FF] flex items-center justify-center text-white text-xs font-black uppercase">
+              <div className="h-10 w-10 rounded-full bg-[#0066FF] flex items-center justify-center text-white text-xs font-black uppercase">
                 {activeConv.other_username?.charAt(0)}
               </div>
               <div>
@@ -279,21 +279,21 @@ export default function MessagesPage() {
               <div className="ml-auto flex items-center gap-2">
                 <button
                   onClick={() => updateConversationState({ is_pinned: !activeConv.is_pinned })}
-                  className={`h-9 rounded-xl px-3 text-xs font-black ${activeConv.is_pinned ? 'bg-[#EEF2FF] text-[#4F46E5]' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300'}`}
+                  className={`h-9 rounded-xl px-3 text-xs font-black ${activeConv.is_pinned ? 'bg-blue-50 text-[#0066FF]' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300'}`}
                 >
                   <PushPin size={14} weight="bold" className="inline mr-1" />
                   {activeConv.is_pinned ? 'Pinned' : 'Pin'}
                 </button>
                 <button
                   onClick={() => updateConversationState({ is_archived: !activeConv.is_archived })}
-                  className={`h-9 rounded-xl px-3 text-xs font-black ${activeConv.is_archived ? 'bg-[#EEF2FF] text-[#4F46E5]' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300'}`}
+                  className={`h-9 rounded-xl px-3 text-xs font-black ${activeConv.is_archived ? 'bg-blue-50 text-[#0066FF]' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300'}`}
                 >
                   <CalendarBlank size={14} weight="bold" className="inline mr-1" />
                   {activeConv.is_archived ? 'Archived' : 'Archive'}
                 </button>
                 <button
                   onClick={() => updateConversationState({ is_muted: !activeConv.is_muted })}
-                  className={`h-9 rounded-xl px-3 text-xs font-black ${activeConv.is_muted ? 'bg-[#EEF2FF] text-[#4F46E5]' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300'}`}
+                  className={`h-9 rounded-xl px-3 text-xs font-black ${activeConv.is_muted ? 'bg-blue-50 text-[#0066FF]' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300'}`}
                 >
                   <BellSlash size={14} weight="bold" className="inline mr-1" />
                   {activeConv.is_muted ? 'Muted' : 'Mute'}
@@ -326,7 +326,7 @@ export default function MessagesPage() {
               <input value={newMsg} onChange={e => setNewMsg(e.target.value)} placeholder="Type a message..."
                 className="flex-1 h-11 rounded-2xl bg-zinc-100 dark:bg-zinc-900 px-4 text-sm font-bold outline-none text-zinc-950 dark:text-white"
                 onKeyDown={e => e.key === 'Enter' && sendMessage()} />
-              <button onClick={sendMessage} className="h-11 w-11 bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-white rounded-2xl flex items-center justify-center hover:brightness-110 transition-all shrink-0">
+              <button onClick={sendMessage} className="h-11 w-11 bg-[#0066FF] text-white rounded-2xl flex items-center justify-center hover:brightness-110 transition-all shrink-0">
                 <PaperPlaneTilt size={20} weight="fill" />
               </button>
             </div>

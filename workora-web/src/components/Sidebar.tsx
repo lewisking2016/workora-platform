@@ -106,7 +106,7 @@ export function Sidebar() {
                   {isActive && (
                     <motion.span
                       layoutId="sidebar-active-pill"
-                      className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#0066FF]/25 to-[#7000FF]/15 ring-1 ring-[#4D9FFF]/25"
+                      className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#0066FF]/25 to-[#0052CC]/15 ring-1 ring-[#4D9FFF]/25"
                       transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                     />
                   )}
@@ -183,7 +183,7 @@ export function Sidebar() {
           </button>
 
           <Link href="/dashboard/profile" className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.04] border border-white/[0.06] hover:bg-white/[0.07] transition-colors group">
-            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#4D9FFF] to-[#7000FF] flex items-center justify-center text-sm font-black text-white shrink-0">
+            <div className="h-9 w-9 rounded-full bg-[#0066FF] flex items-center justify-center text-sm font-black text-white shrink-0">
               {username?.charAt(0)?.toUpperCase() || 'U'}
             </div>
             <div className="min-w-0 flex-1">

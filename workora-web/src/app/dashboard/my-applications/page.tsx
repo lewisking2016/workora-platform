@@ -104,7 +104,7 @@ export default function MyApplicationsPage() {
       <div className="relative border-b border-white/[0.06] px-4 lg:px-8 pt-6 pb-4">
         <div className="mx-auto max-w-4xl">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0066FF] to-[#7000FF] shadow-[0_8px_24px_rgba(0,102,255,0.35)]">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0066FF] shadow-[0_8px_24px_rgba(0,102,255,0.35)]">
               <PaperPlaneTilt size={20} weight="bold" />
             </div>
             <div>
@@ -125,7 +125,7 @@ export default function MyApplicationsPage() {
             </p>
             <button
               onClick={() => router.push('/dashboard/jobs')}
-              className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#0066FF] to-[#7000FF] px-6 py-3 text-sm font-black text-white hover:brightness-110 transition-all"
+              className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-[#0066FF] px-6 py-3 text-sm font-black text-white hover:brightness-110 transition-all"
             >
               Browse jobs <ArrowRight size={15} weight="bold" />
             </button>
@@ -179,7 +179,7 @@ export default function MyApplicationsPage() {
                     {app.application_status === 'accepted' && (
                       <button
                         onClick={() => void openConversationWith(app.hirer_id, router)}
-                        className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#0066FF] to-[#7000FF] py-3 text-xs font-black text-white hover:brightness-110 transition-all"
+                        className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#0066FF] py-3 text-xs font-black text-white hover:brightness-110 transition-all"
                       >
                         <PaperPlaneTilt size={14} weight="bold" /> Message hirer
                       </button>

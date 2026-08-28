@@ -106,7 +106,7 @@ export default function NotificationsPage() {
     switch (type) {
       case 'like': return <Heart size={18} weight="fill" className="text-red-500" />;
       case 'comment': return <ChatCircleDots size={18} weight="fill" className="text-[#0066FF]" />;
-      case 'follow': return <UserCirclePlus size={18} weight="fill" className="text-[#7000FF]" />;
+      case 'follow': return <UserCirclePlus size={18} weight="fill" className="text-[#0066FF]" />;
       case 'rating': return <Star size={18} weight="fill" className="text-yellow-500" />;
       case 'job_application': return <Suitcase size={18} weight="fill" className="text-[#4D9FFF]" />;
       case 'job_accepted': return <CheckCircle size={18} weight="fill" className="text-emerald-500" />;

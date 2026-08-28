@@ -33,7 +33,7 @@ export function TechCard({ children, className = '', hover = true, glow = false 
       {/* Inner glow effect on hover */}
       {glow && (
         <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5" />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-500/5" />
         </div>
       )}
       

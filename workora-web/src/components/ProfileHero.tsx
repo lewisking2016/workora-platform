@@ -29,7 +29,7 @@ export function ProfileHero({
     <div className="rounded-xl bg-white p-6 shadow-sm shadow-black/5 dark:bg-zinc-900">
       <div className="flex items-start gap-5">
         <div className="relative">
-          <div className="rounded-xl bg-gradient-to-tr from-[#0066FF] via-[#4F46E5] to-[#7000FF] p-1.5 shadow-[0_16px_30px_-18px_rgba(79,70,229,0.55)]">
+          <div className="rounded-xl bg-[#0066FF] p-1.5 shadow-[0_16px_30px_-18px_rgba(79,70,229,0.55)]">
             {showImage ? (
               <Image
                 src={imageUrl}
@@ -48,7 +48,7 @@ export function ProfileHero({
           </div>
           
           {isVerified && (
-            <div className="absolute -bottom-1 -right-1 rounded-xl bg-gradient-to-br from-[#0066FF] via-[#4F46E5] to-[#7000FF] p-1.5 shadow-lg">
+            <div className="absolute -bottom-1 -right-1 rounded-xl bg-gradient-to-br from-[#0066FF] p-1.5 shadow-lg">
                 <SealCheck size={18} weight="regular" className="text-white" />
             </div>
           )}

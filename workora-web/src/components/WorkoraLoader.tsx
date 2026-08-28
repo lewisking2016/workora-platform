@@ -77,7 +77,7 @@ export default function WorkoraLoader({ fullScreen = false, startTime }: Workora
     },
     {
       id: 'zip',
-      icon: <ZipperIcon size={28} className="text-[#7000FF] rotate-90" />,
+      icon: <ZipperIcon size={28} className="text-[#0066FF] rotate-90" />,
       trackStyle: 'border-b-4 border-double border-zinc-400',
       gap: 8,
       iconAnim: { scale: [1, 1.1, 1], transition: { duration: animDuration } }

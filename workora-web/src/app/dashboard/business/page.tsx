@@ -228,13 +228,13 @@ export default function BusinessHubPage() {
     <div className="min-h-full w-full bg-[#0A0D16] text-white">
       {/* ambient glows */}
       <div className="pointer-events-none fixed -top-32 left-1/4 h-[320px] w-[320px] rounded-full bg-[#0066FF]/15 blur-[110px]" />
-      <div className="pointer-events-none fixed top-1/3 -right-24 h-[280px] w-[280px] rounded-full bg-[#7000FF]/10 blur-[100px]" />
+      <div className="pointer-events-none fixed top-1/3 -right-24 h-[280px] w-[280px] rounded-full bg-[#0066FF]/10 blur-[100px]" />
 
       {/* Header */}
       <div className="relative border-b border-white/[0.06] px-4 lg:px-8 pt-5 pb-0">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0066FF] to-[#7000FF] shadow-[0_8px_24px_rgba(0,102,255,0.35)]">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0066FF] shadow-[0_8px_24px_rgba(0,102,255,0.35)]">
               <BuildingOffice size={22} weight="bold" />
             </div>
             <div>
@@ -261,7 +261,7 @@ export default function BusinessHubPage() {
                 {tab === t.key && (
                   <motion.span
                     layoutId="business-tab-underline"
-                    className="absolute inset-x-2 bottom-0 h-[3px] rounded-full bg-gradient-to-r from-[#4D9FFF] to-[#A78BFA]"
+                    className="absolute inset-x-2 bottom-0 h-[3px] rounded-full bg-[#0066FF]"
                     transition={{ type: 'spring', stiffness: 400, damping: 32 }}
                   />
                 )}
@@ -280,7 +280,7 @@ export default function BusinessHubPage() {
               {[
                 { label: 'Jobs posted', value: stats.totalJobs, icon: Briefcase, color: 'text-[#4D9FFF]', bg: 'from-[#0066FF]/20 to-transparent' },
                 { label: 'Open now', value: stats.openJobs, icon: ClockCountdown, color: 'text-emerald-400', bg: 'from-emerald-500/15 to-transparent' },
-                { label: 'Applications', value: stats.applications, icon: UsersThree, color: 'text-violet-400', bg: 'from-[#7000FF]/20 to-transparent' },
+                { label: 'Applications', value: stats.applications, icon: UsersThree, color: 'text-violet-400', bg: 'from-[#0066FF]/20 to-transparent' },
                 { label: 'Budget committed', value: stats.budgetCommitted ? `KSh ${stats.budgetCommitted.toLocaleString()}` : '—', icon: Coins, color: 'text-amber-400', bg: 'from-amber-500/15 to-transparent' },
               ].map((s, i) => (
                 <motion.div
@@ -304,7 +304,7 @@ export default function BusinessHubPage() {
                 transition={{ delay: 0.2, ease: EASE }}
                 className="rounded-3xl border border-white/[0.07] bg-white/[0.03] p-10 text-center"
               >
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0066FF]/20 to-[#7000FF]/20">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0066FF]/20 to-[#0052CC]/20">
                   <Suitcase size={30} weight="duotone" className="text-[#4D9FFF]" />
                 </div>
                 <h2 className="text-lg font-black">Post your first job</h2>
@@ -313,7 +313,7 @@ export default function BusinessHubPage() {
                 </p>
                 <button
                   onClick={() => setTab('post')}
-                  className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#0066FF] to-[#7000FF] px-6 py-3 text-sm font-black text-white hover:brightness-110 transition-all"
+                  className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-[#0066FF] px-6 py-3 text-sm font-black text-white hover:brightness-110 transition-all"
                 >
                   <Plus size={16} weight="bold" /> Post a job
                 </button>
@@ -438,7 +438,7 @@ export default function BusinessHubPage() {
               <button
                 onClick={postJob}
                 disabled={!form.title.trim() || posting}
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#0066FF] to-[#7000FF] text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-40 disabled:hover:brightness-100"
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#0066FF] text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-40 disabled:hover:brightness-100"
               >
                 {posting ? <SpinnerGap size={18} className="animate-spin" weight="bold" /> : <Plus size={18} weight="bold" />}
                 {posting ? 'Posting…' : 'Post job'}
@@ -556,7 +556,7 @@ export default function BusinessHubPage() {
                   className="rounded-2xl border border-white/[0.07] bg-white/[0.03] p-5"
                 >
                   <div className="flex items-start gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#4D9FFF] to-[#7000FF] text-sm font-black uppercase">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#0066FF] text-sm font-black uppercase">
                       {app.worker_name?.charAt(0) || '?'}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -588,7 +588,7 @@ export default function BusinessHubPage() {
                       <button
                         onClick={() => decideApplication(app, 'accepted')}
                         disabled={busyApp === app.id}
-                        className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 py-2.5 text-xs font-black text-white hover:brightness-110 transition-all disabled:opacity-50"
+                        className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-500 py-2.5 text-xs font-black text-white hover:brightness-110 transition-all disabled:opacity-50"
                       >
                         {busyApp === app.id ? '…' : <><Check size={14} weight="bold" /> Accept</>}
                       </button>

@@ -27,7 +27,7 @@ const linkColumns = [
   },
   {
     title: 'Company',
-    accent: 'text-[#A78BFA]',
+    accent: 'text-[#4D9FFF]',
     links: [
       { label: 'About System', href: '/about' },
       { label: 'Engineering', href: '/careers' },
@@ -77,7 +77,7 @@ export function Footer() {
   return (
     <footer className={`relative overflow-hidden transition-colors duration-500 ${dark ? 'bg-[#07090F]' : 'bg-[#0A0D16]'}`}>
       {/* ambient gradients */}
-      <div className="pointer-events-none absolute -top-40 left-1/4 h-[420px] w-[720px] rounded-full bg-gradient-to-r from-[#4D9FFF]/12 to-[#7000FF]/12 blur-[120px]" />
+      <div className="pointer-events-none absolute -top-40 left-1/4 h-[420px] w-[720px] rounded-full bg-gradient-to-r from-[#4D9FFF]/12 to-[#0052CC]/12 blur-[120px]" />
       <div className="pointer-events-none absolute -bottom-48 right-0 h-[400px] w-[600px] rounded-full bg-[#0066FF]/8 blur-[120px]" />
       {/* dot grid */}
       <div className="pointer-events-none absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
@@ -93,7 +93,7 @@ export function Footer() {
           transition={{ duration: 0.7, ease: EASE }}
           className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-8 md:p-10 mb-16 backdrop-blur-sm"
         >
-          <div className="absolute -top-24 right-10 h-[220px] w-[320px] rounded-full bg-gradient-to-r from-[#4D9FFF]/25 to-[#7000FF]/25 blur-[80px]" />
+          <div className="absolute -top-24 right-10 h-[220px] w-[320px] rounded-full bg-gradient-to-r from-[#4D9FFF]/25 to-[#0052CC]/25 blur-[80px]" />
           <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
             <div className="space-y-2">
               <span className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
@@ -101,7 +101,7 @@ export function Footer() {
                 Network status · operational
               </span>
               <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">
-                Build your proof. <span className="bg-gradient-to-r from-[#4D9FFF] to-[#A78BFA] bg-clip-text text-transparent">Own your reputation.</span>
+                Build your proof. <span className="bg-[#0066FF] bg-clip-text text-transparent">Own your reputation.</span>
               </h2>
               <p className="text-sm text-white/50 max-w-md">
                 Join the platform — or get platform updates straight to your inbox.
@@ -204,7 +204,7 @@ export function Footer() {
                     >
                       <span className="relative">
                         {link.label}
-                        <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-gradient-to-r from-[#4D9FFF] to-[#A78BFA] transition-transform duration-300 group-hover:scale-x-100" />
+                        <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-[#0066FF] transition-transform duration-300 group-hover:scale-x-100" />
                       </span>
                       <ArrowUpRight size={12} className="opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0 text-[#4D9FFF]" />
                     </Link>

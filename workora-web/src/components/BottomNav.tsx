@@ -43,7 +43,7 @@ export function BottomNav() {
                 {isActive && (
                   <motion.div 
                     layoutId="bottomNavIndicator"
-                    className="absolute top-0 w-8 h-1 bg-gradient-to-r from-[#0066FF] to-[#7000FF] rounded-b-full shadow-[0_4px_12px_rgba(0,102,255,0.4)]"
+                    className="absolute top-0 w-8 h-1 bg-[#0066FF] rounded-b-full shadow-[0_4px_12px_rgba(0,102,255,0.4)]"
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   />
                 )}

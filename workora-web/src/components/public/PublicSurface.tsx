@@ -143,17 +143,17 @@ const ACCENTS: Record<SurfaceVariant, {
   hex: string; text: string; bgSoft: string; ring: string; chip: string;
   gradient: string; bar: string; dot: string;
 }> = {
-  trust:    { hex: '#10B981', text: 'text-emerald-600', bgSoft: 'bg-emerald-50', ring: 'ring-emerald-500/20', chip: 'border-emerald-200/70 text-emerald-700 bg-emerald-50/60', gradient: 'from-emerald-500 to-teal-500', bar: 'bg-gradient-to-r from-emerald-500 to-teal-400', dot: 'text-emerald-500' },
+  trust:    { hex: '#10B981', text: 'text-emerald-600', bgSoft: 'bg-emerald-50', ring: 'ring-emerald-500/20', chip: 'border-emerald-200/70 text-emerald-700 bg-emerald-50/60', gradient: 'from-emerald-500', bar: 'bg-gradient-to-r from-emerald-500 to-teal-400', dot: 'text-emerald-500' },
   safety:   { hex: '#F43F5E', text: 'text-rose-600',     bgSoft: 'bg-rose-50',     ring: 'ring-rose-500/20',     chip: 'border-rose-200/70 text-rose-700 bg-rose-50/60',     gradient: 'from-rose-500 to-orange-500', bar: 'bg-gradient-to-r from-rose-500 to-orange-400', dot: 'text-rose-500' },
   about:    { hex: '#0066FF', text: 'text-blue-600',     bgSoft: 'bg-blue-50',     ring: 'ring-blue-500/20',     chip: 'border-blue-200/70 text-blue-700 bg-blue-50/60',     gradient: 'from-blue-500 to-cyan-500', bar: 'bg-gradient-to-r from-blue-500 to-cyan-400', dot: 'text-blue-500' },
-  careers:  { hex: '#8B5CF6', text: 'text-violet-600',   bgSoft: 'bg-violet-50',   ring: 'ring-violet-500/20',   chip: 'border-violet-200/70 text-violet-700 bg-violet-50/60', gradient: 'from-violet-500 to-fuchsia-500', bar: 'bg-gradient-to-r from-violet-500 to-fuchsia-400', dot: 'text-violet-500' },
+  careers:  { hex: '#8B5CF6', text: 'text-violet-600',   bgSoft: 'bg-violet-50',   ring: 'ring-violet-500/20',   chip: 'border-violet-200/70 text-violet-700 bg-violet-50/60', gradient: 'from-blue-500', bar: 'bg-gradient-to-r from-blue-500', dot: 'text-violet-500' },
   contact:  { hex: '#0066FF', text: 'text-blue-600',     bgSoft: 'bg-blue-50',     ring: 'ring-blue-500/20',     chip: 'border-blue-200/70 text-blue-700 bg-blue-50/60',     gradient: 'from-blue-500 to-cyan-500', bar: 'bg-gradient-to-r from-blue-500 to-cyan-400', dot: 'text-blue-500' },
   help:     { hex: '#F59E0B', text: 'text-amber-600',    bgSoft: 'bg-amber-50',    ring: 'ring-amber-500/20',    chip: 'border-amber-200/70 text-amber-700 bg-amber-50/60',  gradient: 'from-amber-500 to-orange-500', bar: 'bg-gradient-to-r from-amber-500 to-orange-400', dot: 'text-amber-500' },
   privacy:  { hex: '#64748B', text: 'text-slate-600',    bgSoft: 'bg-slate-100',   ring: 'ring-slate-500/20',    chip: 'border-slate-200/70 text-slate-700 bg-slate-50/60',   gradient: 'from-slate-500 to-slate-400', bar: 'bg-gradient-to-r from-slate-500 to-slate-400', dot: 'text-slate-500' },
   terms:    { hex: '#64748B', text: 'text-slate-600',    bgSoft: 'bg-slate-100',   ring: 'ring-slate-500/20',    chip: 'border-slate-200/70 text-slate-700 bg-slate-50/60',   gradient: 'from-slate-500 to-slate-400', bar: 'bg-gradient-to-r from-slate-500 to-slate-400', dot: 'text-slate-500' },
-  personal: { hex: '#10B981', text: 'text-emerald-600',  bgSoft: 'bg-emerald-50',  ring: 'ring-emerald-500/20',  chip: 'border-emerald-200/70 text-emerald-700 bg-emerald-50/60', gradient: 'from-emerald-500 to-teal-500', bar: 'bg-gradient-to-r from-emerald-500 to-teal-400', dot: 'text-emerald-500' },
-  business: { hex: '#0066FF', text: 'text-blue-600',     bgSoft: 'bg-blue-50',     ring: 'ring-blue-500/20',     chip: 'border-blue-200/70 text-blue-700 bg-blue-50/60',     gradient: 'from-blue-500 to-indigo-500', bar: 'bg-gradient-to-r from-blue-500 to-indigo-400', dot: 'text-blue-500' },
-  platform: { hex: '#0066FF', text: 'text-blue-600',     bgSoft: 'bg-blue-50',     ring: 'ring-blue-500/20',     chip: 'border-blue-200/70 text-blue-700 bg-blue-50/60',     gradient: 'from-blue-500 to-violet-500', bar: 'bg-gradient-to-r from-blue-500 to-violet-400', dot: 'text-blue-500' },
+  personal: { hex: '#10B981', text: 'text-emerald-600',  bgSoft: 'bg-emerald-50',  ring: 'ring-emerald-500/20',  chip: 'border-emerald-200/70 text-emerald-700 bg-emerald-50/60', gradient: 'from-emerald-500', bar: 'bg-gradient-to-r from-emerald-500 to-teal-400', dot: 'text-emerald-500' },
+  business: { hex: '#0066FF', text: 'text-blue-600',     bgSoft: 'bg-blue-50',     ring: 'ring-blue-500/20',     chip: 'border-blue-200/70 text-blue-700 bg-blue-50/60',     gradient: 'from-blue-500', bar: 'bg-gradient-to-r from-blue-500', dot: 'text-blue-500' },
+  platform: { hex: '#0066FF', text: 'text-blue-600',     bgSoft: 'bg-blue-50',     ring: 'ring-blue-500/20',     chip: 'border-blue-200/70 text-blue-700 bg-blue-50/60',     gradient: 'from-blue-500', bar: 'bg-gradient-to-r from-blue-500 to-violet-400', dot: 'text-blue-500' },
 };
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -254,7 +254,7 @@ function GigPreview({ gig }: { gig: PublicGig }) {
         <p className="mt-1.5 text-xs text-zinc-500 leading-relaxed line-clamp-2">{gig.description || 'A live post from the feed.'}</p>
         <div className="mt-4 flex items-center justify-between border-t border-zinc-50 pt-3">
           <span className="flex items-center gap-1.5 text-xs font-bold text-zinc-500">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-violet-500 text-[8px] font-black text-white">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 text-[8px] font-black text-white">
               {(gig.user_name || gig.handle || 'M').charAt(0).toUpperCase()}
             </span>
             {gig.user_name || gig.handle || 'Member'}

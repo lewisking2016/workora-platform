@@ -216,7 +216,7 @@ export default function NewPostPage() {
             </div>
           </div>
           <div className="mt-6 h-3 rounded-full bg-zinc-100 dark:bg-zinc-900">
-            <div className="h-3 rounded-full bg-gradient-to-r from-[#0066FF] to-[#7000FF]" style={{ width: `${Math.max(5, uploadProgress)}%` }} />
+            <div className="h-3 rounded-full bg-[#0066FF]" style={{ width: `${Math.max(5, uploadProgress)}%` }} />
           </div>
           <div className="mt-3 flex items-center justify-between">
             <p className="text-sm font-semibold text-zinc-500 dark:text-zinc-400">{uploadProgress}% complete</p>

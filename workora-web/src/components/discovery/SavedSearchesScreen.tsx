@@ -96,9 +96,9 @@ export default function SavedSearchesScreen() {
           <ArrowLeft size={18} />
         </Link>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#4F46E5]">Nodes explorer</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0066FF]">Nodes explorer</p>
           <h1 className="text-2xl font-black flex items-center gap-2">
-            <BookmarkSimple size={22} weight="fill" className="text-[#4F46E5]" /> Saved searches
+            <BookmarkSimple size={22} weight="fill" className="text-[#0066FF]" /> Saved searches
           </h1>
         </div>
       </div>
@@ -149,7 +149,7 @@ export default function SavedSearchesScreen() {
                   onClick={() => runSearch(search)}
                   className="flex min-w-0 flex-1 items-center gap-3 text-left"
                 >
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EEF2FF] text-[#4F46E5] dark:bg-[#1B1F3A] dark:text-[#A5B4FC]">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#0066FF] dark:bg-blue-950 dark:text-[#4D9FFF]">
                     <ClockCounterClockwise size={18} />
                   </span>
                   <span className="min-w-0">

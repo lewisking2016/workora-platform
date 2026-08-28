@@ -33,6 +33,7 @@ import { VideoPlayer } from '@/components/VideoPlayer';
 import { apiFetch, fetchCurrentUser } from '@/lib/session';
 import { APP_CONFIG } from '@/lib/config';
 import { useToast } from '@/components/Toast';
+import { ScrollReveal } from '@/components/ScrollReveal';
 
 type FeedScope = 'new' | 'following' | 'recommended' | 'trending' | 'nearby' | 'reels';
 
@@ -580,7 +581,7 @@ export default function DashboardFeedPage() {
                   className="flex shrink-0 flex-col items-center gap-2"
                   onClick={() => router.push(`/dashboard/stories/${story.id}`)}
                 >
-                  <div className="h-16 w-16 rounded-full bg-gradient-to-tr from-[#0057FF] via-[#4F46E5] to-[#8B5CF6] p-[2px]">
+                  <div className="h-16 w-16 rounded-full bg-[#0066FF] p-[2px]">
                     <div className="flex h-full w-full items-center justify-center rounded-full bg-white text-zinc-950 dark:bg-black dark:text-white">
                       <span className="text-base font-black">{story.name.charAt(0)}</span>
                     </div>
@@ -601,7 +602,7 @@ export default function DashboardFeedPage() {
           {feedError && !loading ? (
             <div className="rounded-2xl bg-white p-8 text-center shadow-sm shadow-black/5 dark:bg-zinc-950">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-900">
-                <WarningCircle size={28} weight="fill" className="text-[#4F46E5]" />
+                <WarningCircle size={28} weight="fill" className="text-[#0066FF]" />
               </div>
               <h2 className="text-xl font-black">{currentScopeCopy.emptyTitle}</h2>
               <p className="mx-auto mt-2 max-w-md text-sm text-zinc-500 dark:text-zinc-400">{feedError}</p>
@@ -632,13 +633,14 @@ export default function DashboardFeedPage() {
             </div>
           ) : posts.length > 0 ? (
             <div className="space-y-4">
-              {posts.map(post => (
-                <article key={post.id} className="overflow-hidden rounded-2xl bg-white shadow-sm shadow-black/5 dark:bg-zinc-950">
+              {posts.map((post, i) => (
+                <ScrollReveal key={post.id} delay={i * 0.05} direction="up">
+                <article className="overflow-hidden rounded-2xl bg-white shadow-sm shadow-black/5 dark:bg-zinc-950 transition-transform duration-200 hover:scale-[1.005]">
                   <div className="flex items-center justify-between px-4 py-4">
                     <div className="flex items-center gap-3 min-w-0">
                       <Link
                         href={`/profile/${post.creator_user_id || post.user_id}`}
-                        className="h-11 w-11 shrink-0 rounded-full bg-gradient-to-tr from-[#0057FF] via-[#4F46E5] to-[#8B5CF6] p-[2px] transition-transform hover:scale-105"
+                        className="h-11 w-11 shrink-0 rounded-full bg-[#0066FF] p-[2px] transition-transform hover:scale-105"
                         aria-label={`View ${post.user_name}'s profile`}
                       >
                         <div className="flex h-full w-full items-center justify-center rounded-full bg-white text-sm font-black text-zinc-950 dark:bg-black dark:text-white">
@@ -648,7 +650,7 @@ export default function DashboardFeedPage() {
                       <div className="min-w-0">
                         <Link href={`/profile/${post.creator_user_id || post.user_id}`} className="flex items-center gap-1.5">
                           <p className="truncate text-sm font-semibold hover:text-[#0057FF] dark:hover:text-[#4D9FFF] transition-colors">{post.user_name}</p>
-                          {post.verified && <SealCheck size={14} weight="fill" className="text-[#4F46E5]" />}
+                          {post.verified && <SealCheck size={14} weight="fill" className="text-[#0066FF]" />}
                         </Link>
                         <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">{post.trade}</p>
                       </div>
@@ -694,7 +696,7 @@ export default function DashboardFeedPage() {
                           disabled={busyId === post.id}
                           className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
                             post.liked_by_me
-                              ? 'bg-[#EEF2FF] text-[#4F46E5] dark:bg-[#1B1F3A] dark:text-[#A5B4FC]'
+                              ? 'bg-blue-50 text-[#0066FF] dark:bg-blue-950 dark:text-[#4D9FFF]'
                               : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800'
                           }`}
                         >
@@ -736,6 +738,7 @@ export default function DashboardFeedPage() {
                     </div>
                   </div>
                 </article>
+                </ScrollReveal>
               ))}
 
               {hasMore && (
@@ -789,8 +792,8 @@ export default function DashboardFeedPage() {
                 Profile
               </Link>
             </div>
-            <div className="mt-4 flex items-center gap-3 rounded-xl bg-gradient-to-br from-[#0057FF]/[0.08] to-[#8B5CF6]/[0.08] p-3 dark:from-[#0057FF]/[0.12] dark:to-[#8B5CF6]/[0.12]">
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-tr from-[#0057FF] via-[#4F46E5] to-[#8B5CF6] text-sm font-black text-white">
+            <div className="mt-4 flex items-center gap-3 rounded-xl bg-gradient-to-br from-[#0066FF]/[0.06] p-3 dark:from-[#0066FF]/[0.10]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#0066FF] text-sm font-black text-white">
                 {currentUser?.username?.charAt(0) || 'U'}
               </div>
               <div>
@@ -817,7 +820,7 @@ export default function DashboardFeedPage() {
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
                         <p className="truncate text-sm font-semibold group-hover:text-[#0057FF] dark:group-hover:text-[#4D9FFF] transition-colors">{pro.name}</p>
-                        {pro.is_verified && <SealCheck size={14} weight="fill" className="text-[#4F46E5]" />}
+                        {pro.is_verified && <SealCheck size={14} weight="fill" className="text-[#0066FF]" />}
                       </div>
                       <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
                         <span className="inline-flex items-center gap-1">
@@ -841,7 +844,7 @@ export default function DashboardFeedPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl bg-gradient-to-br from-[#0057FF] via-[#4F46E5] to-[#8B5CF6] p-[1px]">
+          <div className="rounded-2xl bg-[#0066FF] p-[1px]">
             <div className="rounded-2xl bg-white p-4 dark:bg-zinc-950">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">Grow your reputation</p>
               <h3 className="mt-1 text-lg font-black">Share proof of work</h3>
@@ -850,7 +853,7 @@ export default function DashboardFeedPage() {
               </p>
               <button
                 onClick={() => router.push('/dashboard/create/new')}
-                className="mt-4 w-full rounded-xl bg-gradient-to-r from-[#0057FF] to-[#7000FF] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                className="mt-4 w-full rounded-xl bg-gradient-to-r from-[#0057FF] to-[#0052CC] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
               >
                 Share your work
               </button>
@@ -914,7 +917,7 @@ export default function DashboardFeedPage() {
                 {replyTo && (
                   <div className="mb-3 flex items-center justify-between rounded-xl bg-zinc-50 px-3 py-2 text-xs font-semibold text-zinc-600 dark:bg-zinc-900 dark:text-zinc-300">
                     <span>Replying to @{replyTo.username}</span>
-                    <button onClick={() => setReplyTo(null)} className="text-[#4F46E5]">Clear</button>
+                    <button onClick={() => setReplyTo(null)} className="text-[#0066FF]">Clear</button>
                   </div>
                 )}
                 <div className="flex items-center gap-3">
@@ -1105,7 +1108,7 @@ export default function DashboardFeedPage() {
                     onClick={() => setReportReason(reason.key)}
                     className={`flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-sm font-semibold ${
                       reportReason === reason.key
-                        ? 'bg-[#EEF2FF] text-[#4F46E5] dark:bg-[#1B1F3A] dark:text-[#A5B4FC]'
+                        ? 'bg-blue-50 text-[#0066FF] dark:bg-blue-950 dark:text-[#4D9FFF]'
                         : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300'
                     }`}
                   >

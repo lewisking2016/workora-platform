@@ -39,7 +39,7 @@ const insights = [
     icon: UsersThree,
     tag: 'Network',
     accent: 'bg-violet-50 text-violet-600',
-    bar: 'from-violet-500 to-fuchsia-400',
+    bar: 'from-blue-500',
     title: 'Community beats directory',
     body: 'A directory lists names. A community carries reputation. When workers follow each other, leave reviews, and share live work, hiring stops being a gamble and starts being a referral — at platform scale.',
     stat: '1:1',
@@ -82,7 +82,7 @@ function GigCard({ gig }: { gig: PublicGig }) {
         <p className="mt-1.5 text-xs text-zinc-500 leading-relaxed line-clamp-2">{gig.description || 'A live post from the feed.'}</p>
         <div className="mt-4 flex items-center justify-between border-t border-zinc-50 pt-3">
           <span className="flex items-center gap-1.5 text-xs font-bold text-zinc-500">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-violet-500 text-[8px] font-black text-white">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 text-[8px] font-black text-white">
               {(gig.user_name || gig.handle || 'M').charAt(0).toUpperCase()}
             </span>
             {gig.user_name || gig.handle || 'Member'}
@@ -104,7 +104,7 @@ export function InsightsClient({ data }: { data: PublicSurfaceData }) {
     <main className="min-h-screen bg-white text-zinc-900 overflow-x-clip">
       {/* Hero */}
       <section className="relative overflow-hidden bg-[#07090F] text-white">
-        <div className="absolute -top-40 left-1/2 h-[520px] w-[820px] -translate-x-1/2 rounded-full bg-gradient-to-r from-blue-500 to-violet-500 opacity-[0.15] blur-[120px]" />
+        <div className="absolute -top-40 left-1/2 h-[520px] w-[820px] -translate-x-1/2 rounded-full bg-gradient-to-r from-blue-500 opacity-[0.15] blur-[120px]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_30%,rgba(255,255,255,0.05),transparent_50%)]" />
         <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
 
@@ -121,7 +121,7 @@ export function InsightsClient({ data }: { data: PublicSurfaceData }) {
             </span>
             <h1 className="text-white font-black leading-[1.05] tracking-tight">
               The thinking behind{' '}
-              <span className="bg-gradient-to-r from-blue-500 to-violet-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-blue-500 bg-clip-text text-transparent">
                 the platform
               </span>
             </h1>
@@ -237,7 +237,7 @@ export function InsightsClient({ data }: { data: PublicSurfaceData }) {
           transition={{ duration: 0.7, ease: EASE }}
           className="relative overflow-hidden rounded-[2rem] bg-[#07090F] p-10 md:p-16 text-white"
         >
-          <div className="absolute -top-32 left-1/4 h-[360px] w-[560px] rounded-full bg-gradient-to-r from-blue-500 to-violet-500 opacity-20 blur-[100px]" />
+          <div className="absolute -top-32 left-1/4 h-[360px] w-[560px] rounded-full bg-gradient-to-r from-blue-500 opacity-20 blur-[100px]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.06),transparent_50%)]" />
           <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-10">
             <div className="max-w-xl space-y-3">
@@ -246,7 +246,7 @@ export function InsightsClient({ data }: { data: PublicSurfaceData }) {
                 Start building yours
               </span>
               <h2 className="text-3xl md:text-4xl font-black text-white leading-tight">
-                Your work is your <span className="bg-gradient-to-r from-blue-500 to-violet-500 bg-clip-text text-transparent">evidence</span>
+                Your work is your <span className="bg-gradient-to-r from-blue-500 bg-clip-text text-transparent">evidence</span>
               </h2>
               <p className="text-white/55 text-base md:text-lg leading-relaxed">
                 Join Workora, post your proof, and let verified work speak for you.

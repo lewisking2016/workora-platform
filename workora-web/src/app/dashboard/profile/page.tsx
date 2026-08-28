@@ -267,7 +267,7 @@ export default function DashboardProfilePage() {
             // eslint-disable-next-line @next/next/no-img-element
             <img src={coverSrc} alt="Cover" className="h-full w-full object-cover" />
           ) : (
-            <div className="h-full w-full bg-[radial-gradient(ellipse_at_top_left,rgba(0,102,255,0.55),transparent_55%),radial-gradient(ellipse_at_bottom_right,rgba(112,0,255,0.45),transparent_55%),linear-gradient(135deg,#0B1120,#101A33)]" />
+            <div className="h-full w-full bg-[radial-gradient(ellipse_at_top_left,rgba(0,102,255,0.55),transparent_55%),radial-gradient(ellipse_at_bottom_right,rgba(0,82,204,0.45),transparent_55%),linear-gradient(135deg,#0B1120,#101A33)]" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/10" />
           {/* subtle grid pattern */}
@@ -285,12 +285,12 @@ export default function DashboardProfilePage() {
             {/* Avatar + name */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-5">
               <div className="relative w-fit">
-                <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-white bg-gradient-to-br from-[#4D9FFF] to-[#7000FF] shadow-xl dark:border-[#0A0E17] sm:h-32 sm:w-32">
+                <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-white bg-[#0066FF] shadow-xl dark:border-[#0A0E17] sm:h-32 sm:w-32">
                   {avatarSrc ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={avatarSrc} alt={displayName} className="h-full w-full object-cover" />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#4D9FFF] to-[#7000FF] text-4xl font-black text-white">
+                    <div className="flex h-full w-full items-center justify-center bg-[#0066FF] text-4xl font-black text-white">
                       {initials}
                     </div>
                   )}
@@ -480,7 +480,7 @@ export default function DashboardProfilePage() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-zinc-300 bg-white px-6 py-20 text-center dark:border-zinc-700 dark:bg-zinc-900">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#4D9FFF]/15 to-[#7000FF]/15">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#4D9FFF]/15 to-[#0052CC]/15">
                     <VideoCamera size={30} className="text-[#4D9FFF]" weight="duotone" />
                   </div>
                   <p className="mt-4 text-base font-black text-zinc-950 dark:text-white">No work on this profile yet</p>
@@ -525,7 +525,7 @@ export default function DashboardProfilePage() {
 
               <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
                 <h3 className="flex items-center gap-2 text-sm font-black text-zinc-950 dark:text-white">
-                  <Sparkle size={16} weight="fill" className="text-[#7000FF]" /> Skills
+                  <Sparkle size={16} weight="fill" className="text-[#0066FF]" /> Skills
                 </h3>
                 {skills.length > 0 ? (
                   <div className="mt-3 flex flex-wrap gap-2">
@@ -582,7 +582,7 @@ export default function DashboardProfilePage() {
                             initial={{ width: 0 }}
                             animate={{ width: `${bar.pct}%` }}
                             transition={{ duration: 0.6, ease: EASE }}
-                            className="h-full rounded-full bg-gradient-to-r from-yellow-400 to-amber-500"
+                            className="h-full rounded-full bg-gradient-to-r from-amber-500"
                           />
                         </div>
                         <span className="w-6 text-right text-[11px] font-bold text-zinc-400">{bar.count}</span>
@@ -604,7 +604,7 @@ export default function DashboardProfilePage() {
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#4D9FFF] to-[#7000FF] text-[11px] font-black text-white">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0066FF] text-[11px] font-black text-white">
                             {(review.reviewer_username || 'C').charAt(0).toUpperCase()}
                           </div>
                           <div className="leading-tight">
@@ -731,7 +731,7 @@ export default function DashboardProfilePage() {
                 initial={{ width: 0 }}
                 animate={{ width: `${Math.min(100, Number(profile?.trust_score || 0) * 20)}%` }}
                 transition={{ duration: 0.8, ease: EASE }}
-                className="h-full rounded-full bg-gradient-to-r from-[#4D9FFF] to-[#7000FF]"
+                className="h-full rounded-full bg-gradient-to-r from-[#0066FF]"
               />
             </div>
           </div>

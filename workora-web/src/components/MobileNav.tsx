@@ -40,7 +40,7 @@ export function MobileNav() {
               {isActive && !item.accent && (
                 <motion.div
                   layoutId="activeMobileIndicator"
-                  className="absolute -top-[1px] h-[3px] w-7 rounded-b-full bg-gradient-to-r from-[#4D9FFF] to-[#7000FF] shadow-[0_4px_12px_rgba(0,102,255,0.5)]"
+                  className="absolute -top-[1px] h-[3px] w-7 rounded-b-full bg-gradient-to-r from-[#0066FF] shadow-[0_4px_12px_rgba(0,102,255,0.5)]"
                   transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                 />
               )}
@@ -48,7 +48,7 @@ export function MobileNav() {
               {item.accent ? (
                 <span className={`flex h-11 w-11 items-center justify-center rounded-2xl transition-all ${
                   isActive
-                    ? 'bg-gradient-to-br from-[#0066FF] to-[#7000FF] text-white shadow-[0_8px_24px_rgba(0,102,255,0.45)] -translate-y-2'
+                    ? 'bg-[#0066FF] text-white shadow-[0_8px_24px_rgba(0,102,255,0.45)] -translate-y-2'
                     : 'bg-white/[0.06] text-white/70 group-hover:bg-white/[0.12] group-hover:text-white -translate-y-2'
                 }`}>
                   <Icon size={22} weight={isActive ? 'fill' : 'bold'} />
@@ -65,7 +65,7 @@ export function MobileNav() {
 
               <span className={`text-[9px] font-black uppercase tracking-wider transition-colors duration-200 ${
                 isActive
-                  ? 'bg-gradient-to-r from-[#4D9FFF] to-[#A78BFA] bg-clip-text text-transparent'
+                  ? 'bg-[#0066FF] bg-clip-text text-transparent'
                   : 'text-white/35 group-hover:text-white/60'
               }`}>
                 {item.label}

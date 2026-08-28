@@ -210,7 +210,7 @@ export default function EditProfilePage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white dark:bg-black">
-        <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} className="text-[#4F46E5]">
+        <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} className="text-[#0066FF]">
           <SpinnerGap size={48} weight="bold" />
         </motion.div>
       </div>
@@ -471,7 +471,7 @@ export default function EditProfilePage() {
 
             <div className="rounded-xl bg-zinc-50 px-4 py-4 text-sm text-zinc-600 dark:bg-zinc-900 dark:text-zinc-300">
               <div className="flex items-start gap-3">
-                <Calendar size={18} className="mt-0.5 text-[#4F46E5]" />
+                <Calendar size={18} className="mt-0.5 text-[#0066FF]" />
                 <p>
                   Uploads go straight to your profile record — pick a file and it uploads immediately, then press Save changes to publish.
                 </p>

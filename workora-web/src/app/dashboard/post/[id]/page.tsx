@@ -298,7 +298,7 @@ export default function PostDetailPage() {
       <div className="min-h-full w-full bg-white dark:bg-black flex items-center justify-center px-4">
         <div className="w-full max-w-md rounded-3xl bg-zinc-50 p-8 text-center dark:bg-zinc-950">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-900">
-            <WarningCircle size={28} weight="fill" className="text-[#4F46E5]" />
+            <WarningCircle size={28} weight="fill" className="text-[#0066FF]" />
           </div>
           <h1 className="text-2xl font-black text-zinc-950 dark:text-white">{stateCopy.title}</h1>
           <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">{stateCopy.body}</p>

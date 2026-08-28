@@ -23,6 +23,7 @@ import {
 import { SafeMediaThumb } from '@/components/SafeMediaThumb';
 import { APP_CONFIG } from '@/lib/config';
 import { apiFetch } from '@/lib/session';
+import { ScrollReveal } from '@/components/ScrollReveal';
 
 type SurfaceMode = 'search' | 'explore';
 type ViewMode = 'grid' | 'list' | 'map';
@@ -378,7 +379,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
         key={person.id}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="overflow-hidden rounded-2xl bg-white shadow-sm shadow-black/5 dark:bg-zinc-950"
+        className="overflow-hidden rounded-2xl bg-white shadow-sm shadow-black/5 dark:bg-zinc-950 transition-all duration-200 hover:-translate-y-1 hover:shadow-md dark:hover:shadow-black/20"
       >
         <div className="flex items-center justify-between p-4">
           <button
@@ -396,7 +397,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
                 <p className="truncate text-sm font-semibold text-zinc-950 dark:text-white">{person.user_name}</p>
-                {person.is_verified && <SealCheck size={14} weight="fill" className="text-[#4F46E5]" />}
+                {person.is_verified && <SealCheck size={14} weight="fill" className="text-[#0066FF]" />}
               </div>
               <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">{person.trade}</p>
             </div>
@@ -404,7 +405,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
           <button
             onClick={() => compareAction(person)}
             className={`rounded-xl px-3 py-2 text-xs font-semibold ${
-              selected ? 'bg-[#EEF2FF] text-[#4F46E5] dark:bg-[#1B1F3A] dark:text-[#A5B4FC]' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300'
+              selected ? 'bg-blue-50 text-[#0066FF] dark:bg-blue-950 dark:text-[#4D9FFF]' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300'
             }`}
           >
             {selected ? 'Selected' : 'Compare'}
@@ -437,7 +438,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Location cluster</p>
               <h3 className="mt-1 text-lg font-black">{location}</h3>
             </div>
-            <MapPin size={18} className="text-[#4F46E5]" />
+            <MapPin size={18} className="text-[#0066FF]" />
           </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {people.slice(0, 4).map(person => (
@@ -643,14 +644,14 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">
-                <Compass size={14} className="text-[#4F46E5]" />
+                <Compass size={14} className="text-[#0066FF]" />
                 {headerTitle}
               </div>
               <h1 className="mt-1 text-[28px] font-black tracking-tight sm:text-[34px]">
                 {mode === 'explore' ? (
                   <>
                     Explore the{' '}
-                    <span className="bg-gradient-to-r from-[#4F46E5] to-[#7C3AED] bg-clip-text text-transparent">nodes</span>
+                    <span className="bg-[#0066FF] bg-clip-text text-transparent">nodes</span>
                   </>
                 ) : (
                   headerTitle
@@ -737,7 +738,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center rounded-3xl bg-white px-6 py-20 text-center shadow-sm shadow-black/5 dark:bg-zinc-950">
-            <WarningCircle size={40} weight="fill" className="text-[#4F46E5]" />
+            <WarningCircle size={40} weight="fill" className="text-[#0066FF]" />
             <h2 className="mt-4 text-2xl font-black">Search error</h2>
             <p className="mt-2 max-w-md text-sm text-zinc-500 dark:text-zinc-400">{error}</p>
             <button
@@ -756,7 +757,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Search landing</p>
                   <h2 className="mt-1 text-2xl font-black">Search live professionals</h2>
                 </div>
-                <Sparkle size={22} className="text-[#4F46E5]" />
+                <Sparkle size={22} className="text-[#0066FF]" />
               </div>
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 {[
@@ -816,23 +817,23 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
                       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Explore home</p>
                       <h2 className="mt-1 text-2xl font-black">Discover what&apos;s active right now</h2>
                     </div>
-                    <Compass size={24} className="text-[#4F46E5]" />
+                    <Compass size={24} className="text-[#0066FF]" />
                   </div>
                   <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                    <Link href="/dashboard/explore/trending" className="group rounded-2xl bg-zinc-50 p-4 transition-colors hover:bg-[#EEF2FF] dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
-                      <p className="text-sm font-semibold text-zinc-950 group-hover:text-[#4F46E5] dark:text-white dark:group-hover:text-[#A5B4FC]">Trending professionals</p>
+                    <Link href="/dashboard/explore/trending" className="group rounded-2xl bg-zinc-50 p-4 transition-colors hover:bg-blue-50 dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
+                      <p className="text-sm font-semibold text-zinc-950 group-hover:text-[#0066FF] dark:text-white dark:group-hover:text-[#4D9FFF]">Trending professionals</p>
                       <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Top live profiles by trust score</p>
                     </Link>
-                    <Link href="/dashboard/explore/nearby" className="group rounded-2xl bg-zinc-50 p-4 transition-colors hover:bg-[#EEF2FF] dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
-                      <p className="text-sm font-semibold text-zinc-950 group-hover:text-[#4F46E5] dark:text-white dark:group-hover:text-[#A5B4FC]">Nearby professionals</p>
+                    <Link href="/dashboard/explore/nearby" className="group rounded-2xl bg-zinc-50 p-4 transition-colors hover:bg-blue-50 dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
+                      <p className="text-sm font-semibold text-zinc-950 group-hover:text-[#0066FF] dark:text-white dark:group-hover:text-[#4D9FFF]">Nearby professionals</p>
                       <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Filtered by your location</p>
                     </Link>
-                    <Link href="/dashboard/explore/businesses" className="group rounded-2xl bg-zinc-50 p-4 transition-colors hover:bg-[#EEF2FF] dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
-                      <p className="text-sm font-semibold text-zinc-950 group-hover:text-[#4F46E5] dark:text-white dark:group-hover:text-[#A5B4FC]">Featured businesses</p>
+                    <Link href="/dashboard/explore/businesses" className="group rounded-2xl bg-zinc-50 p-4 transition-colors hover:bg-blue-50 dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
+                      <p className="text-sm font-semibold text-zinc-950 group-hover:text-[#0066FF] dark:text-white dark:group-hover:text-[#4D9FFF]">Featured businesses</p>
                       <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Live business profiles</p>
                     </Link>
-                    <Link href="/dashboard/explore/categories/all" className="group rounded-2xl bg-zinc-50 p-4 transition-colors hover:bg-[#EEF2FF] dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
-                      <p className="text-sm font-semibold text-zinc-950 group-hover:text-[#4F46E5] dark:text-white dark:group-hover:text-[#A5B4FC]">Browse by trade</p>
+                    <Link href="/dashboard/explore/categories/all" className="group rounded-2xl bg-zinc-50 p-4 transition-colors hover:bg-blue-50 dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
+                      <p className="text-sm font-semibold text-zinc-950 group-hover:text-[#0066FF] dark:text-white dark:group-hover:text-[#4D9FFF]">Browse by trade</p>
                       <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Every category on the platform</p>
                     </Link>
                   </div>
@@ -840,15 +841,15 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
                 <div className="rounded-3xl bg-white p-6 shadow-sm shadow-black/5 dark:bg-zinc-950">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Collections</p>
                   <div className="mt-4 space-y-3">
-                    <Link href="/dashboard/explore/collections" className="flex items-center justify-between rounded-2xl bg-zinc-50 px-4 py-3 text-sm font-medium transition-colors hover:bg-[#EEF2FF] dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
+                    <Link href="/dashboard/explore/collections" className="flex items-center justify-between rounded-2xl bg-zinc-50 px-4 py-3 text-sm font-medium transition-colors hover:bg-blue-50 dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
                       <span>Browse collections</span>
                       <ArrowRight size={16} />
                     </Link>
-                    <Link href="/dashboard/explore/saved-searches" className="flex items-center justify-between rounded-2xl bg-zinc-50 px-4 py-3 text-sm font-medium transition-colors hover:bg-[#EEF2FF] dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
+                    <Link href="/dashboard/explore/saved-searches" className="flex items-center justify-between rounded-2xl bg-zinc-50 px-4 py-3 text-sm font-medium transition-colors hover:bg-blue-50 dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
                       <span>Saved searches</span>
                       <ArrowRight size={16} />
                     </Link>
-                    <Link href="/dashboard/saved" className="flex items-center justify-between rounded-2xl bg-zinc-50 px-4 py-3 text-sm font-medium transition-colors hover:bg-[#EEF2FF] dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
+                    <Link href="/dashboard/saved" className="flex items-center justify-between rounded-2xl bg-zinc-50 px-4 py-3 text-sm font-medium transition-colors hover:bg-blue-50 dark:bg-zinc-900 dark:hover:bg-[#1B1F3A]">
                       <span>Saved posts</span>
                       <ArrowRight size={16} />
                     </Link>
@@ -865,7 +866,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
                       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Featured businesses</p>
                       <h2 className="mt-1 text-xl font-black">Live business profiles</h2>
                     </div>
-                    <Briefcase size={20} className="text-[#4F46E5]" />
+                    <Briefcase size={20} className="text-[#0066FF]" />
                   </div>
                   <div className="mt-4 grid gap-4 md:grid-cols-2">
                     {featuredBusinesses.length > 0 ? featuredBusinesses.slice(0, 4).map(renderBusinessCard) : (
@@ -970,9 +971,11 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
                     {displayedProfessionals.map(person => renderProfessionalCard(person))}
                   </div>
                 ) : (
+                  <ScrollReveal stagger={0.06} direction="up">
                   <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                     {displayedProfessionals.map(person => renderProfessionalCard(person))}
                   </div>
+                  </ScrollReveal>
                 )}
               </div>
 
@@ -1043,7 +1046,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
                       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Nearby explore</p>
                       <h2 className="mt-1 text-xl font-black">Nearby professionals and content</h2>
                     </div>
-                    <MapPin size={20} className="text-[#4F46E5]" />
+                    <MapPin size={20} className="text-[#0066FF]" />
                   </div>
                   <div className="mt-4 space-y-3">
                     {nearbyGigList.slice(0, 4).map(gig => (
@@ -1070,7 +1073,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Category browse</p>
                     <h2 className="mt-1 text-xl font-black">Browse by trade</h2>
                   </div>
-                  <Briefcase size={20} className="text-[#4F46E5]" />
+                  <Briefcase size={20} className="text-[#0066FF]" />
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {categories.slice(1, 14).map(category => (
@@ -1093,7 +1096,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-400">Recommended for you</p>
                     <h2 className="mt-1 text-xl font-black">Results ranked by trust</h2>
                   </div>
-                  <Heart size={20} className="text-[#4F46E5]" />
+                  <Heart size={20} className="text-[#0066FF]" />
                 </div>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                   {recommendedPros.slice(0, 4).map(renderProfessionalCard)}
@@ -1207,7 +1210,7 @@ export default function DiscoveryPage({ mode }: DiscoveryPageProps) {
                       setShowSortModal(false);
                     }}
                     className={`w-full rounded-2xl px-4 py-3 text-left ${
-                      sort === option.key ? 'bg-[#EEF2FF] text-[#4F46E5] dark:bg-[#1B1F3A] dark:text-[#A5B4FC]' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300'
+                      sort === option.key ? 'bg-blue-50 text-[#0066FF] dark:bg-blue-950 dark:text-[#4D9FFF]' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300'
                     }`}
                   >
                     <p className="text-sm font-semibold">{option.label}</p>

@@ -73,7 +73,7 @@ export default function RootLayout({
         <div className="mesh-glow" />
         {/* Elegant Top Progress Bar */}
         <div className="fixed top-0 left-0 right-0 h-[2px] z-[9999] overflow-hidden">
-          <div className="w-full h-full bg-gradient-to-r from-[#0066FF] via-[#00D1FF] to-[#7000FF] shadow-lg shadow-blue-500/20" />
+          <div className="w-full h-full bg-[#0066FF] shadow-lg shadow-blue-500/20" />
         </div>
         <Suspense fallback={null}>
           <Providers>
