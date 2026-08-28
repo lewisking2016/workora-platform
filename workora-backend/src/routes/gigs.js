@@ -1,6 +1,5 @@
 const { z } = require('zod');
 const { parsePagination } = require('../lib/pagination');
-// const { getCachedFeed, invalidateCache, cachePost, getCachedPost } = require('../lib/cache');
 
 async function gigRoutes(fastify) {
   const { pool } = fastify;
@@ -45,7 +44,6 @@ async function gigRoutes(fastify) {
     })[scope] || '';
 
     try {
-      // Optimized query: replace 5+ correlated subqueries per row with single GROUP BY JOINs
       const res = await pool.query(`
         WITH counts AS (
           SELECT gig_id, COUNT(*)::int AS likes_count, COUNT(*)::int AS real_likes
@@ -158,7 +156,7 @@ async function gigRoutes(fastify) {
     }
   });
 
-  // 2. GET EXPLORE (Trending/Discovery) - DIRECT QUERY (CACHE DISABLED)
+  // 2. GET EXPLORE (Trending/Discovery)
   fastify.get('/explore', async (request, reply) => {
     const { limit, offset } = parsePagination(request.query, { defaultLimit: 30, maxLimit: 60 });
     
@@ -190,7 +188,74 @@ async function gigRoutes(fastify) {
     return res.rows;
   });
 
-  // 3. CREATE GIG
+  // 3. SEARCH GIGS — MUST be before /:id to avoid catch-all conflict
+  fastify.get('/search', async (request, reply) => {
+    const q = String(request.query.q || '').trim();
+    const category = String(request.query.category || '').trim();
+    const location = String(request.query.location || '').trim();
+    const { limit, offset } = parsePagination(request.query, { defaultLimit: 20, maxLimit: 50 });
+
+    if (!q && !category && !location) {
+      return reply.status(400).send({ message: 'At least one search parameter (q, category, location) is required' });
+    }
+
+    let sql = `
+      SELECT
+        g.id, g.worker_id, g.user_id, g.title, g.description, g.category,
+        g.video_url, g.thumbnail_url, g.view_count, g.created_at,
+        COALESCE(wp.full_name, up.full_name, u.username, 'Member') AS user_name,
+        COALESCE(u.username, 'member') AS handle,
+        COALESCE(wp.trade, up.trade, g.category, 'Member') AS trade,
+        COALESCE(wp.is_verified, up.is_verified, false) AS verified,
+        COALESCE(wp.avatar_url, up.avatar_url) AS avatar_url,
+        COALESCE(g.user_id, wp.user_id, up.user_id) AS creator_user_id,
+        COALESCE((SELECT COUNT(*)::int FROM gig_likes WHERE gig_id = g.id), 0) AS likes_count,
+        COALESCE((SELECT COUNT(*)::int FROM gig_comments WHERE gig_id = g.id), 0) AS comments_count
+      FROM gigs g
+      ${gigAuthorJoins}
+      WHERE 1 = 1
+    `;
+    const params = [];
+
+    // Multi-keyword text search across title, description, category, trade
+    if (q) {
+      const tokens = q.split(/[\s,]+/).map(t => t.trim()).filter(Boolean);
+      const tokenClauses = tokens.map(token => {
+        params.push(`%${token}%`);
+        return `(
+          g.title ILIKE $${params.length}
+          OR g.description ILIKE $${params.length}
+          OR g.category ILIKE $${params.length}
+          OR COALESCE(wp.trade, '') ILIKE $${params.length}
+          OR COALESCE(wp.full_name, '') ILIKE $${params.length}
+        )`;
+      });
+      sql += ` AND ${tokenClauses.join(' AND ')}`;
+    }
+
+    if (category && category !== 'All') {
+      params.push(category);
+      sql += ` AND LOWER(g.category) = LOWER($${params.length})`;
+    }
+
+    if (location) {
+      params.push(`%${location}%`);
+      sql += ` AND COALESCE(wp.location, '') ILIKE $${params.length}`;
+    }
+
+    sql += ` ORDER BY g.view_count DESC, g.created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+    params.push(limit, offset);
+
+    try {
+      const res = await pool.query(sql, params);
+      return res.rows;
+    } catch (err) {
+      request.log.error({ err, q }, 'Gig search failed');
+      return reply.status(500).send({ error: 'Search failed' });
+    }
+  });
+
+  // 4. CREATE GIG
   fastify.post('/', { preHandler: fastify.authenticate }, async (request, reply) => {
     const { worker_id, title, description, video_url, thumbnail_url, category } = request.body;
     const actorId = resolveActorId(request);
@@ -203,9 +268,15 @@ async function gigRoutes(fastify) {
     return res.rows[0];
   });
 
-  // 4. GET SINGLE GIG
+  // 5. GET SINGLE GIG
   fastify.get('/:id', async (request, reply) => {
     const { id } = request.params;
+
+    // Validate UUID format to prevent SQL errors
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      return reply.status(400).send({ message: 'Invalid gig ID format' });
+    }
 
     const res = await pool.query(`
       SELECT
@@ -246,7 +317,7 @@ async function gigRoutes(fastify) {
     return res.rows[0];
   });
 
-  // 5. LIKE/UNLIKE GIG
+  // 6. LIKE/UNLIKE GIG
   fastify.post('/:id/like', { preHandler: fastify.authenticate }, async (request, reply) => {
     const { id } = request.params;
     const user_id = resolveActorId(request);
@@ -270,9 +341,7 @@ async function gigRoutes(fastify) {
     }
   });
 
-  // 6. GET COMMENTS
-  // Record a real view — deduped per (gig, session) so refreshes and
-  // single-session bots count once. Only fresh sessions bump view_count.
+  // 7. RECORD VIEW
   fastify.post('/:id/view', async (request, reply) => {
     let userId = null;
     try {
@@ -304,6 +373,7 @@ async function gigRoutes(fastify) {
     return { viewed: true, first_time: false };
   });
 
+  // 8. GET COMMENTS
   fastify.get('/:id/comments', async (request, reply) => {
     const { id } = request.params;
     const res = await pool.query(`
@@ -316,7 +386,7 @@ async function gigRoutes(fastify) {
     return res.rows;
   });
 
-  // 6b. GET LIKES
+  // 9. GET LIKES
   fastify.get('/:id/likes', async (request, reply) => {
     const { id } = request.params;
     const res = await pool.query(`
@@ -336,7 +406,7 @@ async function gigRoutes(fastify) {
     return res.rows;
   });
 
-  // 7. ADD COMMENT
+  // 10. ADD COMMENT
   fastify.post('/:id/comment', { preHandler: fastify.authenticate }, async (request, reply) => {
     const { id } = request.params;
     const { text } = request.body;
@@ -354,7 +424,7 @@ async function gigRoutes(fastify) {
     return res.rows[0];
   });
 
-  // 8. GET STORIES (Recent active users)
+  // 11. GET STORIES (Recent active users)
   fastify.get('/stories', async (request, reply) => {
     const res = await pool.query(`
       SELECT DISTINCT ON (COALESCE(g.user_id, wp.user_id, up.user_id)) 
@@ -378,7 +448,7 @@ async function gigRoutes(fastify) {
     return res.rows;
   });
 
-  // 9. GET WORKER GIGS
+  // 12. GET WORKER GIGS
   fastify.get('/worker/:workerId', async (request, reply) => {
     const { workerId } = request.params;
     const res = await pool.query(`
@@ -387,7 +457,7 @@ async function gigRoutes(fastify) {
     return res.rows;
   });
 
-  // 10. SAVED GIGS
+  // 13. SAVED GIGS
   fastify.get('/saved/:userId', { preHandler: fastify.authenticate }, async (request, reply) => {
     const { userId } = request.params;
     if (request.user?.id && request.user.id !== userId) {
@@ -418,7 +488,7 @@ async function gigRoutes(fastify) {
     return res.rows;
   });
 
-  // 11. TOGGLE SAVE
+  // 14. TOGGLE SAVE
   fastify.post('/:id/save', { preHandler: fastify.authenticate }, async (request, reply) => {
     const { id } = request.params;
     const userId = resolveActorId(request);
@@ -442,7 +512,7 @@ async function gigRoutes(fastify) {
     return { saved: true };
   });
 
-  // 12. HIDE POST
+  // 15. HIDE POST
   fastify.post('/:id/hide', { preHandler: fastify.authenticate }, async (request, reply) => {
     const { id } = request.params;
     const userId = resolveActorId(request);
@@ -461,7 +531,7 @@ async function gigRoutes(fastify) {
     return { hidden: true };
   });
 
-  // 13. REPORT POST
+  // 16. REPORT POST
   fastify.post('/:id/report', { preHandler: fastify.authenticate }, async (request, reply) => {
     const { id } = request.params;
     const userId = resolveActorId(request);
