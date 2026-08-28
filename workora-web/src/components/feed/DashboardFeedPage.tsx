@@ -32,6 +32,7 @@ import {
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { apiFetch, fetchCurrentUser } from '@/lib/session';
 import { APP_CONFIG } from '@/lib/config';
+import { useToast } from '@/components/Toast';
 
 type FeedScope = 'new' | 'following' | 'recommended' | 'trending' | 'nearby' | 'reels';
 
@@ -176,6 +177,7 @@ export default function DashboardFeedPage() {
   const [reportReason, setReportReason] = useState(REPORT_REASONS[0].key);
   const [reportDetails, setReportDetails] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const syncScope = (nextScope: FeedScope) => {
     setScope(nextScope);
@@ -323,8 +325,10 @@ export default function DashboardFeedPage() {
         liked_by_me: data.liked,
         likes_count: data.liked ? post.likes_count + 1 : Math.max(0, post.likes_count - 1),
       }));
+      toast(data.liked ? 'Liked' : 'Unliked');
     } catch (error) {
       console.error(error);
+      toast('Could not like this post', 'error');
     } finally {
       setBusyId(null);
     }
@@ -337,8 +341,10 @@ export default function DashboardFeedPage() {
       const res = await apiFetch(`/api/gigs/${post.id}/save`, { method: 'POST' });
       const data = await res.json();
       updatePost(post.id, item => ({ ...item, saved_by_me: data.saved }));
+      toast(data.saved ? 'Saved to library' : 'Removed from library');
     } catch (error) {
       console.error(error);
+      toast('Could not save this post', 'error');
     } finally {
       setBusyId(null);
     }
@@ -385,8 +391,10 @@ export default function DashboardFeedPage() {
 
       setCommentValue('');
       setReplyTo(null);
+      toast('Comment posted');
     } catch (error) {
       console.error(error);
+      toast('Could not post comment', 'error');
     } finally {
       setBusyId(null);
     }
@@ -399,8 +407,10 @@ export default function DashboardFeedPage() {
       const res = await apiFetch(`/api/profile/follow/${post.creator_user_id || post.user_id}`, { method: 'POST' });
       const data = await res.json();
       updatePost(post.id, item => ({ ...item, following_by_me: data.following }));
+      toast(data.following ? 'Following' : 'Unfollowed');
     } catch (error) {
       console.error(error);
+      toast('Could not follow creator', 'error');
     } finally {
       setBusyId(null);
     }
@@ -465,8 +475,10 @@ export default function DashboardFeedPage() {
       setMenuPost(null);
       setReportDetails('');
       setReportReason(REPORT_REASONS[0].key);
+      toast('Report submitted — thank you');
     } catch (error) {
       console.error(error);
+      toast('Could not submit report', 'error');
     } finally {
       setBusyId(null);
     }

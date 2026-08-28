@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { PaperPlaneTilt, MagnifyingGlass, Check, Checks, ArrowLeft, PushPin, CalendarBlank, BellSlash } from '@phosphor-icons/react';
 import { useSearchParams } from 'next/navigation';
 import { fetchCurrentUser, apiFetch } from '@/lib/session';
+import { useToast } from '@/components/Toast';
 
 interface Conversation {
   id: string;
@@ -35,6 +36,7 @@ export default function MessagesPage() {
   const [userId, setUserId] = useState('');
   const [username, setUsername] = useState('');
   const [search, setSearch] = useState('');
+  const { toast } = useToast();
   const searchParams = useSearchParams();
   const initialConversationId = searchParams.get('conversation');
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -113,7 +115,10 @@ export default function MessagesPage() {
       setNewMsg('');
       fetchConversations(userId);
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+      toast('Could not send message', 'error');
+    }
   };
 
   // Merge a fresh server snapshot into local messages without duplicating ids.

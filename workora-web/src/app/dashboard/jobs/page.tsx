@@ -17,6 +17,7 @@ import {
   MagnifyingGlass
 } from '@phosphor-icons/react';
 import { apiFetch, fetchCurrentUser } from '@/lib/session';
+import { useToast } from '@/components/Toast';
 
 interface Job {
   id: string;
@@ -46,6 +47,7 @@ export default function BrowseJobsPage() {
   const [applyMessage, setApplyMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [justApplied, setJustApplied] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const fetchJobs = async () => {
     try {
@@ -103,9 +105,13 @@ export default function BrowseJobsPage() {
         setApplying(null);
         setApplyMessage('');
         fetchJobs();
+        toast('Application submitted');
+      } else {
+        toast('Could not submit application', 'error');
       }
     } catch (e) {
       console.error('Apply failed', e);
+      toast('Network error — try again', 'error');
     } finally {
       setSubmitting(false);
     }
