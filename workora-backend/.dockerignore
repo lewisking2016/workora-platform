@@ -6,3 +6,6 @@ npm-debug.log
 *.log
 test
 .DS_Store
+
+# Demo videos - downloaded at build time or mounted
+demo-videos/

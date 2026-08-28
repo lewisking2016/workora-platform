@@ -1,13 +1,20 @@
 /**
- * Migration: Update all gig video_url and thumbnail_url to use the new
- * /demo/videos/ proxy route. This ensures demo videos work from both the
- * web app (via Vercel) and the backend API (for mobile app / investor demos).
+ * Migration: Update all gig video_url and thumbnail_url to use absolute URLs
+ * pointing to the web app's public folder (where the demo videos already exist).
+ *
+ * This ensures demo videos work from:
+ * - Web app (Vercel) — already served from public/videos/
+ * - Mobile app — absolute URLs work without proxy
+ * - Backend API — absolute URLs bypass backend entirely
  *
  * Usage: node update-demo-video-urls.js
  * Requires DATABASE_URL in environment or .env file.
+ * Set WEB_APP_URL to override (default: https://workora.imeantech.com).
  */
 require('dotenv').config();
 const { Pool } = require('pg');
+
+const WEB_APP_URL = process.env.WEB_APP_URL || 'https://workora.imeantech.com';
 
 const CATEGORY_VIDEO_MAP = {
   plumbing: ['plumbing1.mp4', 'plumbing2.mp4', 'plumbing3.mp4', 'plumbing5.mp4'],
@@ -48,6 +55,7 @@ async function main() {
   try {
     const { rows } = await pool.query('SELECT id, category, video_url FROM gigs');
     console.log(`Found ${rows.length} gigs to update`);
+    console.log(`Using web app URL: ${WEB_APP_URL}`);
 
     let updated = 0;
     let skipped = 0;
@@ -61,15 +69,17 @@ async function main() {
       const video = videos[idx];
       const thumb = thumbs[idx % thumbs.length];
 
-      const newVideoUrl = `/demo/videos/${encodeFilename(video)}`;
-      const newThumbUrl = `/demo/videos/${encodeFilename(thumb)}`;
+      // Build absolute URLs pointing to the web app's public folder
+      const newVideoUrl = `${WEB_APP_URL}/videos/${encodeFilename(video)}`;
+      const newThumbUrl = `${WEB_APP_URL}/thumbnails/${encodeFilename(thumb)}`;
 
-      // Only update if this is a demo gig (no real R2 URL)
+      // Skip gigs that already have real external URLs (Pexels, Pixabay, R2, etc.)
       const isRealUrl = gig.video_url && (
         gig.video_url.includes('r2.cloudflarestorage.com') ||
         gig.video_url.includes('videos.pexels.com') ||
         gig.video_url.includes('pixabay.com') ||
-        gig.video_url.includes('unsplash.com')
+        gig.video_url.includes('unsplash.com') ||
+        gig.video_url.includes('cdn.') 
       );
 
       if (isRealUrl) {
@@ -85,6 +95,11 @@ async function main() {
     }
 
     console.log(`\nDone! Updated ${updated} gigs, skipped ${skipped} (real URLs preserved)`);
+    console.log(`\nSample URLs:`);
+    if (updated > 0) {
+      const sample = await pool.query('SELECT video_url, thumbnail_url FROM gigs LIMIT 3');
+      sample.rows.forEach(r => console.log(`  video: ${r.video_url}`));
+    }
   } catch (err) {
     console.error('Migration failed:', err.message);
     process.exit(1);
