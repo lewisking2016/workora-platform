@@ -13,6 +13,7 @@
  */
 require('dotenv').config();
 const { Pool } = require('pg');
+const cleanEnv = (val) => val ? val.replace(/^["'](.+)["']$/, '$1') : val;
 
 const WEB_APP_URL = process.env.WEB_APP_URL || 'https://workora.imeantech.com';
 
@@ -48,7 +49,7 @@ function encodeFilename(name) {
 
 async function main() {
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: cleanEnv(process.env.DATABASE_URL),
     ssl: { rejectUnauthorized: false },
   });
 
