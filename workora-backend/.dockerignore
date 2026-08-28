@@ -5,7 +5,13 @@ npm-debug.log
 .env.*
 *.log
 test
+*.test.js
 .DS_Store
 
-# Demo videos - downloaded at build time or mounted
+# Seed/maintenance scripts - not needed in production
+seed_realistic_data.js
+fix_demo_videos.js
+update-demo-video-urls.js
+
+# Demo videos - too large for Docker image
 demo-videos/

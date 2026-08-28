@@ -47,6 +47,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'ui-avatars.com',
       },
+      {
+        protocol: 'https',
+        hostname: '**.r2.dev',
+      },
     ],
   },
   outputFileTracingRoot: process.env.VERCEL 
