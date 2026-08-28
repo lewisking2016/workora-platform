@@ -3,15 +3,15 @@ const path = require('path');
 
 /**
  * Demo video proxy route — serves local demo videos from /demo/videos/:filename.
- * Used for investor demos and presentation mode so that video URLs work from
- * both the web app and the backend / mobile app without depending on Vercel's
- * public/ folder.
+ * Falls back gracefully if the demo-videos/ directory is not present
+ * (excluded from Docker build via .dockerignore).
+ *
+ * For production, use absolute URLs to the web app's public/ folder instead.
  */
 async function demoVideoRoutes(fastify) {
-  // Ensure the demo directory exists
   const demoDir = path.join(__dirname, '..', '..', 'demo-videos');
+  const hasDemoDir = fs.existsSync(demoDir);
 
-  // Map of category keywords to demo video files
   const CATEGORY_VIDEO_MAP = {
     plumbing: ['plumbing1.mp4', 'plumbing2.mp4', 'plumbing3.mp4', 'plumbing5.mp4'],
     electrician: ['electrical1.mp4', 'electrical2.mp4', 'electrical3.mp4', 'electrical4.mp4', 'electrical5.mp4'],
@@ -20,7 +20,7 @@ async function demoVideoRoutes(fastify) {
     mason: ['construction.mp4', 'construction2.mp4', 'construction%203.mp4'],
   };
 
-  const DEMO_THUMBNAIL_MAP = {
+  const CATEGORY_THUMB_MAP = {
     plumbing: ['plumbing1.jpg', 'plumbing2.jpg', 'plumbing3.jpg', 'plumbing5.jpg'],
     electrician: ['electrical1.jpg', 'electrical2.jpg', 'electrical3.jpg', 'electrical4.jpg', 'electrical5.jpg'],
     electrical: ['electrical1.jpg', 'electrical2.jpg', 'electrical3.jpg', 'electrical4.jpg', 'electrical5.jpg'],
@@ -28,13 +28,16 @@ async function demoVideoRoutes(fastify) {
     mason: ['construction.jpg', 'construction2.jpg', 'construction%203.jpg'],
   };
 
-  // GET /demo/videos/:filename — serve a specific demo video file
+  // GET /demo/videos/:filename
   fastify.get('/videos/:filename', async (request, reply) => {
+    if (!hasDemoDir) {
+      return reply.status(404).send({ error: 'Demo videos not available on this server' });
+    }
+
     const { filename } = request.params;
     const decoded = decodeURIComponent(filename);
     const filePath = path.join(demoDir, decoded);
 
-    // Security: prevent directory traversal
     if (!filePath.startsWith(demoDir)) {
       return reply.status(403).send({ error: 'Forbidden' });
     }
@@ -54,18 +57,15 @@ async function demoVideoRoutes(fastify) {
     };
     const contentType = mimeTypes[ext] || 'application/octet-stream';
 
-    // Support Range requests for video seeking
     const range = request.headers.range;
     if (range) {
       const parts = range.replace(/bytes=/, '').split('-');
       const start = parseInt(parts[0], 10);
-      const end = parts[1] ? parseInt(parts[1], 10) : Math.min(start + 10 * 1024 * 1024 - 1, stat.size - 1); // 10MB chunks
-      const chunkSize = end - start + 1;
-
+      const end = parts[1] ? parseInt(parts[1], 10) : Math.min(start + 10 * 1024 * 1024 - 1, stat.size - 1);
       const stream = fs.createReadStream(filePath, { start, end });
       reply.code(206).header('Content-Range', `bytes ${start}-${end}/${stat.size}`);
       reply.header('Accept-Ranges', 'bytes');
-      reply.header('Content-Length', chunkSize);
+      reply.header('Content-Length', end - start + 1);
       reply.header('Content-Type', contentType);
       reply.header('Cache-Control', 'public, max-age=86400');
       return reply.send(stream);
@@ -78,8 +78,7 @@ async function demoVideoRoutes(fastify) {
     return reply.send(fs.createReadStream(filePath));
   });
 
-  // GET /demo/video-for-gig — returns a deterministic demo video URL for a gig ID
-  // Used by the migration script and frontend
+  // GET /demo/video-for-gig — deterministic mapping
   fastify.get('/video-for-gig', async (request, reply) => {
     const gigId = String(request.query.gig_id || '');
     const category = String(request.query.category || 'construction').toLowerCase();
@@ -88,7 +87,6 @@ async function demoVideoRoutes(fastify) {
       return reply.status(400).send({ error: 'gig_id is required' });
     }
 
-    // Deterministic hash for consistent mapping
     let hash = 0;
     for (let i = 0; i < gigId.length; i++) {
       hash = ((hash << 5) - hash + gigId.charCodeAt(i)) | 0;
@@ -97,24 +95,25 @@ async function demoVideoRoutes(fastify) {
 
     const videos = CATEGORY_VIDEO_MAP[category] || CATEGORY_VIDEO_MAP.construction;
     const video = videos[idx % videos.length];
-    const thumbnails = DEMO_THUMBNAIL_MAP[category] || DEMO_THUMBNAIL_MAP.construction;
-    const thumbnail = thumbnails[idx % thumbnails.length];
+    const thumbs = CATEGORY_THUMB_MAP[category] || CATEGORY_THUMB_MAP.construction;
+    const thumb = thumbs[idx % thumbs.length];
 
     return {
       video_url: `/demo/videos/${video}`,
-      thumbnail_url: `/demo/videos/${thumbnail}`,
+      thumbnail_url: `/demo/videos/${thumb}`,
     };
   });
 
-  // GET /demo/health — check if demo video files exist
-  fastify.get('/health', async () => {
-    const exists = fs.existsSync(demoDir);
-    let fileCount = 0;
-    if (exists) {
-      fileCount = fs.readdirSync(demoDir).filter(f => f.endsWith('.mp4')).length;
-    }
-    return { demoVideosReady: exists, videoFileCount: fileCount };
-  });
+  // GET /demo/health
+  fastify.get('/health', async () => ({
+    demoVideosReady: hasDemoDir,
+    videoFileCount: hasDemoDir
+      ? fs.readdirSync(demoDir).filter(f => f.endsWith('.mp4')).length
+      : 0,
+    note: hasDemoDir
+      ? 'Serving demo videos from local filesystem'
+      : 'Demo videos not bundled — use absolute URLs to web app public/ folder',
+  }));
 }
 
 module.exports = demoVideoRoutes;
